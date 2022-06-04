@@ -1,0 +1,5 @@
+nanoid
+numpy
+svgwrite
+scipy
+bs4
