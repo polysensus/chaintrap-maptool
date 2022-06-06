@@ -1,0 +1,29 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: map generate",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/maptool/__debug__.py",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            },
+            "args": [
+                "gen",
+                "--svgfile",
+                "${workspaceFolder}/x.svg",
+                "--loadfile",
+                "${workspaceFolder}/map.json",
+                "--savefile",
+                "${workspaceFolder}/x.json",
+                "--debug"
+            ],
+            "justMyCode": true
+        }
+    ]
+}

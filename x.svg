@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xlink="http://www.w3.org/1999/xlink" baseProfile="full" height="100%" version="1.1" width="100%">
+  <defs>
+    <marker id="id1" markerHeight="5" markerWidth="5" refX="0" refY="0" viewBox="-5,-5,10,10">
+      <circle cx="0" cy="0" fill="red" fill-opacity="0.5" r="5"/>
+    </marker>
+    <marker id="id3" markerHeight="6" markerWidth="6" refX="3" refY="3">
+      <circle cx="3" cy="3" fill="green" fill-opacity="0.7" r="3"/>
+    </marker>
+    <marker id="id2" markerHeight="5" markerWidth="5" viewBox="-1,-1,2,2">
+      <circle cx="0" cy="0" fill="blue" fill-opacity="0.5" r="1"/>
+    </marker>
+  </defs>
+  <g fill="blue" id="arena">
+    <circle cx="493.04850017747117" cy="365.69565683623864" fill="none" fill-opacity="1.0" r="81.92" stroke="blue" stroke-opacity="0.2" stroke-width="1"/>
+    <line fill="black" opacity="1.0" stroke="blue" stroke-width="1" x1="182.500969978141" x2="182.500969978141" y1="173.1454478030417" y2="538.8411046392803"/>
+    <line fill="black" opacity="0.08333333333333333" stroke="blue" stroke-width="1" x1="223.58834499293025" x2="223.58834499293025" y1="173.1454478030417" y2="538.8411046392803"/>
+    <line fill="black" opacity="0.16666666666666666" stroke="blue" stroke-width="1" x1="264.6757200077195" x2="264.6757200077195" y1="173.1454478030417" y2="538.8411046392803"/>
+    <line fill="black" opacity="0.25" stroke="blue" stroke-width="1" x1="305.76309502250876" x2="305.76309502250876" y1="173.1454478030417" y2="538.8411046392803"/>
+    <line fill="black" opacity="0.3333333333333333" stroke="blue" stroke-width="1" x1="346.850470037298" x2="346.850470037298" y1="173.1454478030417" y2="538.8411046392803"/>
+    <line fill="black" opacity="0.41666666666666663" stroke="blue" stroke-width="1" x1="387.9378450520872" x2="387.9378450520872" y1="173.1454478030417" y2="538.8411046392803"/>
+    <line fill="black" opacity="0.49999999999999994" stroke="blue" stroke-width="1" x1="429.0252200668765" x2="429.0252200668765" y1="173.1454478030417" y2="538.8411046392803"/>
+    <line fill="black" opacity="0.5833333333333333" stroke="blue" stroke-width="1" x1="470.1125950816658" x2="470.1125950816658" y1="173.1454478030417" y2="538.8411046392803"/>
+    <line fill="black" opacity="0.6666666666666666" stroke="blue" stroke-width="1" x1="511.199970096455" x2="511.199970096455" y1="173.1454478030417" y2="538.8411046392803"/>
+    <line fill="black" opacity="0.75" stroke="blue" stroke-width="1" x1="552.2873451112443" x2="552.2873451112443" y1="173.1454478030417" y2="538.8411046392803"/>
+    <line fill="black" opacity="0.8333333333333334" stroke="blue" stroke-width="1" x1="593.3747201260335" x2="593.3747201260335" y1="173.1454478030417" y2="538.8411046392803"/>
+    <line fill="black" opacity="0.9166666666666667" stroke="blue" stroke-width="1" x1="634.4620951408228" x2="634.4620951408228" y1="173.1454478030417" y2="538.8411046392803"/>
+    <line fill="black" opacity="1.0" stroke="blue" stroke-width="1" x1="675.5494701556121" x2="675.5494701556121" y1="173.1454478030417" y2="538.8411046392803"/>
+    <line fill="black" opacity="1.0" stroke="blue" stroke-width="1" x1="182.500969978141" x2="675.5494701556122" y1="173.1454478030417" y2="173.1454478030417"/>
+    <line fill="black" opacity="0.08333333333333333" stroke="blue" stroke-width="1" x1="182.500969978141" x2="675.5494701556122" y1="203.62008587272823" y2="203.62008587272823"/>
+    <line fill="black" opacity="0.16666666666666666" stroke="blue" stroke-width="1" x1="182.500969978141" x2="675.5494701556122" y1="234.0947239424148" y2="234.0947239424148"/>
+    <line fill="black" opacity="0.25" stroke="blue" stroke-width="1" x1="182.500969978141" x2="675.5494701556122" y1="264.56936201210135" y2="264.56936201210135"/>
+    <line fill="black" opacity="0.3333333333333333" stroke="blue" stroke-width="1" x1="182.500969978141" x2="675.5494701556122" y1="295.0440000817879" y2="295.0440000817879"/>
+    <line fill="black" opacity="0.41666666666666663" stroke="blue" stroke-width="1" x1="182.500969978141" x2="675.5494701556122" y1="325.5186381514745" y2="325.5186381514745"/>
+    <line fill="black" opacity="0.49999999999999994" stroke="blue" stroke-width="1" x1="182.500969978141" x2="675.5494701556122" y1="355.993276221161" y2="355.993276221161"/>
+    <line fill="black" opacity="0.5833333333333333" stroke="blue" stroke-width="1" x1="182.500969978141" x2="675.5494701556122" y1="386.46791429084755" y2="386.46791429084755"/>
+    <line fill="black" opacity="0.6666666666666666" stroke="blue" stroke-width="1" x1="182.500969978141" x2="675.5494701556122" y1="416.94255236053414" y2="416.94255236053414"/>
+    <line fill="black" opacity="0.75" stroke="blue" stroke-width="1" x1="182.500969978141" x2="675.5494701556122" y1="447.41719043022067" y2="447.41719043022067"/>
+    <line fill="black" opacity="0.8333333333333334" stroke="blue" stroke-width="1" x1="182.500969978141" x2="675.5494701556122" y1="477.8918284999072" y2="477.8918284999072"/>
+    <line fill="black" opacity="0.9166666666666667" stroke="blue" stroke-width="1" x1="182.500969978141" x2="675.5494701556122" y1="508.3664665695938" y2="508.3664665695938"/>
+    <line fill="black" opacity="1.0" stroke="blue" stroke-width="1" x1="182.500969978141" x2="675.5494701556122" y1="538.8411046392803" y2="538.8411046392803"/>
+    <polygon fill="none" opacity="0.1" points="345.4802535372488,416.3540341058696 491.0669743159316,515.2411046392803 215.70096997814102,348.78491138143676" stroke="grey" stroke-width="1"/>
+    <polygon fill="none" opacity="0.1" points="550.2093257581349,214.8024383459903 350.36668327193803,298.46896078568045 215.70096997814102,348.78491138143676" stroke="grey" stroke-width="1"/>
+    <polygon fill="none" opacity="0.1" points="350.36668327193803,298.46896078568045 550.2093257581349,214.8024383459903 447.58410906736987,281.9733207212099" stroke="grey" stroke-width="1"/>
+    <polygon fill="none" opacity="0.1" points="542.4596712948085,454.9599638249373 569.761824356463,383.1288443059817 618.8393002482318,278.70696100380655" stroke="grey" stroke-width="1"/>
+    <polygon fill="none" opacity="0.1" points="569.761824356463,383.1288443059817 502.6289228157669,336.1667531505905 618.8393002482318,278.70696100380655" stroke="grey" stroke-width="1"/>
+    <polygon fill="none" opacity="0.1" points="502.6289228157669,336.1667531505905 550.2093257581349,214.8024383459903 618.8393002482318,278.70696100380655" stroke="grey" stroke-width="1"/>
+    <polygon fill="none" opacity="0.1" points="550.2093257581349,214.8024383459903 502.6289228157669,336.1667531505905 447.58410906736987,281.9733207212099" stroke="grey" stroke-width="1"/>
+    <polygon fill="none" opacity="0.1" points="542.4596712948085,454.9599638249373 502.6289228157669,336.1667531505905 569.761824356463,383.1288443059817" stroke="grey" stroke-width="1"/>
+    <polygon fill="none" opacity="0.1" points="300.2134378315368,354.2505556807131 345.4802535372488,416.3540341058696 215.70096997814102,348.78491138143676" stroke="grey" stroke-width="1"/>
+    <polygon fill="none" opacity="0.1" points="350.36668327193803,298.46896078568045 300.2134378315368,354.2505556807131 215.70096997814102,348.78491138143676" stroke="grey" stroke-width="1"/>
+    <polygon fill="none" opacity="0.1" points="300.2134378315368,354.2505556807131 350.36668327193803,298.46896078568045 345.4802535372488,416.3540341058696" stroke="grey" stroke-width="1"/>
+    <polygon fill="none" opacity="0.1" points="426.50716538415315,433.69092805864307 502.6289228157669,336.1667531505905 542.4596712948085,454.9599638249373" stroke="grey" stroke-width="1"/>
+    <polygon fill="none" opacity="0.1" points="345.4802535372488,416.3540341058696 426.50716538415315,433.69092805864307 491.0669743159316,515.2411046392803" stroke="grey" stroke-width="1"/>
+    <polygon fill="none" opacity="0.1" points="426.50716538415315,433.69092805864307 542.4596712948085,454.9599638249373 491.0669743159316,515.2411046392803" stroke="grey" stroke-width="1"/>
+    <polygon fill="none" opacity="0.1" points="502.6289228157669,336.1667531505905 426.50716538415315,433.69092805864307 447.58410906736987,281.9733207212099" stroke="grey" stroke-width="1"/>
+    <polygon fill="none" opacity="0.1" points="426.50716538415315,433.69092805864307 350.36668327193803,298.46896078568045 447.58410906736987,281.9733207212099" stroke="grey" stroke-width="1"/>
+    <polygon fill="none" opacity="0.1" points="350.36668327193803,298.46896078568045 426.50716538415315,433.69092805864307 345.4802535372488,416.3540341058696" stroke="grey" stroke-width="1"/>
+    <rect fill="red" height="39.04" stroke="black" stroke-width="3" width="73.28" x="308.8402535372488" y="396.8340341058696"/>
+    <rect fill="red" height="39.68" stroke="black" stroke-width="3" width="53.28" x="323.72668327193804" y="278.6289607856804"/>
+    <rect fill="red" height="55.84" stroke="black" stroke-width="3" width="33.12" x="283.6534378315368" y="326.3305556807131"/>
+    <rect fill="blue" height="43.2" stroke="black" stroke-width="3" width="23.36" x="272.7042216459569" y="250.2574198478371"/>
+    <rect fill="blue" height="37.28" stroke="black" stroke-width="3" width="28.64" x="324.8165352511844" y="173.1454478030417"/>
+    <rect fill="red" height="28.32" stroke="black" stroke-width="3" width="61.76" x="471.7489228157669" y="322.00675315059055"/>
+    <rect fill="red" height="72.32000000000001" stroke="black" stroke-width="3" width="26.080000000000002" x="529.4196712948085" y="418.7999638249373"/>
+    <rect fill="blue" height="24.96" stroke="black" stroke-width="3" width="44.32" x="382.85631587608964" y="212.67663998544856"/>
+    <rect fill="red" height="52.800000000000004" stroke="black" stroke-width="3" width="29.76" x="554.881824356463" y="356.7288443059817"/>
+    <rect fill="red" height="72.8" stroke="black" stroke-width="3" width="28.64" x="535.8893257581349" y="178.4024383459903"/>
+    <rect fill="blue" height="39.84" stroke="black" stroke-width="3" width="37.76" x="637.7894701556122" y="336.18272800470424"/>
+    <rect fill="red" height="47.2" stroke="black" stroke-width="3" width="33.92" x="474.1069743159316" y="491.64110463928023"/>
+    <rect fill="red" height="30.88" stroke="black" stroke-width="3" width="66.4" x="182.500969978141" y="333.34491138143676"/>
+    <rect fill="red" height="31.04" stroke="black" stroke-width="3" width="63.68" x="586.9993002482317" y="263.1869610038066"/>
+    <rect fill="red" height="57.76" stroke="black" stroke-width="3" width="39.84" x="406.58716538415314" y="404.81092805864307"/>
+    <rect fill="red" height="65.12" stroke="black" stroke-width="3" width="24.0" x="435.58410906736987" y="249.41332072120989"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="345.4802535372488" x2="345.4802535372488" y1="435.8740341058696" y2="515.2411046392803"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="345.4802535372488" x2="474.1069743159316" y1="515.2411046392803" y2="515.2411046392803"/>
+    <circle cx="345.4802535372488" cy="435.8740341058696" fill="green" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <circle cx="474.1069743159316" cy="515.2411046392803" fill="yellow" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="316.7734378315368" x2="350.36668327193803" y1="354.2505556807131" y2="354.2505556807131"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="350.36668327193803" x2="350.36668327193803" y1="354.2505556807131" y2="318.3089607856804"/>
+    <circle cx="316.7734378315368" cy="354.2505556807131" fill="green" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <circle cx="350.36668327193803" cy="318.3089607856804" fill="yellow" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="377.006683271938" x2="435.58410906736987" y1="283.86114075344517" y2="283.86114075344517"/>
+    <circle cx="377.006683271938" cy="283.86114075344517" fill="green" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <circle cx="435.58410906736987" cy="283.86114075344517" fill="yellow" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="300.2134378315368" x2="300.2134378315368" y1="382.1705556807131" y2="416.3540341058696"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="300.2134378315368" x2="308.8402535372488" y1="416.3540341058696" y2="416.3540341058696"/>
+    <circle cx="300.2134378315368" cy="382.1705556807131" fill="green" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <circle cx="308.8402535372488" cy="416.3540341058696" fill="yellow" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="283.6534378315368" x2="248.900969978141" y1="345.27773353107494" y2="345.27773353107494"/>
+    <circle cx="283.6534378315368" cy="345.27773353107494" fill="green" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <circle cx="248.900969978141" cy="345.27773353107494" fill="yellow" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="533.5089228157668" x2="618.8393002482318" y1="336.1667531505905" y2="336.1667531505905"/>
+    <circle cx="533.5089228157668" cy="336.1667531505905" fill="green" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <circle cx="618.8393002482318" cy="336.1667531505905" fill="yellow" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="446.4271653841531" x2="502.6289228157669" y1="433.69092805864307" y2="433.69092805864307"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="502.6289228157669" x2="502.6289228157669" y1="433.69092805864307" y2="350.32675315059055"/>
+    <circle cx="446.4271653841531" cy="433.69092805864307" fill="green" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <circle cx="502.6289228157669" cy="350.32675315059055" fill="yellow" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="447.58410906736987" x2="447.58410906736987" y1="314.5333207212099" y2="336.1667531505905"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="447.58410906736987" x2="471.7489228157669" y1="336.1667531505905" y2="336.1667531505905"/>
+    <circle cx="447.58410906736987" cy="314.5333207212099" fill="green" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <circle cx="471.7489228157669" cy="336.1667531505905" fill="yellow" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="555.4996712948085" x2="569.761824356463" y1="454.9599638249373" y2="454.9599638249373"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="569.761824356463" x2="569.761824356463" y1="454.9599638249373" y2="409.5288443059817"/>
+    <circle cx="555.4996712948085" cy="454.9599638249373" fill="green" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <circle cx="569.761824356463" cy="409.5288443059817" fill="yellow" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="508.02697431593157" x2="542.4596712948085" y1="515.2411046392803" y2="515.2411046392803"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="542.4596712948085" x2="542.4596712948085" y1="515.2411046392803" y2="491.1199638249373"/>
+    <circle cx="508.02697431593157" cy="515.2411046392803" fill="green" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <circle cx="542.4596712948085" cy="491.1199638249373" fill="yellow" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="533.5089228157668" x2="569.761824356463" y1="336.1667531505905" y2="336.1667531505905"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="569.761824356463" x2="569.761824356463" y1="336.1667531505905" y2="356.7288443059817"/>
+    <circle cx="533.5089228157668" cy="336.1667531505905" fill="green" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <circle cx="569.761824356463" cy="356.7288443059817" fill="yellow" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="584.641824356463" x2="618.8393002482318" y1="383.1288443059817" y2="383.1288443059817"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="618.8393002482318" x2="618.8393002482318" y1="383.1288443059817" y2="336.1667531505905"/>
+    <circle cx="584.641824356463" cy="383.1288443059817" fill="green" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <circle cx="618.8393002482318" cy="336.1667531505905" fill="yellow" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="550.2093257581349" x2="550.2093257581349" y1="251.20243834599032" y2="278.70696100380655"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="550.2093257581349" x2="586.9993002482317" y1="278.70696100380655" y2="278.70696100380655"/>
+    <circle cx="550.2093257581349" cy="251.20243834599032" fill="green" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <circle cx="586.9993002482317" cy="278.70696100380655" fill="yellow" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="406.58716538415314" x2="382.1202535372488" y1="420.34248108225637" y2="420.34248108225637"/>
+    <circle cx="406.58716538415314" cy="420.34248108225637" fill="green" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <circle cx="382.1202535372488" cy="420.34248108225637" fill="yellow" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="296.06422164595693" x2="323.72668327193804" y1="286.0431903167588" y2="286.0431903167588"/>
+    <circle cx="296.06422164595693" cy="286.0431903167588" fill="green" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <circle cx="323.72668327193804" cy="286.0431903167588" fill="yellow" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="338.59160926156125" x2="338.59160926156125" y1="210.4254478030417" y2="278.6289607856804"/>
+    <circle cx="338.59160926156125" cy="210.4254478030417" fill="green" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <circle cx="338.59160926156125" cy="278.6289607856804" fill="yellow" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="427.17631587608963" x2="447.58410906736987" y1="225.15663998544858" y2="225.15663998544858"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="447.58410906736987" x2="447.58410906736987" y1="225.15663998544858" y2="249.41332072120989"/>
+    <circle cx="427.17631587608963" cy="225.15663998544858" fill="green" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <circle cx="447.58410906736987" cy="249.41332072120989" fill="yellow" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="644.234385201922" x2="644.234385201922" y1="336.18272800470424" y2="294.2269610038066"/>
+    <circle cx="644.234385201922" cy="336.18272800470424" fill="green" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <circle cx="644.234385201922" cy="294.2269610038066" fill="yellow" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="618.8393002482318" x2="618.8393002482318" y1="336.1667531505905" y2="294.2269610038066"/>
+    <circle cx="618.8393002482318" cy="336.1667531505905" fill="green" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <circle cx="618.8393002482318" cy="294.2269610038066" fill="yellow" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <circle cx="345.4802535372488" cy="416.3540341058696" fill="yellow" fill-opacity="1.0" r="12.0" stroke="black" stroke-width="1"/>
+    <text x="341.4802535372488" y="421.1540341058696">
+      <tspan fill="black" font-family="monospace" font-size="15" font-weight="normal" stroke="black" stroke-width="0.5">0</tspan>
+    </text>
+    <circle cx="350.36668327193803" cy="298.46896078568045" fill="yellow" fill-opacity="1.0" r="12.0" stroke="black" stroke-width="1"/>
+    <text x="346.36668327193803" y="303.26896078568046">
+      <tspan fill="black" font-family="monospace" font-size="15" font-weight="normal" stroke="black" stroke-width="0.5">1</tspan>
+    </text>
+    <circle cx="300.2134378315368" cy="354.2505556807131" fill="yellow" fill-opacity="1.0" r="12.0" stroke="black" stroke-width="1"/>
+    <text x="296.2134378315368" y="359.0505556807131">
+      <tspan fill="black" font-family="monospace" font-size="15" font-weight="normal" stroke="black" stroke-width="0.5">2</tspan>
+    </text>
+    <circle cx="284.3842216459569" cy="271.8574198478371" fill="yellow" fill-opacity="1.0" r="12.0" stroke="black" stroke-width="1"/>
+    <text x="280.3842216459569" y="276.6574198478371">
+      <tspan fill="black" font-family="monospace" font-size="15" font-weight="normal" stroke="black" stroke-width="0.5">3</tspan>
+    </text>
+    <circle cx="339.1365352511844" cy="191.78544780304168" fill="yellow" fill-opacity="1.0" r="12.0" stroke="black" stroke-width="1"/>
+    <text x="335.1365352511844" y="196.5854478030417">
+      <tspan fill="black" font-family="monospace" font-size="15" font-weight="normal" stroke="black" stroke-width="0.5">4</tspan>
+    </text>
+    <circle cx="502.6289228157669" cy="336.1667531505905" fill="yellow" fill-opacity="1.0" r="12.0" stroke="black" stroke-width="1"/>
+    <text x="498.6289228157669" y="340.96675315059053">
+      <tspan fill="black" font-family="monospace" font-size="15" font-weight="normal" stroke="black" stroke-width="0.5">5</tspan>
+    </text>
+    <circle cx="542.4596712948085" cy="454.9599638249373" fill="yellow" fill-opacity="1.0" r="12.0" stroke="black" stroke-width="1"/>
+    <text x="538.4596712948085" y="459.7599638249373">
+      <tspan fill="black" font-family="monospace" font-size="15" font-weight="normal" stroke="black" stroke-width="0.5">6</tspan>
+    </text>
+    <circle cx="405.01631587608966" cy="225.15663998544858" fill="yellow" fill-opacity="1.0" r="12.0" stroke="black" stroke-width="1"/>
+    <text x="401.01631587608966" y="229.95663998544856">
+      <tspan fill="black" font-family="monospace" font-size="15" font-weight="normal" stroke="black" stroke-width="0.5">7</tspan>
+    </text>
+    <circle cx="569.761824356463" cy="383.1288443059817" fill="yellow" fill-opacity="1.0" r="12.0" stroke="black" stroke-width="1"/>
+    <text x="565.761824356463" y="387.9288443059817">
+      <tspan fill="black" font-family="monospace" font-size="15" font-weight="normal" stroke="black" stroke-width="0.5">8</tspan>
+    </text>
+    <circle cx="550.2093257581349" cy="214.8024383459903" fill="yellow" fill-opacity="1.0" r="12.0" stroke="black" stroke-width="1"/>
+    <text x="546.2093257581349" y="219.60243834599032">
+      <tspan fill="black" font-family="monospace" font-size="15" font-weight="normal" stroke="black" stroke-width="0.5">9</tspan>
+    </text>
+    <circle cx="656.6694701556121" cy="356.10272800470426" fill="yellow" fill-opacity="1.0" r="12.0" stroke="black" stroke-width="1"/>
+    <text x="648.6694701556122" y="360.9027280047043">
+      <tspan fill="black" font-family="monospace" font-size="15" font-weight="normal" stroke="black" stroke-width="0.5">10</tspan>
+    </text>
+    <circle cx="491.0669743159316" cy="515.2411046392803" fill="yellow" fill-opacity="1.0" r="12.0" stroke="black" stroke-width="1"/>
+    <text x="483.0669743159316" y="520.0411046392802">
+      <tspan fill="black" font-family="monospace" font-size="15" font-weight="normal" stroke="black" stroke-width="0.5">11</tspan>
+    </text>
+    <circle cx="215.70096997814102" cy="348.78491138143676" fill="yellow" fill-opacity="1.0" r="12.0" stroke="black" stroke-width="1"/>
+    <text x="207.70096997814102" y="353.58491138143677">
+      <tspan fill="black" font-family="monospace" font-size="15" font-weight="normal" stroke="black" stroke-width="0.5">12</tspan>
+    </text>
+    <circle cx="618.8393002482318" cy="278.70696100380655" fill="yellow" fill-opacity="1.0" r="12.0" stroke="black" stroke-width="1"/>
+    <text x="610.8393002482318" y="283.50696100380657">
+      <tspan fill="black" font-family="monospace" font-size="15" font-weight="normal" stroke="black" stroke-width="0.5">13</tspan>
+    </text>
+    <circle cx="426.50716538415315" cy="433.69092805864307" fill="yellow" fill-opacity="1.0" r="12.0" stroke="black" stroke-width="1"/>
+    <text x="418.50716538415315" y="438.490928058643">
+      <tspan fill="black" font-family="monospace" font-size="15" font-weight="normal" stroke="black" stroke-width="0.5">14</tspan>
+    </text>
+    <circle cx="447.58410906736987" cy="281.9733207212099" fill="yellow" fill-opacity="1.0" r="12.0" stroke="black" stroke-width="1"/>
+    <text x="439.58410906736987" y="286.7733207212099">
+      <tspan fill="black" font-family="monospace" font-size="15" font-weight="normal" stroke="black" stroke-width="0.5">15</tspan>
+    </text>
+    <circle cx="618.8393002482318" cy="336.1667531505905" fill="yellow" fill-opacity="1.0" r="12.0" stroke="black" stroke-width="1"/>
+    <text x="610.8393002482318" y="340.96675315059053">
+      <tspan fill="black" font-family="monospace" font-size="15" font-weight="normal" stroke="black" stroke-width="0.5">16</tspan>
+    </text>
+    <circle cx="345.4802535372488" cy="515.2411046392803" fill="green" fill-opacity="1.0" r="8.0" stroke="black" stroke-width="1"/>
+    <text x="341.4802535372488" y="520.0411046392802">
+      <tspan fill="black" font-family="monospace" font-size="11" font-weight="normal" stroke="black" stroke-width="0.5">0</tspan>
+    </text>
+    <circle cx="350.36668327193803" cy="354.2505556807131" fill="green" fill-opacity="1.0" r="8.0" stroke="black" stroke-width="1"/>
+    <text x="346.36668327193803" y="359.0505556807131">
+      <tspan fill="black" font-family="monospace" font-size="11" font-weight="normal" stroke="black" stroke-width="0.5">1</tspan>
+    </text>
+    <circle cx="406.295396169654" cy="283.86114075344517" fill="green" fill-opacity="1.0" r="8.0" stroke="black" stroke-width="1"/>
+    <text x="402.295396169654" y="288.6611407534452">
+      <tspan fill="black" font-family="monospace" font-size="11" font-weight="normal" stroke="black" stroke-width="0.5">2</tspan>
+    </text>
+    <circle cx="300.2134378315368" cy="416.3540341058696" fill="green" fill-opacity="1.0" r="8.0" stroke="black" stroke-width="1"/>
+    <text x="296.2134378315368" y="421.1540341058696">
+      <tspan fill="black" font-family="monospace" font-size="11" font-weight="normal" stroke="black" stroke-width="0.5">3</tspan>
+    </text>
+    <circle cx="266.2772039048389" cy="345.27773353107494" fill="green" fill-opacity="1.0" r="8.0" stroke="black" stroke-width="1"/>
+    <text x="262.2772039048389" y="350.0777335310749">
+      <tspan fill="black" font-family="monospace" font-size="11" font-weight="normal" stroke="black" stroke-width="0.5">4</tspan>
+    </text>
+    <circle cx="576.1741115319993" cy="336.1667531505905" fill="green" fill-opacity="1.0" r="8.0" stroke="black" stroke-width="1"/>
+    <text x="572.1741115319993" y="340.96675315059053">
+      <tspan fill="black" font-family="monospace" font-size="11" font-weight="normal" stroke="black" stroke-width="0.5">5</tspan>
+    </text>
+    <circle cx="502.6289228157669" cy="433.69092805864307" fill="green" fill-opacity="1.0" r="8.0" stroke="black" stroke-width="1"/>
+    <text x="498.6289228157669" y="438.490928058643">
+      <tspan fill="black" font-family="monospace" font-size="11" font-weight="normal" stroke="black" stroke-width="0.5">6</tspan>
+    </text>
+    <circle cx="447.58410906736987" cy="336.1667531505905" fill="green" fill-opacity="1.0" r="8.0" stroke="black" stroke-width="1"/>
+    <text x="443.58410906736987" y="340.96675315059053">
+      <tspan fill="black" font-family="monospace" font-size="11" font-weight="normal" stroke="black" stroke-width="0.5">7</tspan>
+    </text>
+    <circle cx="569.761824356463" cy="454.9599638249373" fill="green" fill-opacity="1.0" r="8.0" stroke="black" stroke-width="1"/>
+    <text x="565.761824356463" y="459.7599638249373">
+      <tspan fill="black" font-family="monospace" font-size="11" font-weight="normal" stroke="black" stroke-width="0.5">8</tspan>
+    </text>
+    <circle cx="542.4596712948085" cy="515.2411046392803" fill="green" fill-opacity="1.0" r="8.0" stroke="black" stroke-width="1"/>
+    <text x="538.4596712948085" y="520.0411046392802">
+      <tspan fill="black" font-family="monospace" font-size="11" font-weight="normal" stroke="black" stroke-width="0.5">9</tspan>
+    </text>
+    <circle cx="569.761824356463" cy="336.1667531505905" fill="green" fill-opacity="1.0" r="8.0" stroke="black" stroke-width="1"/>
+    <text x="561.761824356463" y="340.96675315059053">
+      <tspan fill="black" font-family="monospace" font-size="11" font-weight="normal" stroke="black" stroke-width="0.5">10</tspan>
+    </text>
+    <circle cx="618.8393002482318" cy="383.1288443059817" fill="green" fill-opacity="1.0" r="8.0" stroke="black" stroke-width="1"/>
+    <text x="610.8393002482318" y="387.9288443059817">
+      <tspan fill="black" font-family="monospace" font-size="11" font-weight="normal" stroke="black" stroke-width="0.5">11</tspan>
+    </text>
+    <circle cx="550.2093257581349" cy="278.70696100380655" fill="green" fill-opacity="1.0" r="8.0" stroke="black" stroke-width="1"/>
+    <text x="542.2093257581349" y="283.50696100380657">
+      <tspan fill="black" font-family="monospace" font-size="11" font-weight="normal" stroke="black" stroke-width="0.5">12</tspan>
+    </text>
+    <circle cx="394.353709460701" cy="420.34248108225637" fill="green" fill-opacity="1.0" r="8.0" stroke="black" stroke-width="1"/>
+    <text x="386.353709460701" y="425.1424810822564">
+      <tspan fill="black" font-family="monospace" font-size="11" font-weight="normal" stroke="black" stroke-width="0.5">13</tspan>
+    </text>
+    <circle cx="309.8954524589475" cy="286.0431903167588" fill="green" fill-opacity="1.0" r="8.0" stroke="black" stroke-width="1"/>
+    <text x="301.8954524589475" y="290.8431903167588">
+      <tspan fill="black" font-family="monospace" font-size="11" font-weight="normal" stroke="black" stroke-width="0.5">14</tspan>
+    </text>
+    <circle cx="338.59160926156125" cy="244.52720429436107" fill="green" fill-opacity="1.0" r="8.0" stroke="black" stroke-width="1"/>
+    <text x="330.59160926156125" y="249.32720429436108">
+      <tspan fill="black" font-family="monospace" font-size="11" font-weight="normal" stroke="black" stroke-width="0.5">15</tspan>
+    </text>
+    <circle cx="447.58410906736987" cy="225.15663998544858" fill="green" fill-opacity="1.0" r="8.0" stroke="black" stroke-width="1"/>
+    <text x="439.58410906736987" y="229.95663998544856">
+      <tspan fill="black" font-family="monospace" font-size="11" font-weight="normal" stroke="black" stroke-width="0.5">16</tspan>
+    </text>
+    <circle cx="644.234385201922" cy="315.20484450425545" fill="green" fill-opacity="1.0" r="8.0" stroke="black" stroke-width="1"/>
+    <text x="636.234385201922" y="320.0048445042554">
+      <tspan fill="black" font-family="monospace" font-size="11" font-weight="normal" stroke="black" stroke-width="0.5">17</tspan>
+    </text>
+    <circle cx="618.8393002482318" cy="315.19685707719856" fill="green" fill-opacity="1.0" r="8.0" stroke="black" stroke-width="1"/>
+    <text x="610.8393002482318" y="319.99685707719857">
+      <tspan fill="black" font-family="monospace" font-size="11" font-weight="normal" stroke="black" stroke-width="0.5">18</tspan>
+    </text>
+    <text x="182.500969978141" y="550.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">Rooms</tspan>
+    </text>
+    <text x="675.5494701556122" y="550.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">Corridors</tspan>
+    </text>
+    <text x="182.500969978141" y="568.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (0): corridors N=, W=3, S=0, E=13</tspan>
+    </text>
+    <text x="182.500969978141" y="586.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (1): corridors N=15, W=14, S=, E=1,2</tspan>
+    </text>
+    <text x="182.500969978141" y="604.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (2): corridors N=, W=4, S=1,3, E=</tspan>
+    </text>
+    <text x="182.500969978141" y="622.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (3): corridors N=, W=, S=, E=14</tspan>
+    </text>
+    <text x="182.500969978141" y="640.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (4): corridors N=, W=, S=15, E=</tspan>
+    </text>
+    <text x="182.500969978141" y="658.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (5): corridors N=10, W=, S=7, E=5,6</tspan>
+    </text>
+    <text x="182.500969978141" y="676.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (6): corridors N=, W=, S=, E=8,9</tspan>
+    </text>
+    <text x="182.500969978141" y="694.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (7): corridors N=, W=, S=, E=16</tspan>
+    </text>
+    <text x="182.500969978141" y="712.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (8): corridors N=, W=, S=8, E=10,11</tspan>
+    </text>
+    <text x="182.500969978141" y="730.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (9): corridors N=, W=, S=12, E=</tspan>
+    </text>
+    <text x="182.500969978141" y="748.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (10): corridors N=17, W=, S=, E=</tspan>
+    </text>
+    <text x="182.500969978141" y="766.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (11): corridors N=, W=0, S=9, E=</tspan>
+    </text>
+    <text x="182.500969978141" y="784.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (12): corridors N=, W=, S=, E=4</tspan>
+    </text>
+    <text x="182.500969978141" y="802.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (13): corridors N=, W=12, S=17,18, E=</tspan>
+    </text>
+    <text x="182.500969978141" y="820.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (14): corridors N=, W=13, S=6, E=</tspan>
+    </text>
+    <text x="182.500969978141" y="838.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (15): corridors N=16, W=2,7, S=, E=</tspan>
+    </text>
+    <text x="182.500969978141" y="856.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">inter (16): corridors N=18, W=5, S=11, E=</tspan>
+    </text>
+    <text x="675.5494701556122" y="568.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (0): kind=elbow, south-west, joins=0.11, clipped=0, entangled=</tspan>
+    </text>
+    <text x="675.5494701556122" y="586.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (1): kind=elbow, east-south, joins=1.2, clipped=0, entangled=</tspan>
+    </text>
+    <text x="675.5494701556122" y="604.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (2): kind=linear, east-west, joins=1.15, clipped=0, entangled=</tspan>
+    </text>
+    <text x="675.5494701556122" y="622.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (3): kind=elbow, south-west, joins=2.0, clipped=0, entangled=</tspan>
+    </text>
+    <text x="675.5494701556122" y="640.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (4): kind=linear, west-east, joins=2.12, clipped=0, entangled=</tspan>
+    </text>
+    <text x="675.5494701556122" y="658.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (5): kind=linear, east-west, joins=5.16, clipped=True, entangled=</tspan>
+    </text>
+    <text x="675.5494701556122" y="676.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (6): kind=elbow, east-south, joins=5.14, clipped=0, entangled=</tspan>
+    </text>
+    <text x="675.5494701556122" y="694.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (7): kind=elbow, south-west, joins=5.15, clipped=0, entangled=</tspan>
+    </text>
+    <text x="675.5494701556122" y="712.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (8): kind=elbow, east-south, joins=6.8, clipped=0, entangled=</tspan>
+    </text>
+    <text x="675.5494701556122" y="730.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (9): kind=elbow, east-south, joins=6.11, clipped=0, entangled=</tspan>
+    </text>
+    <text x="675.5494701556122" y="748.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (10): kind=elbow, east-north, joins=8.5, clipped=0, entangled=</tspan>
+    </text>
+    <text x="675.5494701556122" y="766.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (11): kind=elbow, east-south, joins=8.16, clipped=True, entangled=</tspan>
+    </text>
+    <text x="675.5494701556122" y="784.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (12): kind=elbow, south-west, joins=9.13, clipped=0, entangled=</tspan>
+    </text>
+    <text x="675.5494701556122" y="802.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (13): kind=linear, west-east, joins=14.0, clipped=0, entangled=</tspan>
+    </text>
+    <text x="675.5494701556122" y="820.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (14): kind=linear, east-west, joins=3.1, clipped=0, entangled=</tspan>
+    </text>
+    <text x="675.5494701556122" y="838.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (15): kind=linear, south-north, joins=4.1, clipped=0, entangled=</tspan>
+    </text>
+    <text x="675.5494701556122" y="856.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (16): kind=elbow, east-north, joins=7.15, clipped=0, entangled=</tspan>
+    </text>
+    <text x="675.5494701556122" y="874.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (17): kind=linear, north-south, joins=10.13, clipped=0, entangled=</tspan>
+    </text>
+    <text x="675.5494701556122" y="892.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (18): kind=linear, north-south, joins=16.13, inserted,clipped=0, entangled=</tspan>
+    </text>
+  </g>
+</svg>

@@ -77,6 +77,18 @@ class Room:
     def euclidean_dist(self, other) -> float:
         return g.pt_dist(self.center, other.center)
 
+
+    def attached_side(self, icor) -> int:
+        """Determine which side, if any, icor is present on
+        """
+        for side, axis in enumerate(self.corridors):
+            try:
+                i = axis.index(icor)
+                return side
+            except ValueError:
+                continue
+        return None
+
     def detach_corridor(self, icor) -> int:
         """When reconciling entangled corridors we make special intersection rooms
 
@@ -94,7 +106,7 @@ class Room:
                 return side
             except ValueError:
                 continue
-        raise KeyError(f"corridor {icor} not found in room {self.id}")
+        raise KeyError(f"corridor {icor} not found")
 
     def corridor_side(self, icor):
         for side, axis in enumerate(self.corridors):

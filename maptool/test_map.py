@@ -65,6 +65,7 @@ def test_generator_persist():
     rooms1 = g.model.rooms
 
     source = g.tojson(dumps=True)
+    g = Map(args)
     g.load(source)
 
     for (i, r) in enumerate(rooms1):

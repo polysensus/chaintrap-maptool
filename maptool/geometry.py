@@ -69,10 +69,10 @@ def check_line_in_line(l1a, l1b, l2a, l2b, margin=0.1) -> bool:
     Note that if they are co linear and l2 is shorter than l1 then the test fails.
     So, depending on context, you may need to call twice."""
 
-    if not check_pt_on_line(l1a, l2a, l2b):
+    if not check_pt_on_line(l1a, l2a, l2b, margin=margin):
         return False
 
-    if not check_pt_on_line(l1b, l2a, l2b):
+    if not check_pt_on_line(l1b, l2a, l2b, margin=margin):
         return False
     
     return True
@@ -259,17 +259,15 @@ def box_hextrude(b1, b2, factor=0.5, min=0.0):
 
     """
 
-    def corridor_endian(a, b):
-        return a, b
-
-    if b1.tl.x > b2.tl.x:
-        b1, b2 = b2, b1
-        def corridor_endian(a, b):
-            return b, a
-
     shadow = box_hshadow(b1, b2)
     if shadow <= min:
         return False, (None, None), (None, None)
+
+    # inverted case b2 -> b1 ?
+    swaped = False
+    if b1.br.x > b2.tl.x:
+        b2, b1 = b1, b2
+        swaped = True
 
     b1_i = Vec2(b1.br.x, b2.tl.y)
     b2_i = Vec2(b2.tl.x, b1.br.y)
@@ -278,10 +276,11 @@ def box_hextrude(b1, b2, factor=0.5, min=0.0):
     p1 = Vec2(b1.br.x, iy)
     p2 = Vec2(b2.tl.x, iy)
 
-    if p1.x < p2.x:
-        return True, (p1, p2), corridor_endian(RIGHT, LEFT)
+    # inverted case b2 -> b1 (remembering we swaped b1, b2 above) ?
+    if swaped:
+        return True, (p2, p1), (LEFT, RIGHT)
     else:
-        return True, (p1, p2), corridor_endian(LEFT, RIGHT)
+        return True, (p1, p2), (RIGHT, LEFT)
 
 
 def box_vextrude(b1, b2, factor=0.5, min=0.0):
@@ -298,13 +297,11 @@ def box_vextrude(b1, b2, factor=0.5, min=0.0):
 
     """
 
-    def corridor_endian(a, b):
-        return a, b
-
+    # inverted case b2 -> b1 ?
+    swaped = False
     if b1.tl.y > b2.tl.y:
         b1, b2 = b2, b1
-        def corridor_endian(a, b):
-            return b, a
+        swaped = True
 
     shadow = box_vshadow(b1, b2)
     if shadow <= min:
@@ -317,48 +314,20 @@ def box_vextrude(b1, b2, factor=0.5, min=0.0):
     p1 = Vec2(ix, b1.br.y)
     p2 = Vec2(ix, b2.tl.y)
 
-    if p1.y < p2.y:
-        return True, (p1, p2), corridor_endian(BOTTOM, TOP)
+    if swaped:
+        return True, (p2, p1), (TOP, BOTTOM)
     else:
-        return True, (p1, p2), corridor_endian(TOP, BOTTOM)
+        return True, (p1, p2), (BOTTOM, TOP)
 
 
 def dist2(a: Vec2, b: Vec2) -> float:
     return (b.x - a.x) ** 2 + (b.y - a.y) ** 2
 
 
-def box_lextrude(b1, b2, factor=0.5, min=0.0):
-    """assume the boxes are neither horizonatly nor verticaly aligned and create
-    a pair of elbows. The caller can pick the one they like
-
-    +-----+b1_i
-    |b1   |-----+
-    +-----+     |
-        |      +-----+
-        +______|b2   |
-               |     |
-               +-----+
-
-               +-----+
-        +____  |b2   |
-        |      +-----+
-    +-----+      |
-    |b1   |------+
-    |-----+ b1_i
+def identify_ends(points):
     """
-
-    def corridor_endian(a, b):
-        return a, b
-
-    if b1.tl.x > b2.tl.x:
-        b1, b2 = b2, b1
-        # this leads to L corridors that don't make sense
-        # the points and the ends can end up the wrong way round
-        def corridor_endian(a, b):
-            return b, a
-
-    def identify_ends(points):
-        return points, corridor_endian(*_identify_ends(points))
+    TODO: We could probably infer this directly. but its pain and just checking
+    the geometry is easy"""
 
     def _identify_ends(points):
 
@@ -396,6 +365,106 @@ def box_lextrude(b1, b2, factor=0.5, min=0.0):
             return RIGHT, BOTTOM
         else:
             return LEFT, BOTTOM
+
+    return points, _identify_ends(points)
+
+
+def box_lextrude(b0, b1, factor=0.5, min=0.0):
+
+    """assume the boxes are neither horizonatly nor verticaly aligned and create
+    a pair of elbows. The caller can pick the one they like
+
+                           We deal with the opposite cases by flipping the points around
+    +-----+b1_i            +-----+b2_i
+    |b1   |-----+          |b2   |-----+
+    +-----+     |          +-----+     |
+        |      +-----+         |      +-----+
+        +______|b2   |         +______|b1   |
+               |     |                |     |
+               +-----+                +-----+
+
+               +-----+                +-----+
+        +____  |b2   |         +____  |b1   |
+        |      +-----+         |      +-----+
+    +-----+      |         +-----+      |
+    |b1   |------+         |b2   |------+
+    +-----+ b1_i           +-----+ b2_i
+    """
+
+    # we return an indication to the caller of which wall the corridor leaves b1
+    # and which it enters b2. to reduce the cases here, we sometimes swap b1 &
+    # b2.
+
+    b = [b0, b1]
+
+    ib0, ib1 = 0, 1
+    if b[0].tl.x > b[1].br.x:
+        # flipped case
+        ib0, ib1 = 1, 0
+
+    b0_right_i = Vec2(b[ib0].br.x, b[ib0].tl.y + (b[ib0].br.y - b[ib0].tl.y) * factor)
+    b1_left_i = Vec2(b[ib1].tl.x, b[ib1].tl.y + (b[ib1].br.y - b[ib1].tl.y) * factor)
+
+    b0_top_i = Vec2(b[ib0].tl.x + (b[ib0].br.x - b[ib0].tl.x) * factor, b[ib0].tl.y)
+    b0_bot_i = Vec2(b[ib0].tl.x + (b[ib0].br.x - b[ib0].tl.x) * factor, b[ib0].br.y)
+
+    b1_top_i = Vec2(b[ib1].tl.x + (b[ib1].br.x - b[ib1].tl.x) * factor, b[ib1].tl.y)
+    b1_bot_i = Vec2(b[ib1].tl.x + (b[ib1].br.x - b[ib1].tl.x) * factor, b[ib1].br.y)
+
+     # b1 right to b2 top
+    if b[ib0].tl.y < b[ib1].tl.y:
+
+        # b[0].x is always < b[1].x
+        el_right_top = (b0_right_i, Vec2(b1_top_i.x, b0_right_i.y), b1_top_i)
+        el_bot_left = (b0_bot_i, Vec2(b0_bot_i.x, b1_left_i.y), b1_left_i)
+
+        # return the shortest first
+        d2_right_top = dist2(el_right_top[0], el_right_top[1])
+        d2_right_top += dist2(el_right_top[1], el_right_top[2])
+        d2_bot_left = dist2(el_bot_left[0], el_bot_left[1])
+        d2_bot_left += dist2(el_bot_left[1], el_bot_left[2])
+
+        if d2_right_top < d2_bot_left:
+            return identify_ends(el_right_top), identify_ends(el_bot_left)
+        else:
+            return identify_ends(el_bot_left), identify_ends(el_right_top)
+
+
+    el_top_right = (b0_top_i, Vec2(b0_top_i.x, b1_left_i.y), b1_left_i)
+    el_right_bot = (b0_right_i, Vec2(b1_bot_i.x, b0_right_i.y), b1_bot_i)
+
+    d2_top_right = dist2(el_top_right[0], el_top_right[1])
+    d2_top_right += dist2(el_top_right[1], el_top_right[2])
+    d2_right_bot = dist2(el_right_bot[0], el_right_bot[1])
+    d2_right_bot += dist2(el_right_bot[1], el_right_bot[1])
+
+    if d2_top_right < d2_right_bot:
+        return identify_ends(el_top_right), identify_ends(el_right_bot)
+    else:
+        return identify_ends(el_right_bot), identify_ends(el_top_right)
+
+
+
+def xbox_lextrude(b1, b2, factor=0.5, min=0.0):
+    """assume the boxes are neither horizonatly nor verticaly aligned and create
+    a pair of elbows. The caller can pick the one they like
+
+                           We deal with the opposite cases by flipping the points around
+    +-----+b1_i            +-----+b2_i
+    |b1   |-----+          |b2   |-----+
+    +-----+     |          +-----+     |
+        |      +-----+         |      +-----+
+        +______|b2   |         +______|b1   |
+               |     |                |     |
+               +-----+                +-----+
+
+               +-----+                +-----+
+        +____  |b2   |         +____  |b1   |
+        |      +-----+         |      +-----+
+    +-----+      |         +-----+      |
+    |b1   |------+         |b2   |------+
+    +-----+ b1_i           +-----+ b2_i
+    """
 
     # we return an indication to the caller of which wall the corridor leaves b1
     # and which it enters b2. to reduce the cases here, we sometimes swap b1 &

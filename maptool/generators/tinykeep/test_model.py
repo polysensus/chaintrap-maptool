@@ -5,6 +5,7 @@ from maptool.datatypes import Vec2, Box
 from maptool.map import Map
 from maptool.room import Room, RoomSide
 from maptool.corridor import Corridor
+from maptool.geometry import *
 
 NORTH = RoomSide.NORTH
 WEST = RoomSide.WEST
@@ -168,6 +169,45 @@ def spur_horizontal_opposed(emptymodel, rooms3_horizontal_spur):
     return g
 
 
+@pytest.fixture
+def spur_horizontal_11(emptymodel, rooms3_horizontal_spur):
+    """
+                 r2
+                  + i0
+                  |     Corridor A
+    r1  i2+-------+ i1
+    r1  j2+----+ j1     Corridor B
+               |       <- spur is j1 - j2
+               + j0
+               r3
+    """
+
+    g = emptymodel
+    r1, r2, r3 = rooms3_horizontal_spur
+
+    ca = Corridor(
+        points=[Vec2(12.0, 4.0), Vec2(12.0, 8.0), Vec2(4.0, 8.0)],
+        joins=[1, 0],
+        join_sides=[SOUTH, EAST]
+        )
+
+    cb = Corridor(
+        points=[Vec2(12.0, 4.0), Vec2(8.0, 8.0), Vec2(4.0, 8.0)],
+        joins=[2, 0],
+        join_sides=[NORTH, EAST]
+        )
+
+    r2.corridors[SOUTH] = [0]
+    r1.corridors[EAST] = [0, 1]
+    r3.corridors[NORTH] = [1]
+
+    g.rooms.extend([r1, r2, r3])
+    g.corridors.extend([ca, cb])
+    return g
+
+
+
+
 
 @pytest.fixture
 def spur_horizontal_inverted(emptymodel, rooms3_horizontal_spur_inverted):
@@ -259,8 +299,16 @@ class TestModel:
                    r3
         """
 
-
         g = spur_horizontal
+
+        ca = g.corridors[0]
+        cb = g.corridors[1]
+
+        assert ca.join_sides[0] == EAST
+        assert ca.join_sides[1] == SOUTH
+
+        assert cb.join_sides[0] == EAST
+        assert cb.join_sides[1] == NORTH
 
         g._generate_corridor_intersections()
         assert len(g.corridors) == 3
@@ -278,10 +326,73 @@ class TestModel:
 
         # check the new corridor
         cnew = g.corridors[2]
-        assert cnew.joins[0] == 0
-        assert cnew.joins[1] == 3
-        assert cnew.join_sides[0] == EAST
-        assert cnew.join_sides[1] == WEST
+        assert cnew.joins[0] == 3
+        assert cnew.joins[1] == 0
+        assert cnew.join_sides[0] == WEST
+        assert cnew.join_sides[1] == EAST
+
+        # check the spur
+        assert cb.join_sides[0] == SOUTH
+        assert cb.join_sides[1] == NORTH
+
+        # check the clipped corridor
+        assert ca.join_sides[0] == EAST
+        assert ca.join_sides[1] == SOUTH
+
+        assert cb.joins[0] == 3
+        assert cb.joins[1] == 2
+
+
+    def test_merge_spur_horizontal_11(self, spur_horizontal_11):
+        """
+                  + i0
+                  |
+        i2+-------+ i1
+        j2+----+ j1
+               |       <- spur is j1 - j0
+               + j0
+        """
+        g = spur_horizontal_11
+
+        ca = g.corridors[0]
+        cb = g.corridors[1]
+
+        assert ca.join_sides[0] == SOUTH 
+        assert ca.join_sides[1] == EAST
+
+        assert cb.join_sides[0] == NORTH
+        assert cb.join_sides[1] == EAST
+
+        g._generate_corridor_intersections()
+        assert len(g.corridors) == 3
+        assert len(g.rooms) == 4
+
+        # check the new room
+        rnew = g.rooms[3]
+        assert rnew.is_intersection is True
+        assert rnew.corridors[WEST] == [2] # new room west wall -> new corridor
+        assert rnew.corridors[EAST] == [0] # new room east wall -> clipped major corridor (long leg)
+        assert g.corridors[rnew.corridors[WEST][0]].clipped == 0
+        assert g.corridors[rnew.corridors[EAST][0]].clipped != 0
+
+        assert rnew.corridors[SOUTH] == [1] # new room south wall -> clipped spur corridor
+
+        # check the new corridor
+        cnew = g.corridors[2]
+        assert cnew.joins[0] == 3
+        assert cnew.joins[1] == 0
+        assert cnew.join_sides[0] == WEST 
+        assert cnew.join_sides[1] == EAST
+
+        # check the clipped side
+        assert ca.join_sides[0] == SOUTH
+        assert ca.join_sides[1] == EAST
+
+        # check the spur
+        assert cb.join_sides[0] == NORTH
+        assert cb.join_sides[1] == SOUTH 
+        assert cb.joins[0] == 2
+        assert cb.joins[1] == 3
 
 
     def test_merge_spur_horizontal_opposed(self, spur_horizontal_opposed):
@@ -295,6 +406,15 @@ class TestModel:
         """
         g = spur_horizontal_opposed
 
+        ca = g.corridors[0]
+        cb = g.corridors[1]
+
+        assert ca.join_sides[0] == EAST
+        assert ca.join_sides[1] == SOUTH
+
+        assert cb.join_sides[0] == NORTH
+        assert cb.join_sides[1] == EAST
+
         g._generate_corridor_intersections()
         assert len(g.corridors) == 3
         assert len(g.rooms) == 4
@@ -311,10 +431,21 @@ class TestModel:
 
         # check the new corridor
         cnew = g.corridors[2]
-        assert cnew.joins[0] == 0
-        assert cnew.joins[1] == 3
-        assert cnew.join_sides[0] == EAST
-        assert cnew.join_sides[1] == WEST
+        assert cnew.joins[0] == 3
+        assert cnew.joins[1] == 0
+        assert cnew.join_sides[0] == WEST
+        assert cnew.join_sides[1] == EAST
+
+        # check the clipped side
+        assert ca.join_sides[0] == EAST
+        assert ca.join_sides[1] == SOUTH
+
+        # check the spur
+        assert cb.join_sides[0] == NORTH
+        assert cb.join_sides[1] == SOUTH 
+        assert cb.joins[0] == 2
+        assert cb.joins[1] == 3
+
 
     def test_merge_spur_horizontal_inverted(self, spur_horizontal_inverted):
         """
@@ -326,6 +457,17 @@ class TestModel:
              + j2
         """
         g = spur_horizontal_inverted
+
+        ca = g.corridors[0]
+        cb = g.corridors[1]
+
+        # major side
+        assert ca.join_sides[0] == WEST
+        assert ca.join_sides[1] == SOUTH
+
+        # spur
+        assert cb.join_sides[0] == WEST
+        assert cb.join_sides[1] == NORTH
 
         g._generate_corridor_intersections()
         assert len(g.corridors) == 3
@@ -343,10 +485,21 @@ class TestModel:
 
         # check the new corridor
         cnew = g.corridors[2]
-        assert cnew.joins[0] == 0 # r1
-        assert cnew.joins[1] == 3 # rnew
-        assert cnew.join_sides[0] == WEST
-        assert cnew.join_sides[1] == EAST
+        assert cnew.joins[0] == 3
+        assert cnew.joins[1] == 0
+        assert cnew.join_sides[0] == EAST
+        assert cnew.join_sides[1] == WEST
+
+        # major side
+        assert ca.join_sides[0] == WEST
+        assert ca.join_sides[1] == SOUTH
+
+        # spur
+        assert cb.join_sides[0] == SOUTH
+        assert cb.join_sides[1] == NORTH
+        assert cb.joins[0] == 3
+        assert cb.joins[1] == 2
+
 
 
     def test_merge_spur_horizontal_inverted_opposed(self, spur_horizontal_inverted_opposed):
@@ -363,6 +516,17 @@ class TestModel:
 
         g = spur_horizontal_inverted_opposed
 
+        ca = g.corridors[0]
+        cb = g.corridors[1]
+
+        # major side
+        assert ca.join_sides[0] == WEST
+        assert ca.join_sides[1] == SOUTH
+
+        # spur
+        assert cb.join_sides[0] == NORTH
+        assert cb.join_sides[1] == WEST
+
         g._generate_corridor_intersections()
         assert len(g.corridors) == 3
         assert len(g.rooms) == 4
@@ -379,8 +543,23 @@ class TestModel:
 
         # check the new corridor
         cnew = g.corridors[2]
-        assert cnew.joins[0] == 0 # r1
-        assert cnew.joins[1] == 3 # rnew
-        assert cnew.join_sides[0] == WEST
-        assert cnew.join_sides[1] == EAST
+        assert cnew.joins[0] == 3 # rnew
+        assert cnew.joins[1] == 0
+        assert cnew.join_sides[0] == EAST
+        assert cnew.join_sides[1] == WEST
+
+        # major side
+        assert ca.join_sides[0] == WEST
+        assert ca.join_sides[1] == SOUTH
+
+        # spur
+        assert len(cb.points) == 2
+        assert essentially_equal(cb.points[1].y, cnew.points[0].y)
+        assert essentially_equal(cb.points[1].y, cnew.points[1].y)
+
+        assert cb.join_sides[0] == NORTH
+        assert cb.join_sides[1] == SOUTH
+        assert cb.joins[0] == 2
+        assert cb.joins[1] == 3
+
 
