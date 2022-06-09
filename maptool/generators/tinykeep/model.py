@@ -296,11 +296,14 @@ class Generator:
 
         print(f"extrude: r{i}, r{j}")
 
-        (line1, join1), (line2, join2) = g.box_lextrude(
+        ifoot, (line1, join1), (line2, join2) = g.box_lextrude(
             bi, bj
         )  # each line will be 3 points
         cor.points = list(line1)
         cor.join_sides = list(join1)
+
+        cor.joins[0], cor.joins[1] = cor.joins[ifoot], cor.joins[1-ifoot]
+
         cor.crosses = list(rooms_crossing_line(self.rooms, line1, i, j))
 
         if not cor.crosses:
@@ -428,116 +431,50 @@ class Generator:
         if len(ci.points) != 3 and len(cj.points) != 3:
             raise ValueError("corridor_lmerge requires two elbows")
 
-        lmerge_spur = {
-            (0,0):self._corridor_lmerge_spur00,
-            (0,1):self._corridor_lmerge_spur01,
-            (1,0):self._corridor_lmerge_spur10,
-            (1,1):self._corridor_lmerge_spur11
-        }
+        # if it gets clipped on the previous pass, we need to skip it
+        if len(ci.points) != 3 or len(cj.points) != 3:
+            return
 
-        for i in range(2):
-            ci_a, ci_b = ci.points[i], ci.points[i + 1]
-            for j in range(2):
+        if ci.joins[0] == cj.joins[0]:
+            if (g.dist2(cj.points[0], cj.points[0]) < g.dist2(ci.points[0], ci.points[1])):
 
-                # if it gets clipped on the previous pass, we need to skip it
-                if len(cj.points) != 3:
-                    continue
+                iri = self._corridor_lmerge_split_long(icor, 0, cj.points[1].clone())
+                self._corridor_lmerge_truncate_short(jcor, 0, iri)
+            else:
+                iri = self._corridor_lmerge_split_long(jcor, 0, ci.points[1].clone())
+                self._corridor_lmerge_truncate_short(icor, 0, iri)
+        elif ci.joins[0] == cj.joins[1]:
+            if (g.dist2(cj.points[1], cj.points[2]) < g.dist2(ci.points[0], ci.points[1])):
+                iri = self._corridor_lmerge_split_long(icor, 0, cj.points[1].clone())
+                self._corridor_lmerge_truncate_short(jcor, 1, iri)
+            else:
+                iri = self._corridor_lmerge_split_long(jcor, 0, ci.points[1].clone())
+                self._corridor_lmerge_truncate_short(icor, 1, iri)
 
-                if ci.joins[0] == cj.joins[0]:
-                    if (g.dist2(cj.points[0], cj.points[0]) < g.dist2(ci.points[0], ci.points[0])):
+        elif ci.joins[1] == cj.joins[0]:
+            if (g.dist2(cj.points[0], cj.points[0]) < g.dist2(ci.points[1], ci.points[2])):
+                iri = self._corridor_lmerge_split_long(icor, 1, cj.points[1].clone())
+                self._corridor_lmerge_truncate_short(jcor, 0, iri)
 
-                        iri = self._corridor_lmerge_split_long(icor, 0, cj.points[1].clone())
-                        self._corridor_lmerge_truncate_short(jcor, 0, iri)
-                        # lmerge_spur[(0,0)](icor, jcor)
-                    else:
-                        iri = self._corridor_lmerge_split_long(jcor, 0, ci.points[1].clone())
-                        self._corridor_lmerge_truncate_short(icor, 0, iri)
+            else:
+                iri = self._corridor_lmerge_split_long(jcor, 0, ci.points[1].clone())
+                self._corridor_lmerge_truncate_short(icor, 1, iri)
 
-                        # lmerge_spur[(0,0)](jcor, icor)
-                elif ci.joins[0] == cj.joins[1]:
-                    if (g.dist2(cj.points[1], cj.points[2]) < g.dist2(ci.points[0], ci.points[0])):
-                        # lmerge_spur[(0,1)](icor, jcor)
-                        iri = self._corridor_lmerge_split_long(icor, 0, cj.points[1].clone())
-                        self._corridor_lmerge_truncate_short(jcor, 1, iri)
-                    else:
-                        # lmerge_spur[(0,1)](jcor, icor)
-                        iri = self._corridor_lmerge_split_long(jcor, 0, ci.points[1].clone())
-                        self._corridor_lmerge_truncate_short(icor, 1, iri)
-
-                elif ci.joins[1] == cj.joins[0]:
-                    if (g.dist2(cj.points[0], cj.points[0]) < g.dist2(ci.points[1], ci.points[2])):
-                        # lmerge_spur[(1,0)](icor, jcor)
-                        iri = self._corridor_lmerge_split_long(icor, 1, cj.points[1].clone())
-                        self._corridor_lmerge_truncate_short(jcor, 0, iri)
-
-                    else:
-                        # lmerge_spur[(1,0)](jcor, icor)
-                        iri = self._corridor_lmerge_split_long(jcor, 0, ci.points[1].clone())
-                        self._corridor_lmerge_truncate_short(icor, 1, iri)
-
-                else:
-                    assert ci.joins[1] == cj.joins[1]
-                    if (g.dist2(cj.points[1], cj.points[2]) < g.dist2(ci.points[1], ci.points[2])):
-                        # lmerge_spur[(1,1)](icor, jcor)
-                        iri = self._corridor_lmerge_split_long(icor, 1, cj.points[1].clone())
-                        self._corridor_lmerge_truncate_short(jcor, 1, iri)
-
-                    else:
-                        # lmerge_spur[(1,1)](jcor, icor)
-                        iri = self._corridor_lmerge_split_long(jcor, 1, ci.points[1].clone())
-                        self._corridor_lmerge_truncate_short(icor, 1, iri)
-
-                self.corridors[icor].entangled.remove(jcor)
-                self.corridors[jcor].entangled.remove(icor)
-
-
-    def _corridor_lmerge_truncate_short(self, icor, r1end, iri):
-        """
-        Here we are making the L between R1 - R3 into a straight joining R1 R3
-
-        We do this by removing the r1end point. The old elbow point becomes the end point. Which is also the center of the new intersection
-
- r1end=0           
-            RI(pi) |
-        R1 --+-----+ 
-             |  ci
-             R3 
-
-               R1 r1end=1
-                |     ci
-          RI(pi)+----R3 
-                |
-           -----+
-       
-        """
-        ci = self.corridors[icor]
-
-        ir1 = ci.joins[r1end]
-        r1 = self.rooms[ir1]
-
-        # adjust the corridor join to end at the RI intersection rather than R1
-        orig = ci.joins[:]
-        orig_sides = ci.join_sides[:]
-
-        if r1end == 0:
-            ci.points = ci.points[1:]
         else:
-            ci.points = ci.points[:2]
+            assert ci.joins[1] == cj.joins[1]
+            if (g.dist2(cj.points[1], cj.points[2]) < g.dist2(ci.points[1], ci.points[2])):
+                # lmerge_spur[(1,1)](icor, jcor)
+                iri = self._corridor_lmerge_split_long(icor, 1, cj.points[1].clone())
+                self._corridor_lmerge_truncate_short(jcor, 1, iri)
 
-        # we want the side *opposite* the side we attach too on R3    
-        riside = RoomSide.opposite(ci.joins[1-r1end])
+            else:
+                # lmerge_spur[(1,1)](jcor, icor)
+                iri = self._corridor_lmerge_split_long(jcor, 1, ci.points[1].clone())
+                self._corridor_lmerge_truncate_short(icor, 1, iri)
 
-        # note: iri is a parameter as it is typically generated by spliting the other entangled 'longer' corridor segment.
-        ci.joins[r1end] = iri
-        ci.join_sides[r1end] = riside
+        self.corridors[icor].entangled.remove(jcor)
+        self.corridors[jcor].entangled.remove(icor)
 
-        print(f"trunc-short: cn: {str(orig)} -> {str(ci.joins)}")
-
-        # detach from R1
-        r1.detach_corridor(icor)
-        # attach the truncated corridor to the intersection
-        ri = self.rooms[iri]
-        ri.corridors[riside].append(icor)
 
     def _corridor_lmerge_split_long(self, icor, r1end, pi):
         """
@@ -580,8 +517,9 @@ class Generator:
             is_inserted=True, generation=self.generation
         )
 
-        cn.points[ipfoot] = p1 # R1
-        cn.points[iphead] = pi # RI
+        # note: use r1end directly as cn is a straight with 2 points
+        cn.points[r1end] = p1 # R1
+        cn.points[1- r1end] = pi # RI
 
         ri = Room(generation=self.generation)  # intersection
         ri.is_intersection = True
@@ -589,6 +527,7 @@ class Generator:
 
         # The new intersection room index
         iri = len(self.rooms)
+        ici = len(self.corridors)
 
         self.corridors.append(cn)
         self.rooms.append(ri)
@@ -608,10 +547,11 @@ class Generator:
 
         # update the join for the clipped end so it joins to the new intersection
         orig = ci.joins[:]
+        orig_sides = ci.join_sides[:]
         assert ci.joins[r1end] == ir1
         ci.joins[r1end] = iri
 
-        print(f"split-long: ci: {str(ci.joins)} -> {ci.joins}")    
+        print(f"split-long: cor: {icor} ci: {str(ci.joins)} -> {ci.joins}. joins")    
 
         # make the new corridor segment join *from* the interesection *to* R1 so
         # that the new corridor foot joins R1 at the same 'end'. This isn't
@@ -622,542 +562,71 @@ class Generator:
         cn.joins[1 - r1end] = iri # intersection
         cn.join_sides[r1end] = r1iside
         cn.join_sides[1 - r1end] = RoomSide.opposite(r1iside)
-        print(f"split-long: cn: {str(orig)} -> {str(cn.joins)}")
+        r1.corridors[cn.join_sides[r1end]].append(ici)
+        ri.corridors[cn.join_sides[1 - r1end]].append(ici)
 
-        return ir1
+        print(f"split-long: cor: {icor} cn: {str(orig)} -> {str(cn.joins)}. joins")
+        print(f"split-long: cor: {icor} cn: {str(orig_sides)} -> {str(cn.join_sides)}. join_sides")
+        print(f"split-long: cor: {icor} cn: {str(r1.corridors)}. r[{ir1}].corridors")
+        print(f"split-long: cor: {icor} cn: {str(ri.corridors)}. r[{iri}].corridors")
 
-    def _corridor_lmerge_spur00(self, icor, jcor):
+        return iri
+
+
+    def _corridor_lmerge_truncate_short(self, icor, r1end, iri):
         """
-        iside = jside == 0
-                  + i2
-                  |
-        i0+-------+ i1
-        j0+----+ j1
-               | <- spur
-               + j2
+        Here we are making the L between R1 - R3 into a straight joining R1 R3
 
-                      R2 [., ., Ci, .]
-                      + p2
-  [., ., ., Ci]       |      Ci [R1, R2]
-        R1  p0+-------+ p1
-        R1  p0+----+ p1
-  [., ., ., Cj]    | <- spur Cj [R1, R3]
-                   + p2
-                   R3 [Cj, ., ., .]
+        We do this by removing the r1end point. The old elbow point becomes the end point. Which is also the center of the new intersection
 
+ r1end=0           
+            RI(pi) |
+        R1 --+-----+ 
+             |  ci
+             R3 
 
-                      R2 [., ., Ci, .]
-                       + p0
-                Cn     |   Ci [I, R2]
-        R1  p1+---+I+--+ p1
-  [., ., ., Cn]    | <- spur Cj [I, R3]
-                   + p0
-                   R3 [Cj, ., ., .]
-
-        Cn [I, R1]
-
+               R1 r1end=1
+                |     ci
+          RI(pi)+----R3 
+                |
+           -----+
+       
         """
+        ci = self.corridors[icor]
+        r1 = self.rooms[ci.joins[r1end]]
+        r3 = self.rooms[ci.joins[1 - r1end]]
+
+        # adjust the corridor join to end at the RI intersection rather than R1
+        orig = ci.joins[:]
+        orig_sides = ci.join_sides[:]
+
+        if r1end == 0:
+            ci.points = ci.points[1:]
+        else:
+            ci.points = ci.points[:2]
+
+        # we want the side *opposite* the side we attach too on R3    
+        riside = RoomSide.opposite(ci.joins[1-r1end])
+
+        # note: iri is a parameter as it is typically generated by spliting the other entangled 'longer' corridor segment.
+        ci.joins[r1end] = iri
+        ci.join_sides[r1end] = riside
+
+        print(f"trunc-short: cor: {icor}, ci: {str(orig)} -> {str(ci.joins)}. joins")
+        print(f"trunc-short: cor: {icor} ci: {str(orig_sides)} -> {str(ci.join_sides)}. join_sides")
+
+        # detach from R1
+        r1.detach_corridor(icor)
+
+        # the re-attachment has to be derived from room 3. we want the opposite of the side icor is attached to.
+        riside = RoomSide.opposite(r3.attached_side(icor))
+        # attach the truncated corridor to the intersection
+        ri = self.rooms[iri]
+        ri.corridors[riside].append(icor)
+        ir1 = orig[r1end]
+        print(f"trunc-short: cor: {icor} cn: {str(r1.corridors)}. r[{ir1}].corridors")
+        print(f"trunc-short: cor: {icor} cn: {str(ri.corridors)}. r[{iri}].corridors")
 
-        leg0, leg1 = 0, 1
-        ipfoot0 = 0 #leg0foot
-        ipelbow = 1
-        ipfoot1 = 2 #leg1foot
-
-        ci, cj = self.corridors[icor], self.corridors[jcor]
-        # As the second legs of each corridor must be co-incident as a condition
-        # for calling this function, the second legs of each corridor should
-        # both enter R1.
-        assert cj.joins[leg0] == ci.joins[leg0]
-
-        ir1 = cj.joins[leg0]
-        r1 = self.rooms[ir1] # == rooms[ci.joins[leg0]]
-        r3 = self.rooms[cj.joins[leg1]] # room 3 is at the foot of cj leg1
-
-        # The intersection point is the elbow point of the shorter leg of cj.
-        # The caller must ensure icor allways refers to the long 'major'
-        # corridor
-        pi = cj.points[ipelbow].clone()
-        # The foot of the new corridor is taken from the foot of leg0 on ci or leg0 on cj
-        p1 = cj.points[ipfoot0].clone()
-
-        # Now we have the clip point pi, we can create the new corridor segment
-        # and the intersection
-        cn = Corridor(
-            points=[pi, p1], # [RI, R1] though we can chose either direction
-            joins=[None, None],
-            join_sides=[None, None],
-            is_inserted=True, generation=self.generation
-        )
-
-        ri = Room(generation=self.generation)  # intersection
-        ri.is_intersection = True
-        ri.center = pi.clone()
-
-        # The new corridor index
-        icn = len(self.corridors)
-
-        # The new intersection room index
-        iri = len(self.rooms)
-
-        self.corridors.append(cn)
-        self.rooms.append(ri)
-
-        # deal with the minor corridor first ---
-
-        # convert the minor corridor cj to a straight by dropping the leg that
-        # is co-incident with ci.
-
-        # drop the foot point of the first leg, making cj a straight
-        cj.points = cj.points[1:]
-        cj.clipped = True
-
-        # detatch cj from room 1, remembering the side the corridor was attached
-        # to so we can use it when connecting up the new corridor segment 
-        r1jside = r1.detach_corridor(jcor)
-
-        # attach cj to the intersection.
-        r3jside = r3.attached_side(jcor)
-        r3jside_opposite = RoomSide.opposite(r3jside)
-        assert r3jside is not None
-        # The attachment side is oposite the remainging attachment to R3
-        ri.corridors[r3jside_opposite].append(jcor)
-
-        # update the joins
-        print(f"00: cj: {str(cj.joins)} -> {[ir1, cj.joins[1]]}")
-        assert cj.joins[0] == ir1
-        cj.joins[0] = iri # the new intersection replaces the previous join to R1
-        cj.join_sides[0] = r3jside_opposite # opposite remaining attachment to R3
-        # joins & join_sides [1] remains attached to R3
-
-        # deal with the major corridor ---
-
-        # set the foot of the second leg to the intersection position
-        ci.points[ipfoot0] = pi.clone()
-        ci.clipped = True
-
-        # detach ci from room 1
-        r1iside = r1.detach_corridor(icor)
-        assert r1jside == r1iside # check it was attached to the same side as jcor
-
-        # atach it to the intersection the side of attachment is the *same* side
-        # as it was previously attached to R1 on.
-        ri.corridors[r1iside].append(icor)
-
-        print(f"00: ci: {str(ci.joins)} -> {[iri, ci.joins[1]]}")    
-        assert ci.joins[0] == ir1
-        ci.joins[0] = iri
-        # join_sides remains the same
-
-        # deal with the inserted corridor cn ---
-
-        # attach the new corridor to R1
-        r1.corridors[r1iside].append(icn)
-        # attach the new corridor to the new room RI
-        ri.corridors[RoomSide.opposite(r1iside)].append(icn)
-
-        # new corridor originates at the new intersection, as that follows the
-        # direction of the original corridor legs.
-        print(f"00: cn: {str(cn.joins)} -> {[iri, ir1]}")
-        cn.joins[0] = iri # intersection
-        cn.joins[1] = ir1 # R1
-        cn.join_sides[0] = RoomSide.opposite(r1iside)
-        cn.join_sides[1] = r1iside
-
-
-    def _corridor_lmerge_spur01(self, icor, jcor):
-        """
-        iside = 0, jside == 1
-
-                      R2 [., ., Ci, .]
-                      + p2
-  [., ., ., Ci]       |      Ci [R1, R2]
-        R1  p0+-------+ p1
-        R1  p2+----+ p1
-  [., ., ., Cj]    | <- spur Cj [R3, R1]
-                   + p0
-                   R3 [Cj, ., ., .]
-
-
-                      R2 [., ., Ci, .]
-                       + p0
-                Cn     |   Ci [I, R2]
-        R1  p1+---+I+--+ p1
-  [., ., ., Cn]    | <- spur Cj [R3, I]
-                   + p0
-                   R3 [Cj, ., ., .]
-
-        Cn [I, R1]
-
-        """
-        leg0, leg1 = 0, 1
-        ipfoot0 = 0
-        ipelbow = 1
-        ipfoot1 = 2
-
-        ci, cj = self.corridors[icor], self.corridors[jcor]
-        # Two legsco-incident as a condition for calling this function, and the co-incident legs must enter 
-        # the same room if they are geometrically correct.
-
-        assert cj.joins[leg1] == ci.joins[leg0]  # ci leg0 co-incident with cj leg1
-
-        ir1 = ci.joins[leg0]
-        r1 = self.rooms[ir1] # == rooms[cj.joins[leg0]]
-        # r2 = self.rooms[ci.joins[leg0]] # room 2 is at the foot of ci leg0
-        r3 = self.rooms[cj.joins[leg0]] # room 3 is at the foot of cj leg0
-
-        # The intersection point is the elbow point of the shorter leg of cj.
-        # The caller must ensure icor allways refers to the long 'major'
-        # corridor
-        pi = cj.points[ipelbow].clone()
-        # The foot of the new corridor is taken from the foot of leg1 on either cj or leg0 of ci
-        p1 = cj.points[ipfoot1].clone()
-
-        # Now we have the clip point pi, we can create the new corridor segment
-        # and the intersection
-        cn = Corridor(
-            points=[pi, p1], # the direction is arbirary as the originals are opposed
-            joins=[None, None],
-            join_sides=[None, None],
-            is_inserted=True, generation=self.generation
-        )
-
-        ri = Room(generation=self.generation)  # intersection
-        ri.is_intersection = True
-        ri.center = pi.clone()
-
-        # The new corridor index
-        icn = len(self.corridors)
-
-        # The new intersection room index
-        iri = len(self.rooms)
-
-        self.corridors.append(cn)
-        self.rooms.append(ri)
-
-        # deal with the minor corridor first ---
-
-        # convert the minor corridor cj to a straight by dropping the leg that
-        # is co-incident with ci.
-
-        # drop the foot point of the second leg, making cj a straight
-        cj.points = cj.points[:2]
-        cj.clipped = True
-
-        # detatch cj from room 1, remembering the side the corridor was attached
-        # to so we can use it when connecting up the new corridor segment 
-        r1jside = r1.detach_corridor(jcor)
-
-        # attach cj to the intersection.
-        r3jside = r3.attached_side(jcor)
-        r3jside_opposite = RoomSide.opposite(r3jside)
-        assert r3jside is not None
-        # The attachment side is oposite the remainging attachment to R3
-        ri.corridors[r3jside_opposite].append(jcor)
-
-        # update the joins
-        print(f"01: cj: {str(cj.joins)} -> {[cj.joins[0], iri]}")
-        assert cj.joins[1] == ir1
-        cj.joins[1] = iri # the new intersection replaces the previous join to R1
-        cj.join_sides[1] = r3jside_opposite # opposite remaining attachment to R3
-        # joins & join_sides [0] remains attached to R3
-
-        # deal with the major corridor ---
-
-        # set the foot of the first leg to the intersection position
-        ci.points[ipfoot0] = pi.clone()
-        ci.clipped = True
-
-        # detach ci from room 1
-        r1iside = r1.detach_corridor(icor)
-        assert r1jside == r1iside # check it was attached to the same side as jcor
-
-        # atach it to the intersection the side of attachment is the *same* side
-        # as it was previously attached to R1 on.
-        ri.corridors[r1iside].append(icor)
-
-        print(f"01: ci: {str(ci.joins)} -> {[ir1, ci.joins[1]]}")    
-        assert ci.joins[0] == ir1
-        ci.joins[0] = iri
-        # join_sides remains the same
-
-        # deal with the inserted corridor cn ---
-
-        # attach the new corridor to R1
-        r1.corridors[r1iside].append(icn)
-        # attach the new corridor to the new room RI
-        ri.corridors[RoomSide.opposite(r1iside)].append(icn)
-
-        # Make the new corridor originate at the new intersection. (But we could pick either direction)
-        print(f"01: cn: {str(cn.joins)} -> {[iri, ir1]}")
-        cn.joins[0] = iri # intersection
-        cn.joins[1] = ir1 # R1
-        cn.join_sides[0] = RoomSide.opposite(r1iside)
-        cn.join_sides[1] = r1iside
-
-
-    def _corridor_lmerge_spur10(self, icor, jcor):
-        """
-        iside = 1, jside == 0
-
-                      R2 [., ., Ci, .]
-                      + p0
-  [., ., ., Ci]       |      Ci [R2, R1]
-        R1  p2+-------+ p1
-        R1  p0+----+ p1
-  [., ., ., Cj]    | <- spur Cj [R1, R3]
-                   + p2
-                   R3 [Cj, ., ., .]
-
-
-                      R2 [., ., Ci, .]
-                       + p0
-                Cn     |   Ci [R2, I]
-        R1  p1+---+I+--+ p1
-  [., ., ., Cn]    | <- spur Cj [R3, I]
-                   + p1
-                   R3 [Cj, ., ., .]
-
-        Cn [I, R1]
-
-        """
-
-        leg0, leg1 = 0, 1
-        ipfoot0 = 0 #leg0foot
-        ipelbow = 1
-        ipfoot1 = 2 #leg1foot
-
-        ci, cj = self.corridors[icor], self.corridors[jcor]
-        # As the second legs of each corridor must be co-incident as a condition
-        # for calling this function, the second legs of each corridor should
-        # both enter R1.
-        assert cj.joins[leg0] == ci.joins[leg1]
-
-        ir1 = cj.joins[leg0]
-        r1 = self.rooms[ir1] # == rooms[ci.joins[leg1]]
-        # r2 = self.rooms[ci.joins[leg0]] # room 2 is at the foot of ci leg0
-        r3 = self.rooms[cj.joins[leg1]] # room 3 is at the foot of cj leg1
-
-        # The intersection point is the elbow point of the shorter leg of cj.
-        # The caller must ensure icor allways refers to the long 'major'
-        # corridor
-        pi = cj.points[ipelbow].clone()
-        # The foot of the new corridor is taken from the foot of leg1 on ci or leg0 on cj
-        p1 = cj.points[ipfoot0].clone()
-
-        # Now we have the clip point pi, we can create the new corridor segment
-        # and the intersection
-        cn = Corridor(
-            points=[pi, p1], # [RI, R1] though we can chose either direction
-            joins=[None, None],
-            join_sides=[None, None],
-            is_inserted=True, generation=self.generation
-        )
-
-        ri = Room(generation=self.generation)  # intersection
-        ri.is_intersection = True
-        ri.center = pi.clone()
-
-        # The new corridor index
-        icn = len(self.corridors)
-
-        # The new intersection room index
-        iri = len(self.rooms)
-
-        self.corridors.append(cn)
-        self.rooms.append(ri)
-
-        # deal with the minor corridor first ---
-
-        # convert the minor corridor cj to a straight by dropping the leg that
-        # is co-incident with ci.
-
-        # drop the foot point of the first leg, making cj a straight
-        cj.points = cj.points[1:]
-        cj.clipped = True
-
-        # detatch cj from room 1, remembering the side the corridor was attached
-        # to so we can use it when connecting up the new corridor segment 
-        r1jside = r1.detach_corridor(jcor)
-
-        # attach cj to the intersection.
-        r3jside = r3.attached_side(jcor)
-        r3jside_opposite = RoomSide.opposite(r3jside)
-        assert r3jside is not None
-        # The attachment side is oposite the remainging attachment to R3
-        ri.corridors[r3jside_opposite].append(jcor)
-
-        # update the joins
-        print(f"10: cj: {str(cj.joins)} -> {[iri, ci.joins[1]]}")
-        assert cj.joins[0] == ir1
-        cj.joins[0] = iri # the new intersection replaces the previous join to R1
-        cj.join_sides[0] = r3jside_opposite # opposite remaining attachment to R3
-        # joins & join_sides [1] remains attached to R3
-
-        # deal with the major corridor ---
-
-        # set the foot of the second leg to the intersection position
-        ci.points[ipfoot1] = pi.clone()
-        ci.clipped = True
-
-        # detach ci from room 1
-        r1iside = r1.detach_corridor(icor)
-        assert r1jside == r1iside # check it was attached to the same side as jcor
-
-        # atach it to the intersection the side of attachment is the *same* side
-        # as it was previously attached to R1 on.
-        ri.corridors[r1iside].append(icor)
-
-        print(f"10: ci: {str(ci.joins)} -> {[ci.joins[0], iri]}")    
-        assert ci.joins[1] == ir1
-        ci.joins[1] = iri
-        # join_sides remains the same
-
-        # deal with the inserted corridor cn ---
-
-        # attach the new corridor to R1
-        r1.corridors[r1iside].append(icn)
-        # attach the new corridor to the new room RI
-        ri.corridors[RoomSide.opposite(r1iside)].append(icn)
-
-        # new corridor originates at the new intersection, as that follows the
-        # direction of the original corridor legs.
-        print(f"10: cn: {str(cn.joins)} -> {[iri, ir1]}")
-        cn.joins[0] = iri # intersection
-        cn.joins[1] = ir1 # R1
-        cn.join_sides[0] = RoomSide.opposite(r1iside)
-        cn.join_sides[1] = r1iside
-
-
-    def _corridor_lmerge_spur11(self, icor, jcor):
-        """
-
-        iside = 1, jside == 1
-
-                      R2 [., ., Ci, .]
-                      + p0
-  [., ., ., Ci]       |      Ci [R2, R1]
-        R1  p2+-------+ p1
-        R1  p2+----+ p1
-  [., ., ., Cj]    | <- spur Cj [R3, R1]
-                   + p0
-                   R3 [Cj, ., ., .]
-
-
-                      R2 [., ., Ci, .]
-                       + p0
-                Cn     |   Ci [R2, I]
-        R1  p1+---+I+--+ p1
-  [., ., ., Cn]    | <- spur Cj [R3, I]
-                   + p0
-                   R3 [Cj, ., ., .]
-
-        Cn [I, R1]
-        """
-
-        leg0, leg1 = 0, 1
-        ipelbow = 1
-        ipfoot1 = 2
-
-        ci, cj = self.corridors[icor], self.corridors[jcor]
-        # As the second legs of each corridor must be co-incident as a condition
-        # for calling this function, the second legs of each corridor should
-        # both enter R1.
-        assert cj.joins[leg1] == ci.joins[leg1]
-
-        ir1 = ci.joins[leg1]
-        r1 = self.rooms[ir1] # == rooms[cj.joins[leg1]]
-        # r2 = self.rooms[ci.joins[leg0]] # room 2 is at the foot of ci leg0
-        r3 = self.rooms[cj.joins[leg0]] # room 3 is at the foot of cj leg0
-
-        # The intersection point is the elbow point of the shorter leg of cj.
-        # The caller must ensure icor allways refers to the long 'major'
-        # corridor
-        pi = cj.points[ipelbow].clone()
-        # The foot of the new corridor is taken from the foot of leg1 on either ci or cj
-        p1 = cj.points[ipfoot1].clone()
-
-        # Now we have the clip point pi, we can create the new corridor segment
-        # and the intersection
-        cn = Corridor(
-            points=[pi, p1], # keep the direction the same as the original
-            joins=[None, None],
-            join_sides=[None, None],
-            is_inserted=True, generation=self.generation
-        )
-
-        ri = Room(generation=self.generation)  # intersection
-        ri.is_intersection = True
-        ri.center = pi.clone()
-
-        # The new corridor index
-        icn = len(self.corridors)
-
-        # The new intersection room index
-        iri = len(self.rooms)
-
-        self.corridors.append(cn)
-        self.rooms.append(ri)
-
-
-        # deal with the minor corridor first ---
-
-        # convert the minor corridor cj to a straight by dropping the leg that
-        # is co-incident with ci.
-
-        # drop the foot point of the second leg, making cj a straight
-        cj.points = cj.points[:2]
-        cj.clipped = True
-
-        # detatch cj from room 1, remembering the side the corridor was attached
-        # to so we can use it when connecting up the new corridor segment 
-        r1jside = r1.detach_corridor(jcor)
-
-        # attach cj to the intersection.
-        r3jside = r3.attached_side(jcor)
-        r3jside_opposite = RoomSide.opposite(r3jside)
-        assert r3jside is not None
-        # The attachment side is oposite the remainging attachment to R3
-        ri.corridors[r3jside_opposite].append(jcor)
-
-        # update the joins
-        print(f"11: cj: {str(cj.joins)} -> {[iri, ir1]}")
-        assert cj.joins[1] == ir1
-        cj.joins[1] = iri # the new intersection replaces the previous join to R1
-        cj.join_sides[1] = r3jside_opposite # opposite remaining attachment to R3
-        # joins & join_sides [0] remains attached to R3
-
-        # deal with the major corridor ---
-
-        # set the foot of the second leg to the intersection position
-        ci.points[ipfoot1] = pi.clone()
-        ci.clipped = True
-
-        # detach ci from room 1
-        r1iside = r1.detach_corridor(icor)
-        assert r1jside == r1iside # check it was attached to the same side as jcor
-
-        # atach it to the intersection the side of attachment is the *same* side
-        # as it was previously attached to R1 on.
-        ri.corridors[r1iside].append(icor)
-
-        print(f"11: ci: {str(ci.joins)} -> {[ci.joins[0], iri]}")    
-        assert ci.joins[1] == ir1
-        ci.joins[1] = iri
-
-        # deal with the inserted corridor cn ---
-
-        # attach the new corridor to R1
-        r1.corridors[r1iside].append(icn)
-        # attach the new corridor to the new room RI
-        ri.corridors[RoomSide.opposite(r1iside)].append(icn)
-
-        # new corridor originates at the new intersection, as that follows the
-        # direction of the original corridor legs.
-        print(f"11: cn: {str(cn.joins)} -> {[iri, ir1]}")
-        cn.joins[0] = iri # intersection
-        cn.joins[1] = ir1 # R1
-        cn.join_sides[0] = RoomSide.opposite(r1iside)
-        cn.join_sides[1] = r1iside
 
     def _generate_corridor_intersections(self):
         """resolve overlapping or crossing corridors"""

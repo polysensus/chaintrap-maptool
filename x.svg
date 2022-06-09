@@ -90,8 +90,8 @@
     <line fill="black" stroke="blue" stroke-width="3" x1="283.6534378315368" x2="248.900969978141" y1="345.27773353107494" y2="345.27773353107494"/>
     <circle cx="283.6534378315368" cy="345.27773353107494" fill="green" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
     <circle cx="248.900969978141" cy="345.27773353107494" fill="yellow" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
-    <line fill="black" stroke="blue" stroke-width="3" x1="533.5089228157668" x2="618.8393002482318" y1="336.1667531505905" y2="336.1667531505905"/>
-    <circle cx="533.5089228157668" cy="336.1667531505905" fill="green" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="569.761824356463" x2="618.8393002482318" y1="336.1667531505905" y2="336.1667531505905"/>
+    <circle cx="569.761824356463" cy="336.1667531505905" fill="green" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
     <circle cx="618.8393002482318" cy="336.1667531505905" fill="yellow" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
     <line fill="black" stroke="blue" stroke-width="3" x1="446.4271653841531" x2="502.6289228157669" y1="433.69092805864307" y2="433.69092805864307"/>
     <line fill="black" stroke="blue" stroke-width="3" x1="502.6289228157669" x2="502.6289228157669" y1="433.69092805864307" y2="350.32675315059055"/>
@@ -109,9 +109,8 @@
     <line fill="black" stroke="blue" stroke-width="3" x1="542.4596712948085" x2="542.4596712948085" y1="515.2411046392803" y2="491.1199638249373"/>
     <circle cx="508.02697431593157" cy="515.2411046392803" fill="green" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
     <circle cx="542.4596712948085" cy="491.1199638249373" fill="yellow" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
-    <line fill="black" stroke="blue" stroke-width="3" x1="533.5089228157668" x2="569.761824356463" y1="336.1667531505905" y2="336.1667531505905"/>
     <line fill="black" stroke="blue" stroke-width="3" x1="569.761824356463" x2="569.761824356463" y1="336.1667531505905" y2="356.7288443059817"/>
-    <circle cx="533.5089228157668" cy="336.1667531505905" fill="green" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <circle cx="569.761824356463" cy="336.1667531505905" fill="green" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
     <circle cx="569.761824356463" cy="356.7288443059817" fill="yellow" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
     <line fill="black" stroke="blue" stroke-width="3" x1="584.641824356463" x2="618.8393002482318" y1="383.1288443059817" y2="383.1288443059817"/>
     <line fill="black" stroke="blue" stroke-width="3" x1="618.8393002482318" x2="618.8393002482318" y1="383.1288443059817" y2="336.1667531505905"/>
@@ -137,6 +136,9 @@
     <line fill="black" stroke="blue" stroke-width="3" x1="644.234385201922" x2="644.234385201922" y1="336.18272800470424" y2="294.2269610038066"/>
     <circle cx="644.234385201922" cy="336.18272800470424" fill="green" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
     <circle cx="644.234385201922" cy="294.2269610038066" fill="yellow" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <line fill="black" stroke="blue" stroke-width="3" x1="533.5089228157668" x2="569.761824356463" y1="336.1667531505905" y2="336.1667531505905"/>
+    <circle cx="533.5089228157668" cy="336.1667531505905" fill="green" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
+    <circle cx="569.761824356463" cy="336.1667531505905" fill="yellow" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
     <line fill="black" stroke="blue" stroke-width="3" x1="618.8393002482318" x2="618.8393002482318" y1="336.1667531505905" y2="294.2269610038066"/>
     <circle cx="618.8393002482318" cy="336.1667531505905" fill="green" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
     <circle cx="618.8393002482318" cy="294.2269610038066" fill="yellow" fill-opacity="1.0" r="4.8" stroke="black" stroke-width="3"/>
@@ -204,9 +206,13 @@
     <text x="439.58410906736987" y="286.7733207212099">
       <tspan fill="black" font-family="monospace" font-size="15" font-weight="normal" stroke="black" stroke-width="0.5">15</tspan>
     </text>
+    <circle cx="569.761824356463" cy="336.1667531505905" fill="yellow" fill-opacity="1.0" r="12.0" stroke="black" stroke-width="1"/>
+    <text x="561.761824356463" y="340.96675315059053">
+      <tspan fill="black" font-family="monospace" font-size="15" font-weight="normal" stroke="black" stroke-width="0.5">16</tspan>
+    </text>
     <circle cx="618.8393002482318" cy="336.1667531505905" fill="yellow" fill-opacity="1.0" r="12.0" stroke="black" stroke-width="1"/>
     <text x="610.8393002482318" y="340.96675315059053">
-      <tspan fill="black" font-family="monospace" font-size="15" font-weight="normal" stroke="black" stroke-width="0.5">16</tspan>
+      <tspan fill="black" font-family="monospace" font-size="15" font-weight="normal" stroke="black" stroke-width="0.5">17</tspan>
     </text>
     <circle cx="345.4802535372488" cy="515.2411046392803" fill="green" fill-opacity="1.0" r="8.0" stroke="black" stroke-width="1"/>
     <text x="341.4802535372488" y="520.0411046392802">
@@ -228,8 +234,8 @@
     <text x="262.2772039048389" y="350.0777335310749">
       <tspan fill="black" font-family="monospace" font-size="11" font-weight="normal" stroke="black" stroke-width="0.5">4</tspan>
     </text>
-    <circle cx="576.1741115319993" cy="336.1667531505905" fill="green" fill-opacity="1.0" r="8.0" stroke="black" stroke-width="1"/>
-    <text x="572.1741115319993" y="340.96675315059053">
+    <circle cx="594.3005623023474" cy="336.1667531505905" fill="green" fill-opacity="1.0" r="8.0" stroke="black" stroke-width="1"/>
+    <text x="590.3005623023474" y="340.96675315059053">
       <tspan fill="black" font-family="monospace" font-size="11" font-weight="normal" stroke="black" stroke-width="0.5">5</tspan>
     </text>
     <circle cx="502.6289228157669" cy="433.69092805864307" fill="green" fill-opacity="1.0" r="8.0" stroke="black" stroke-width="1"/>
@@ -248,8 +254,8 @@
     <text x="538.4596712948085" y="520.0411046392802">
       <tspan fill="black" font-family="monospace" font-size="11" font-weight="normal" stroke="black" stroke-width="0.5">9</tspan>
     </text>
-    <circle cx="569.761824356463" cy="336.1667531505905" fill="green" fill-opacity="1.0" r="8.0" stroke="black" stroke-width="1"/>
-    <text x="561.761824356463" y="340.96675315059053">
+    <circle cx="569.761824356463" cy="346.44779872828616" fill="green" fill-opacity="1.0" r="8.0" stroke="black" stroke-width="1"/>
+    <text x="561.761824356463" y="351.24779872828617">
       <tspan fill="black" font-family="monospace" font-size="11" font-weight="normal" stroke="black" stroke-width="0.5">10</tspan>
     </text>
     <circle cx="618.8393002482318" cy="383.1288443059817" fill="green" fill-opacity="1.0" r="8.0" stroke="black" stroke-width="1"/>
@@ -280,9 +286,13 @@
     <text x="636.234385201922" y="320.0048445042554">
       <tspan fill="black" font-family="monospace" font-size="11" font-weight="normal" stroke="black" stroke-width="0.5">17</tspan>
     </text>
+    <circle cx="551.6353735861148" cy="336.1667531505905" fill="green" fill-opacity="1.0" r="8.0" stroke="black" stroke-width="1"/>
+    <text x="543.6353735861148" y="340.96675315059053">
+      <tspan fill="black" font-family="monospace" font-size="11" font-weight="normal" stroke="black" stroke-width="0.5">18</tspan>
+    </text>
     <circle cx="618.8393002482318" cy="315.19685707719856" fill="green" fill-opacity="1.0" r="8.0" stroke="black" stroke-width="1"/>
     <text x="610.8393002482318" y="319.99685707719857">
-      <tspan fill="black" font-family="monospace" font-size="11" font-weight="normal" stroke="black" stroke-width="0.5">18</tspan>
+      <tspan fill="black" font-family="monospace" font-size="11" font-weight="normal" stroke="black" stroke-width="0.5">19</tspan>
     </text>
     <text x="182.500969978141" y="550.8411046392803">
       <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">Rooms</tspan>
@@ -294,10 +304,10 @@
       <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (0): corridors N=, W=3, S=0, E=13</tspan>
     </text>
     <text x="182.500969978141" y="586.8411046392803">
-      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (1): corridors N=15, W=14, S=, E=1,2</tspan>
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (1): corridors N=15, W=14, S=1, E=2</tspan>
     </text>
     <text x="182.500969978141" y="604.8411046392803">
-      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (2): corridors N=, W=4, S=1,3, E=</tspan>
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (2): corridors N=, W=4, S=3, E=1</tspan>
     </text>
     <text x="182.500969978141" y="622.8411046392803">
       <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (3): corridors N=, W=, S=, E=14</tspan>
@@ -306,16 +316,16 @@
       <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (4): corridors N=, W=, S=15, E=</tspan>
     </text>
     <text x="182.500969978141" y="658.8411046392803">
-      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (5): corridors N=10, W=, S=7, E=5,6</tspan>
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (5): corridors N=, W=7, S=6, E=18</tspan>
     </text>
     <text x="182.500969978141" y="676.8411046392803">
-      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (6): corridors N=, W=, S=, E=8,9</tspan>
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (6): corridors N=, W=, S=9, E=8</tspan>
     </text>
     <text x="182.500969978141" y="694.8411046392803">
       <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (7): corridors N=, W=, S=, E=16</tspan>
     </text>
     <text x="182.500969978141" y="712.8411046392803">
-      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (8): corridors N=, W=, S=8, E=10,11</tspan>
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (8): corridors N=10, W=, S=8, E=11</tspan>
     </text>
     <text x="182.500969978141" y="730.8411046392803">
       <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (9): corridors N=, W=, S=12, E=</tspan>
@@ -324,28 +334,31 @@
       <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (10): corridors N=17, W=, S=, E=</tspan>
     </text>
     <text x="182.500969978141" y="766.8411046392803">
-      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (11): corridors N=, W=0, S=9, E=</tspan>
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (11): corridors N=, W=0, S=, E=9</tspan>
     </text>
     <text x="182.500969978141" y="784.8411046392803">
       <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (12): corridors N=, W=, S=, E=4</tspan>
     </text>
     <text x="182.500969978141" y="802.8411046392803">
-      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (13): corridors N=, W=12, S=17,18, E=</tspan>
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (13): corridors N=, W=12, S=17,19, E=</tspan>
     </text>
     <text x="182.500969978141" y="820.8411046392803">
-      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (14): corridors N=, W=13, S=6, E=</tspan>
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (14): corridors N=, W=13, S=, E=6</tspan>
     </text>
     <text x="182.500969978141" y="838.8411046392803">
-      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (15): corridors N=16, W=2,7, S=, E=</tspan>
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">room (15): corridors N=16, W=2, S=7, E=</tspan>
     </text>
     <text x="182.500969978141" y="856.8411046392803">
-      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">inter (16): corridors N=18, W=5, S=11, E=</tspan>
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">inter (16): corridors N=, W=18, S=10, E=5</tspan>
+    </text>
+    <text x="182.500969978141" y="874.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">inter (17): corridors N=19, W=5, S=11, E=</tspan>
     </text>
     <text x="675.5494701556122" y="568.8411046392803">
       <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (0): kind=elbow, south-west, joins=0.11, clipped=0, entangled=</tspan>
     </text>
     <text x="675.5494701556122" y="586.8411046392803">
-      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (1): kind=elbow, east-south, joins=1.2, clipped=0, entangled=</tspan>
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (1): kind=elbow, south-east, joins=2.1, clipped=0, entangled=</tspan>
     </text>
     <text x="675.5494701556122" y="604.8411046392803">
       <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (2): kind=linear, east-west, joins=1.15, clipped=0, entangled=</tspan>
@@ -357,25 +370,25 @@
       <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (4): kind=linear, west-east, joins=2.12, clipped=0, entangled=</tspan>
     </text>
     <text x="675.5494701556122" y="658.8411046392803">
-      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (5): kind=linear, east-west, joins=5.16, clipped=True, entangled=</tspan>
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (5): kind=linear, east-south, joins=16.17, clipped=True, entangled=</tspan>
     </text>
     <text x="675.5494701556122" y="676.8411046392803">
-      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (6): kind=elbow, east-south, joins=5.14, clipped=0, entangled=</tspan>
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (6): kind=elbow, south-east, joins=14.5, clipped=0, entangled=</tspan>
     </text>
     <text x="675.5494701556122" y="694.8411046392803">
-      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (7): kind=elbow, south-west, joins=5.15, clipped=0, entangled=</tspan>
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (7): kind=elbow, west-south, joins=15.5, clipped=0, entangled=</tspan>
     </text>
     <text x="675.5494701556122" y="712.8411046392803">
       <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (8): kind=elbow, east-south, joins=6.8, clipped=0, entangled=</tspan>
     </text>
     <text x="675.5494701556122" y="730.8411046392803">
-      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (9): kind=elbow, east-south, joins=6.11, clipped=0, entangled=</tspan>
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (9): kind=elbow, south-east, joins=11.6, clipped=0, entangled=</tspan>
     </text>
     <text x="675.5494701556122" y="748.8411046392803">
-      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (10): kind=elbow, east-north, joins=8.5, clipped=0, entangled=</tspan>
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (10): kind=linear, south-east, joins=16.8, clipped=0, entangled=</tspan>
     </text>
     <text x="675.5494701556122" y="766.8411046392803">
-      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (11): kind=elbow, east-south, joins=8.16, clipped=True, entangled=</tspan>
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (11): kind=elbow, east-south, joins=8.17, clipped=True, entangled=</tspan>
     </text>
     <text x="675.5494701556122" y="784.8411046392803">
       <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (12): kind=elbow, south-west, joins=9.13, clipped=0, entangled=</tspan>
@@ -396,7 +409,10 @@
       <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (17): kind=linear, north-south, joins=10.13, clipped=0, entangled=</tspan>
     </text>
     <text x="675.5494701556122" y="892.8411046392803">
-      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (18): kind=linear, north-south, joins=16.13, inserted,clipped=0, entangled=</tspan>
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (18): kind=linear, east-west, joins=5.16, inserted,clipped=0, entangled=</tspan>
+    </text>
+    <text x="675.5494701556122" y="910.8411046392803">
+      <tspan fill="black" font-family="monospace" font-size="14" font-weight="normal" stroke="black" stroke-width="0.5">cor (19): kind=linear, north-south, joins=17.13, inserted,clipped=0, entangled=</tspan>
     </text>
   </g>
 </svg>

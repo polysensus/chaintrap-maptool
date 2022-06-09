@@ -398,9 +398,11 @@ def box_lextrude(b0, b1, factor=0.5, min=0.0):
     b = [b0, b1]
 
     ib0, ib1 = 0, 1
+    ifoot = 0
     if b[0].tl.x > b[1].br.x:
         # flipped case
         ib0, ib1 = 1, 0
+        ifoot = 1
 
     b0_right_i = Vec2(b[ib0].br.x, b[ib0].tl.y + (b[ib0].br.y - b[ib0].tl.y) * factor)
     b1_left_i = Vec2(b[ib1].tl.x, b[ib1].tl.y + (b[ib1].br.y - b[ib1].tl.y) * factor)
@@ -411,8 +413,16 @@ def box_lextrude(b0, b1, factor=0.5, min=0.0):
     b1_top_i = Vec2(b[ib1].tl.x + (b[ib1].br.x - b[ib1].tl.x) * factor, b[ib1].tl.y)
     b1_bot_i = Vec2(b[ib1].tl.x + (b[ib1].br.x - b[ib1].tl.x) * factor, b[ib1].br.y)
 
-     # b1 right to b2 top
-    if b[ib0].tl.y < b[ib1].tl.y:
+    # b1 right to b2 top
+    # +-----+b1_i            +-----+b2_i
+    # |b1   |-----+          |b2   |-----+
+    # +-----+     |          +-----+     |
+    #     |      +-----+         |      +-----+
+    #     +______|b2   |         +______|b1   |
+    #            |     |                |     |
+    #            +-----+                +-----+
+    #if b[ib0].tl.y < b[ib1].tl.y:
+    if b[ib0].br.y < b[ib1].tl.y:
 
         # b[0].x is always < b[1].x
         el_right_top = (b0_right_i, Vec2(b1_top_i.x, b0_right_i.y), b1_top_i)
@@ -425,24 +435,54 @@ def box_lextrude(b0, b1, factor=0.5, min=0.0):
         d2_bot_left += dist2(el_bot_left[1], el_bot_left[2])
 
         if d2_right_top < d2_bot_left:
-            return identify_ends(el_right_top), identify_ends(el_bot_left)
+
+            # return identify_ends(el_right_top), identify_ends(el_bot_left)
+            join1, join2 = [None, None], [None, None]
+
+            join1[ib0], join1[ib1] = (RIGHT, TOP)
+            join2[ib0], join2[ib1] = (BOTTOM, LEFT)
+
+            return ifoot, (el_right_top, join1), (el_bot_left, join2)
+
         else:
-            return identify_ends(el_bot_left), identify_ends(el_right_top)
+            # return identify_ends(el_bot_left), identify_ends(el_right_top)
+            join1, join2 = [None, None], [None, None]
 
+            join1[ib0], join1[ib1] = (BOTTOM, LEFT)
+            join2[ib0], join2[ib1] = (RIGHT, TOP)
+            return ifoot, (el_bot_left, join1), (el_right_top, join2)
 
-    el_top_right = (b0_top_i, Vec2(b0_top_i.x, b1_left_i.y), b1_left_i)
+    # b1 top to b2 left
+    #            +-----+                +-----+
+    #     +____  |b2   |         +____  |b1   |
+    #     |      +-----+         |      +-----+
+    # +-----+      |         +-----+      |
+    # |b1   |------+         |b2   |------+
+    # +-----+ b1_i           +-----+ b2_i
+
+    el_top_left = (b0_top_i, Vec2(b0_top_i.x, b1_left_i.y), b1_left_i)
     el_right_bot = (b0_right_i, Vec2(b1_bot_i.x, b0_right_i.y), b1_bot_i)
 
-    d2_top_right = dist2(el_top_right[0], el_top_right[1])
-    d2_top_right += dist2(el_top_right[1], el_top_right[2])
+    d2_top_left = dist2(el_top_left[0], el_top_left[1])
+    d2_top_left += dist2(el_top_left[1], el_top_left[2])
     d2_right_bot = dist2(el_right_bot[0], el_right_bot[1])
     d2_right_bot += dist2(el_right_bot[1], el_right_bot[1])
 
-    if d2_top_right < d2_right_bot:
-        return identify_ends(el_top_right), identify_ends(el_right_bot)
-    else:
-        return identify_ends(el_right_bot), identify_ends(el_top_right)
+    if d2_top_left < d2_right_bot:
+        # return identify_ends(el_top_left), identify_ends(el_right_bot)
+        join1, join2 = [None, None], [None, None]
 
+        join1[ib0], join1[ib1] = (TOP, LEFT)
+        join2[ib0], join2[ib1] = (RIGHT, BOTTOM)
+        return ifoot, (el_top_left, join1), (el_right_bot, join2)
+
+    else:
+        # return identify_ends(el_right_bot), identify_ends(el_top_left)
+        join1, join2 = [None, None], [None, None]
+
+        join1[ib0], join1[ib1] = (RIGHT, BOTTOM)
+        join2[ib0], join2[ib1] = (TOP, LEFT)
+        return ifoot, (el_right_bot, join1), (el_top_left, join2)
 
 
 def xbox_lextrude(b1, b2, factor=0.5, min=0.0):
