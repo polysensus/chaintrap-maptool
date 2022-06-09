@@ -294,6 +294,8 @@ class Generator:
         # ok, its an elbow. there are always two to pick from. the joins tuple
         # indicates which side the elbow (LEAVES, ENTERS) and is correct for cor.join_sides 'as is'
 
+        print(f"extrude: r{i}, r{j}")
+
         (line1, join1), (line2, join2) = g.box_lextrude(
             bi, bj
         )  # each line will be 3 points
@@ -441,29 +443,188 @@ class Generator:
                 if len(cj.points) != 3:
                     continue
 
-                cj_a, cj_b = cj.points[j], cj.points[j + 1]
+                if ci.joins[0] == cj.joins[0]:
+                    if (g.dist2(cj.points[0], cj.points[0]) < g.dist2(ci.points[0], ci.points[0])):
 
-                # for the entangled_even case we still need to pick the right sides
-                if g.check_line_in_line(cj_a, cj_b, ci_a, ci_b):
-                    # c2 in c1 so c1 is long
-                    assert not (ci.entangled_even or cj.entangled_even)
-                    lmerge_spur[(i,j)](icor, jcor)
-                    self.corridors[icor].entangled.remove(jcor)
-                    self.corridors[jcor].entangled.remove(icor)
-                    return
+                        iri = self._corridor_lmerge_split_long(icor, 0, cj.points[1].clone())
+                        self._corridor_lmerge_truncate_short(jcor, 0, iri)
+                        # lmerge_spur[(0,0)](icor, jcor)
+                    else:
+                        iri = self._corridor_lmerge_split_long(jcor, 0, ci.points[1].clone())
+                        self._corridor_lmerge_truncate_short(icor, 0, iri)
 
-                elif g.check_line_in_line(ci_a, ci_b, cj_a, cj_b):
-                    assert not (ci.entangled_even or cj.entangled_even)
-                    lmerge_spur[(j,i)](jcor, icor)
-                    self.corridors[icor].entangled.remove(jcor)
-                    self.corridors[jcor].entangled.remove(icor)
-                    return
+                        # lmerge_spur[(0,0)](jcor, icor)
+                elif ci.joins[0] == cj.joins[1]:
+                    if (g.dist2(cj.points[1], cj.points[2]) < g.dist2(ci.points[0], ci.points[0])):
+                        # lmerge_spur[(0,1)](icor, jcor)
+                        iri = self._corridor_lmerge_split_long(icor, 0, cj.points[1].clone())
+                        self._corridor_lmerge_truncate_short(jcor, 1, iri)
+                    else:
+                        # lmerge_spur[(0,1)](jcor, icor)
+                        iri = self._corridor_lmerge_split_long(jcor, 0, ci.points[1].clone())
+                        self._corridor_lmerge_truncate_short(icor, 1, iri)
 
-                elif g.pt_essentially_same(ci_a, cj_a) and g.pt_essentially_same(ci_b, cj_b):
-                    assert ci.entangled_even or cj.entangled_even
-                    self._corridor_lmerge_even(icor, jcor, i, j)
-                    return
+                elif ci.joins[1] == cj.joins[0]:
+                    if (g.dist2(cj.points[0], cj.points[0]) < g.dist2(ci.points[1], ci.points[2])):
+                        # lmerge_spur[(1,0)](icor, jcor)
+                        iri = self._corridor_lmerge_split_long(icor, 1, cj.points[1].clone())
+                        self._corridor_lmerge_truncate_short(jcor, 0, iri)
 
+                    else:
+                        # lmerge_spur[(1,0)](jcor, icor)
+                        iri = self._corridor_lmerge_split_long(jcor, 0, ci.points[1].clone())
+                        self._corridor_lmerge_truncate_short(icor, 1, iri)
+
+                else:
+                    assert ci.joins[1] == cj.joins[1]
+                    if (g.dist2(cj.points[1], cj.points[2]) < g.dist2(ci.points[1], ci.points[2])):
+                        # lmerge_spur[(1,1)](icor, jcor)
+                        iri = self._corridor_lmerge_split_long(icor, 1, cj.points[1].clone())
+                        self._corridor_lmerge_truncate_short(jcor, 1, iri)
+
+                    else:
+                        # lmerge_spur[(1,1)](jcor, icor)
+                        iri = self._corridor_lmerge_split_long(jcor, 1, ci.points[1].clone())
+                        self._corridor_lmerge_truncate_short(icor, 1, iri)
+
+                self.corridors[icor].entangled.remove(jcor)
+                self.corridors[jcor].entangled.remove(icor)
+
+
+    def _corridor_lmerge_truncate_short(self, icor, r1end, iri):
+        """
+        Here we are making the L between R1 - R3 into a straight joining R1 R3
+
+        We do this by removing the r1end point. The old elbow point becomes the end point. Which is also the center of the new intersection
+
+ r1end=0           
+            RI(pi) |
+        R1 --+-----+ 
+             |  ci
+             R3 
+
+               R1 r1end=1
+                |     ci
+          RI(pi)+----R3 
+                |
+           -----+
+       
+        """
+        ci = self.corridors[icor]
+
+        ir1 = ci.joins[r1end]
+        r1 = self.rooms[ir1]
+
+        # adjust the corridor join to end at the RI intersection rather than R1
+        orig = ci.joins[:]
+        orig_sides = ci.join_sides[:]
+
+        if r1end == 0:
+            ci.points = ci.points[1:]
+        else:
+            ci.points = ci.points[:2]
+
+        # we want the side *opposite* the side we attach too on R3    
+        riside = RoomSide.opposite(ci.joins[1-r1end])
+
+        # note: iri is a parameter as it is typically generated by spliting the other entangled 'longer' corridor segment.
+        ci.joins[r1end] = iri
+        ci.join_sides[r1end] = riside
+
+        print(f"trunc-short: cn: {str(orig)} -> {str(ci.joins)}")
+
+        # detach from R1
+        r1.detach_corridor(icor)
+        # attach the truncated corridor to the intersection
+        ri = self.rooms[iri]
+        ri.corridors[riside].append(icor)
+
+    def _corridor_lmerge_split_long(self, icor, r1end, pi):
+        """
+        Here we are spliting the L between R1 - R2 on the leg joining R1 and inserting a new straight corridor segment
+        to join the new intersection to R1
+
+                   R2
+            RI(pi) | ci
+        R1 --+-----+ r1end=0
+             |
+               R1 r1end=1
+                |
+          RI(pi)+--
+             ci |
+        R2 -----+
+        """
+
+        ci = self.corridors[icor]
+
+        # the corridor foot rests on the room attached to the side we are splitting
+        ipfoot = r1end * 2 # 0 or 2
+
+        # the corridor head rests on the room attached to the side we are not splitting
+        iphead = (1-r1end) * 2 # 0 or 2
+
+
+        # Make a new corridor joining R1 to the intersection point. The
+        # intersection point is the elbow point of the shorter leg of cj.
+        ir1 = ci.joins[r1end]
+        r1 = self.rooms[ir1]
+
+        # The foot of the new corridor will rest on r1
+        p1 = ci.points[ipfoot].clone()
+
+        # create the new corridor segment and the intersection
+        cn = Corridor(
+            points=[None, None],
+            joins=[None, None],
+            join_sides=[None, None],
+            is_inserted=True, generation=self.generation
+        )
+
+        cn.points[ipfoot] = p1 # R1
+        cn.points[iphead] = pi # RI
+
+        ri = Room(generation=self.generation)  # intersection
+        ri.is_intersection = True
+        ri.center = pi.clone()
+
+        # The new intersection room index
+        iri = len(self.rooms)
+
+        self.corridors.append(cn)
+        self.rooms.append(ri)
+
+        # detach ci from room 1 and clip it
+
+        # set the foot of the second leg to the intersection position
+        ci.points[ipfoot] = pi.clone()
+        ci.clipped = True
+
+        # detach ci from room 1
+        r1iside = r1.detach_corridor(icor)
+
+        # attach it to the intersection the side of attachment is the *same*
+        # side as it was previously attached to R1 on.
+        ri.corridors[r1iside].append(icor)
+
+        # update the join for the clipped end so it joins to the new intersection
+        orig = ci.joins[:]
+        assert ci.joins[r1end] == ir1
+        ci.joins[r1end] = iri
+
+        print(f"split-long: ci: {str(ci.joins)} -> {ci.joins}")    
+
+        # make the new corridor segment join *from* the interesection *to* R1 so
+        # that the new corridor foot joins R1 at the same 'end'. This isn't
+        # strictly necessary but it makes it easier to follow the logic
+
+        orig = cn.joins[:] # so we can log before and after
+        cn.joins[r1end] = ir1 # R1
+        cn.joins[1 - r1end] = iri # intersection
+        cn.join_sides[r1end] = r1iside
+        cn.join_sides[1 - r1end] = RoomSide.opposite(r1iside)
+        print(f"split-long: cn: {str(orig)} -> {str(cn.joins)}")
+
+        return ir1
 
     def _corridor_lmerge_spur00(self, icor, jcor):
         """
@@ -1053,10 +1214,18 @@ class Generator:
                     if c2.generation == self.generation:
                         print(f"skipping new entangled corridor {jc}")
                         continue
+
+                    considered.add((ic, jc))
+                    # considered.add((jc, ic))
                     if len(c1.points) == 3 and len(c2.points) == 3:
                         self._corridor_lmerge(ic, jc)
-                    considered.add((ic, jc))
-                    considered.add((jc, ic))
+                        continue
+                    if len(c1.points) == 2 and len(c2.points) == 3:
+                        self._corridor_hvlmerge(ic, jc)
+                        continue
+                    if len(c1.points) == 3 and len(c2.points) == 2:
+                        self._corridor_hvlmerge(ic, jc)
+                        continue
 
 
     def _generate_corridors(self):
@@ -1073,6 +1242,8 @@ class Generator:
 
         nc, nr = len(self.corridors), len(self.rooms)
         self._generate_corridor_intersections()
+
+        return
         while nc != len(self.corridors) or nr != len(self.rooms):
             self.generation += 1
             nc, nr = len(self.corridors), len(self.rooms)
