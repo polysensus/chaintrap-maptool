@@ -69,6 +69,8 @@ def test_generator_persist():
     g.load(source)
 
     for (i, r) in enumerate(rooms1):
+        if r != g.model.rooms[i]:
+            print('x')
         assert r == g.model.rooms[i]
 
 def test_run():

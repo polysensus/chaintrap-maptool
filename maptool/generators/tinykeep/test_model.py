@@ -119,7 +119,7 @@ def spur_horizontal(emptymodel, rooms3_horizontal_spur):
         )
 
     cb = Corridor(
-        points=[Vec2(4.0, 8.0), Vec2(8.0, 8.0), Vec2(12.0, 4.0)],
+        points=[Vec2(4.0, 8.0), Vec2(8.0, 8.0), Vec2(8.0, 12.0)],
         joins=[0,2],
         join_sides=[EAST, NORTH]
         )
@@ -192,7 +192,7 @@ def spur_horizontal_11(emptymodel, rooms3_horizontal_spur):
         )
 
     cb = Corridor(
-        points=[Vec2(12.0, 4.0), Vec2(8.0, 8.0), Vec2(4.0, 8.0)],
+        points=[Vec2(8.0, 12.0), Vec2(8.0, 8.0), Vec2(4.0, 8.0)],
         joins=[2, 0],
         join_sides=[NORTH, EAST]
         )
@@ -204,9 +204,6 @@ def spur_horizontal_11(emptymodel, rooms3_horizontal_spur):
     g.rooms.extend([r1, r2, r3])
     g.corridors.extend([ca, cb])
     return g
-
-
-
 
 
 @pytest.fixture
@@ -306,9 +303,17 @@ class TestModel:
 
         assert ca.join_sides[0] == EAST
         assert ca.join_sides[1] == SOUTH
-
         assert cb.join_sides[0] == EAST
         assert cb.join_sides[1] == NORTH
+
+        # assert the test data is the shape we expect
+        assert essentially_equal(ca.points[0].y, ca.points[1].y)
+        assert essentially_equal(ca.points[1].x, ca.points[2].x)
+        assert essentially_equal(cb.points[0].y, cb.points[1].y)
+        assert essentially_equal(cb.points[1].x, cb.points[2].x)
+
+        assert pt_essentially_same(ca.points[0], cb.points[0])
+        assert pt_dist2(cb.points[0], cb.points[1]) < pt_dist2(ca.points[0], ca.points[1])
 
         g._generate_corridor_intersections()
         assert len(g.corridors) == 3
@@ -326,10 +331,10 @@ class TestModel:
 
         # check the new corridor
         cnew = g.corridors[2]
-        assert cnew.joins[0] == 3
-        assert cnew.joins[1] == 0
-        assert cnew.join_sides[0] == WEST
-        assert cnew.join_sides[1] == EAST
+        assert cnew.joins[0] == 0
+        assert cnew.joins[1] == 3
+        assert cnew.join_sides[0] == EAST
+        assert cnew.join_sides[1] == WEST
 
         # check the spur
         assert cb.join_sides[0] == SOUTH
@@ -359,10 +364,20 @@ class TestModel:
 
         assert ca.join_sides[0] == SOUTH 
         assert ca.join_sides[1] == EAST
-
         assert cb.join_sides[0] == NORTH
         assert cb.join_sides[1] == EAST
 
+        # assert the test data is the shape we expect
+        assert essentially_equal(ca.points[1].y, ca.points[2].y)
+        assert essentially_equal(ca.points[0].x, ca.points[1].x)
+        assert essentially_equal(cb.points[1].y, cb.points[2].y)
+        assert essentially_equal(cb.points[0].x, cb.points[1].x)
+
+        assert pt_essentially_same(ca.points[2], cb.points[2])
+        # assert pt_dist2(ca.points[1], ca.points[2]) > pt_dist2(cb.points[1], cb.points[2])
+        assert pt_dist2(cb.points[1], cb.points[2]) < pt_dist2(ca.points[1], ca.points[2])
+
+        # merge the corridors
         g._generate_corridor_intersections()
         assert len(g.corridors) == 3
         assert len(g.rooms) == 4
@@ -431,10 +446,10 @@ class TestModel:
 
         # check the new corridor
         cnew = g.corridors[2]
-        assert cnew.joins[0] == 3
-        assert cnew.joins[1] == 0
-        assert cnew.join_sides[0] == WEST
-        assert cnew.join_sides[1] == EAST
+        assert cnew.joins[0] == 0
+        assert cnew.joins[1] == 3
+        assert cnew.join_sides[0] == EAST
+        assert cnew.join_sides[1] == WEST
 
         # check the clipped side
         assert ca.join_sides[0] == EAST
@@ -485,10 +500,10 @@ class TestModel:
 
         # check the new corridor
         cnew = g.corridors[2]
-        assert cnew.joins[0] == 3
-        assert cnew.joins[1] == 0
-        assert cnew.join_sides[0] == EAST
-        assert cnew.join_sides[1] == WEST
+        assert cnew.joins[0] == 0
+        assert cnew.joins[1] == 3
+        assert cnew.join_sides[0] == WEST
+        assert cnew.join_sides[1] == EAST
 
         # major side
         assert ca.join_sides[0] == WEST
@@ -543,10 +558,10 @@ class TestModel:
 
         # check the new corridor
         cnew = g.corridors[2]
-        assert cnew.joins[0] == 3 # rnew
-        assert cnew.joins[1] == 0
-        assert cnew.join_sides[0] == EAST
-        assert cnew.join_sides[1] == WEST
+        assert cnew.joins[0] == 0
+        assert cnew.joins[1] == 3 # rnew
+        assert cnew.join_sides[0] == WEST
+        assert cnew.join_sides[1] == EAST
 
         # major side
         assert ca.join_sides[0] == WEST

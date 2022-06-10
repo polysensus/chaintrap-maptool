@@ -130,7 +130,7 @@
       {
         "join_sides": [
           3,
-          2
+          1
         ],
         "joins": [
           16,
@@ -245,7 +245,7 @@
       },
       {
         "join_sides": [
-          2,
+          1,
           3
         ],
         "joins": [
@@ -779,7 +779,7 @@
     "beta": "92fbb4da14bcea8d776e4214c6ebad433c733b80a3515ac70946fb2b8d841e89f8da45455382d1eb7e90647df51c56c24c88e4e8591b96fb1be3c3fe6fe7735e",
     "pi": "367b5cb86ea2856a1740f9fa0e6fff0ff44286f6c508ae18db9bce15054d04aeede63cd0a2def346dbee04ade9630abccc65a087a3f967d11969f5d2c19629a363311aa03cb9c3fe364da8b0d0edbe08",
     "public_key": "bc633f327c4b6a6841d14bb7e1a8ac011651263359390899dbe45b08230255be",
-    "secret": "98b8684c68f8b9f51646908d1523aefbb2f121e28b883342f7ad4374b7c04bb7",
+    "secret": "5ebe4989b24956374a691a60a6170728655576f56db893362364384597f6038b",
     "seed": "9c9d1793f1e2c6db"
   }
 }
