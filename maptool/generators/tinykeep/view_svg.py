@@ -375,8 +375,8 @@ class Viewer:
                 if len(cor.alternate_crosses):
                     colour = "yellow"
 
-                structure.append(SceneLine(start=p1, end=p2, opacity=0.3, stroke=colour, **line_kw))
-                structure.append(SceneLine(start=p2, end=p3, opacity=0.3, stroke=colour, **line_kw))
+                structure.append(SceneLine(start=p1, end=p2, stroke=colour, **line_kw))
+                structure.append(SceneLine(start=p2, end=p3, stroke=colour, **line_kw))
                 append_end_circles(p1, p3)
 
 
