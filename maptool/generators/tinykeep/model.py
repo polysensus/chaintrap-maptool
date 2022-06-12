@@ -433,7 +433,7 @@ class Generator:
 
                 # We are going to truncate the L by clipping and attaching it to
                 # the room at the other end of cj - as its lying ON the L corridor.
-                iri = cj.joins[1] # the L is going to truncate and attach to the 
+                iri = cj.joins[1] # index of intersection room
                 self._corridor_lmerge_truncate_long(icor, 0, cj.points[1].clone(), iri)
                 # there is nothing left to do to the shorter straigh corridor.
             else:
@@ -444,37 +444,43 @@ class Generator:
                 # We just shorten the leg attached to R1 and move it to RI
                 self._corridor_lmerge_truncate_long(icor, 0, ci.points[1].clone(), iri)
 
+        # the remaining cases are the same, its just that the endian-ness of the corridors changes
         elif ci.joins[0] == cj.joins[1]:
-            if False:
-                if (g.dist2(cj.points[1], cj.points[2]) < g.dist2(ci.points[0], ci.points[1])):
-                    iri = self._corridor_lmerge_split_long(icor, 0, cj.points[1].clone())
-                    self._corridor_lmerge_truncate_lshort(jcor, 1, iri)
-                else:
-                    iri = self._corridor_lmerge_split_long(jcor, 0, ci.points[1].clone())
-                    self._corridor_lmerge_truncate_lshort(icor, 1, iri)
+            if (g.dist2(cj.points[0], cj.points[1]) < g.dist2(ci.points[0], ci.points[1])):
+                iri = cj.joins[0] # index of intersection room
+                self._corridor_lmerge_truncate_long(icor, 0, cj.points[1].clone(), iri)
+                # there is nothing left to do to the shorter straigh corridor.
+            else:
+                # the straight is longer, so we need to split and create a new intersection
+                iri = self._corridor_lmerge_split_hvlong(jcor, 1, ci.points[1].clone())
+
+                # now we have the intersection, we can deal with the L as above.
+                self._corridor_lmerge_truncate_long(icor, 0, ci.points[1].clone(), iri)
 
         elif ci.joins[1] == cj.joins[0]:
-            if False:
-                if (g.dist2(cj.points[0], cj.points[0]) < g.dist2(ci.points[1], ci.points[2])):
-                    iri = self._corridor_lmerge_split_long(icor, 1, cj.points[1].clone())
-                    self._corridor_lmerge_truncate_lshort(jcor, 0, iri)
 
-                else:
-                    iri = self._corridor_lmerge_split_long(jcor, 0, ci.points[1].clone())
-                    self._corridor_lmerge_truncate_lshort(icor, 1, iri)
+            if (g.dist2(cj.points[0], cj.points[1]) < g.dist2(ci.points[1], ci.points[2])):
+                iri = cj.joins[0] # index of intersection room
+                self._corridor_lmerge_truncate_long(icor, 1, cj.points[1].clone(), iri)
+                # there is nothing left to do to the shorter straigh corridor.
+            else:
+                # the straight is longer, so we need to split and create a new intersection
+                iri = self._corridor_lmerge_split_hvlong(jcor, 0, ci.points[1].clone())
 
+                # now we have the intersection, we can deal with the L as above.
+                self._corridor_lmerge_truncate_long(icor, 1, ci.points[1].clone(), iri)
         else:
-            if False:
-                assert ci.joins[1] == cj.joins[1]
-                if (g.dist2(cj.points[1], cj.points[2]) < g.dist2(ci.points[1], ci.points[2])):
-                    # lmerge_spur[(1,1)](icor, jcor)
-                    iri = self._corridor_lmerge_split_long(icor, 1, cj.points[1].clone())
-                    self._corridor_lmerge_truncate_lshort(jcor, 1, iri)
 
-                else:
-                    # lmerge_spur[(1,1)](jcor, icor)
-                    iri = self._corridor_lmerge_split_long(jcor, 1, ci.points[1].clone())
-                    self._corridor_lmerge_truncate_lshort(icor, 1, iri)
+            if (g.dist2(cj.points[0], cj.points[1]) < g.dist2(ci.points[1], ci.points[2])):
+                iri = cj.joins[0] # index of intersection room
+                self._corridor_lmerge_truncate_long(icor, 1, cj.points[1].clone(), iri)
+                # there is nothing left to do to the shorter straigh corridor.
+            else:
+                # the straight is longer, so we need to split and create a new intersection
+                iri = self._corridor_lmerge_split_hvlong(jcor, 1, ci.points[1].clone())
+
+                # now we have the intersection, we can deal with the L as above.
+                self._corridor_lmerge_truncate_long(icor, 1, ci.points[1].clone(), iri)
 
         self.corridors[icor].entangled.remove(jcor)
         self.corridors[jcor].entangled.remove(icor)
