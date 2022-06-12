@@ -144,7 +144,7 @@ def l_inv_hshort(emptymodel, rooms3_horizontal_spur):
     r1, r2, r3 = rooms3_horizontal_spur
 
     ca = Corridor(
-        points=[Vec2(12.0, 8.0), Vec2(12.0, 4.0), Vec2(4.0, 8.0)],
+        points=[Vec2(12.0, 4.0), Vec2(12.0, 8.0), Vec2(4.0, 8.0)],
         joins=[1,0],
         join_sides=[SOUTH, EAST]
         )
@@ -179,7 +179,7 @@ def l_inv_hshort_inv(emptymodel, rooms3_horizontal_spur):
     r1, r2, r3 = rooms3_horizontal_spur
 
     ca = Corridor(
-        points=[Vec2(12.0, 8.0), Vec2(12.0, 4.0), Vec2(4.0, 8.0)],
+        points=[Vec2(12.0, 4.0), Vec2(12.0, 8.0), Vec2(4.0, 8.0)],
         joins=[1,0],
         join_sides=[SOUTH, EAST]
         )
@@ -365,7 +365,7 @@ def spur_horizontal_opposed(emptymodel, rooms3_horizontal_spur):
         )
 
     cb = Corridor(
-        points=[Vec2(12.0, 4.0), Vec2(8.0, 8.0), Vec2(4.0, 8.0)],
+        points=[Vec2(12.0, 4.0), Vec2(12.0, 8.0), Vec2(4.0, 8.0)],
         joins=[2, 0],
         join_sides=[NORTH, EAST]
         )
@@ -537,48 +537,6 @@ class TestCorridor:
 
 class TestModel:
 
-    def test_merge_l_hlong(self, l_hlong):
-        """
-             r2
-             | ca
-        r1+--+
-          +-----+ r3
-             cb
-
-
-               ca
-              r2
-            cn|  cb
-         r1+--+----+ r3
-              ri
-
-        """
-
-        g = l_hlong
-        ca = g.corridors[0]
-        cb = g.corridors[1]
-
-        assert ca.joins[0] == 0
-        assert ca.joins[1] == 1
-
-        assert cb.joins[0] == 0
-        assert cb.joins[1] == 2
-
-        g._generate_corridor_intersections()
-        assert len(g.corridors) == 3
-        assert len(g.rooms) == 4
-
-        cn = g.corridors[2]
-
-        assert ca.joins[0] == 3
-        assert ca.joins[1] == 1
-
-        assert cb.joins[0] == 3
-        assert cb.joins[1] == 2
-        assert cn.joins[0] == 0
-        assert cn.joins[1] == 3
-
-
     def test_merge_l_hlong(self, l_hlong_inv):
         """
                r2
@@ -606,7 +564,7 @@ class TestModel:
         assert cb.joins[0] == 2
         assert cb.joins[1] == 0
 
-        g._generate_corridor_intersections()
+        g._generate_intersections()
         assert len(g.corridors) == 3
         assert len(g.rooms) == 4
 
@@ -644,7 +602,7 @@ class TestModel:
         assert cb.joins[0] == 0
         assert cb.joins[1] == 2
 
-        g._generate_corridor_intersections()
+        g._generate_intersections()
         assert len(g.corridors) == 2
         assert len(g.rooms) == 3
 
@@ -678,7 +636,7 @@ class TestModel:
         assert cb.joins[0] == 0
         assert cb.joins[1] == 2
 
-        g._generate_corridor_intersections()
+        g._generate_intersections()
         assert len(g.corridors) == 2
         assert len(g.rooms) == 3
 
@@ -712,7 +670,7 @@ class TestModel:
         assert cb.joins[0] == 2
         assert cb.joins[1] == 0
 
-        g._generate_corridor_intersections()
+        g._generate_intersections()
         assert len(g.corridors) == 2
         assert len(g.rooms) == 3
 
@@ -747,7 +705,7 @@ class TestModel:
         assert cb.joins[0] == 2
         assert cb.joins[1] == 0
 
-        g._generate_corridor_intersections()
+        g._generate_intersections()
         assert len(g.corridors) == 2
         assert len(g.rooms) == 3
 
@@ -791,7 +749,7 @@ class TestModel:
         assert pt_essentially_same(ca.points[0], cb.points[0])
         assert pt_dist2(cb.points[0], cb.points[1]) < pt_dist2(ca.points[0], ca.points[1])
 
-        g._generate_corridor_intersections()
+        g._generate_intersections()
         assert len(g.corridors) == 3
         assert len(g.rooms) == 4
 
@@ -854,7 +812,7 @@ class TestModel:
         assert pt_dist2(cb.points[1], cb.points[2]) < pt_dist2(ca.points[1], ca.points[2])
 
         # merge the corridors
-        g._generate_corridor_intersections()
+        g._generate_intersections()
         assert len(g.corridors) == 3
         assert len(g.rooms) == 4
 
@@ -906,7 +864,7 @@ class TestModel:
         assert cb.join_sides[0] == NORTH
         assert cb.join_sides[1] == EAST
 
-        g._generate_corridor_intersections()
+        g._generate_intersections()
         assert len(g.corridors) == 3
         assert len(g.rooms) == 4
 
@@ -960,7 +918,7 @@ class TestModel:
         assert cb.join_sides[0] == WEST
         assert cb.join_sides[1] == NORTH
 
-        g._generate_corridor_intersections()
+        g._generate_intersections()
         assert len(g.corridors) == 3
         assert len(g.rooms) == 4
 
@@ -1018,7 +976,7 @@ class TestModel:
         assert cb.join_sides[0] == NORTH
         assert cb.join_sides[1] == WEST
 
-        g._generate_corridor_intersections()
+        g._generate_intersections()
         assert len(g.corridors) == 3
         assert len(g.rooms) == 4
 

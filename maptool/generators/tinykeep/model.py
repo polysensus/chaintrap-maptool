@@ -398,20 +398,95 @@ class Generator:
         """
         raise NotImplementedError()
 
+    def _corridor_hvmergehv(self, icor, jcor):
+        """
+        merge a co-incident pair of straight corridors. either horizontal or vertical
+        """
+        ci = self.corridors[icor]
+        cj = self.corridors[jcor]
+
+        if len(ci.points) != 2 or len(cj.points) != 2:
+            raise ValueError("corridor_hvmergehv needs two straight corridors")
+
+        if ci.joins[0] == cj.joins[0]:
+            pi = cj.points[1].clone()
+            if (g.dist2(cj.points[0], cj.points[1]) < g.dist2(ci.points[0], ci.points[1])):
+                self._corridor_merge_hvhv(icor, 0, cj.points[1].clone(), cj.joins[1])
+            else:
+                self._corridor_merge_hvhv(jcor, 0, ci.points[1].clone(), ci.joins[1])
+        elif ci.joins[0] == cj.joins[1]:
+            if (g.dist2(cj.points[0], cj.points[1]) < g.dist2(ci.points[0], ci.points[1])):
+                self._corridor_merge_hvhv(icor, 0, cj.points[0].clone(), cj.joins[0])
+            else:
+                self._corridor_merge_hvhv(jcor, 1, ci.points[1].clone(), ci.joins[1])
+        elif ci.joins[1] == cj.joins[0]:
+            if (g.dist2(cj.points[0], cj.points[1]) < g.dist2(ci.points[0], ci.points[1])):
+                self._corridor_merge_hvhv(icor, 1, cj.points[1].clone(), cj.joins[1])
+            else:
+                self._corridor_merge_hvhv(jcor, 0, ci.points[0].clone(), ci.joins[0])
+        else:
+            if (g.dist2(cj.points[0], cj.points[1]) < g.dist2(ci.points[0], ci.points[1])):
+                self._corridor_merge_hvhv(icor, 1, cj.points[0].clone(), cj.joins[0])
+            else:
+                self._corridor_merge_hvhv(jcor, 1, ci.points[0].clone(), ci.joins[0])
+
+    def _corridor_merge_hvhv(self, icor, r1end, pi, iri):
+        """
+        Merge two co-incident straight corridors.
+
+        icor is the longer
+
+
+        r1end   ci
+        j0+-------------+ j1 R2  icor
+    R1  i0+-----+ i1 pi
+            cj  R3
+
+            cj     ci     R2
+    R1  i0+-----+-------- i1  icor
+               R3
+
+        """
+        ci = self.corridors[icor]
+        r1 = self.rooms[ci.joins[r1end]]
+        ri = self.rooms[iri]
+
+        # adjust the corridor ci join to end at the RI intersection rather than R1
+        orig = ci.joins[:]
+        orig_sides = ci.join_sides[:]
+
+        # detach ci from room 1 and clip it
+
+        r1iside = r1.detach_corridor(icor)
+
+        # attach it to the intersection the side of attachment is the *same*
+        # side as it was previously attached to R1 on.
+        ri.corridors[r1iside].append(icor)
+
+        # The intersection point is the other end of cj from the end co-incident with ci
+        ci.points[r1end] = pi.clone()
+        ci.clipped += 1 
+        ci.joins[r1end] = iri 
+        # join_sides stays the same
+
+        print(f"merge-hhv: cors: {icor} ci: {str(orig)} -> {ci.joins}. joins")    
+
+
+
     def _corridor_lmergehv(self, icor, jcor):
         """
         ic is the index of the L corridor
         jc is the index of the horizontal or vertical corridor
 
-                + i2
-                | 
-        i0+-----+ i1
+                + i2   jc is the shorter.
+                |      For this case, c1 remains an L and its i0 foot
+        i0+-----+ i1   goes on a new intersection inserted at j1
         j0+--+ j1
 
 
-                + i2
-                | 
-        i0+-----+ i1
+                + i2   jc is the longer 
+                |      For this case c1 is converted to a straight and
+        i0+-----+ i1   the mid point at i1 ends up attached to the new intersection
         j0+-------------+ j1
 
 
@@ -440,22 +515,27 @@ class Generator:
                 # the straight is longer, so we need to split and create a new intersection
                 iri = self._corridor_lmerge_split_hvlong(jcor, 0, ci.points[1].clone())
 
-                # now we have the intersection, we can deal with the L as above.
-                # We just shorten the leg attached to R1 and move it to RI
-                self._corridor_lmerge_truncate_long(icor, 0, ci.points[1].clone(), iri)
+                # Now convert the L to a straight and attach its old mid point to the intersection
+                self._corridor_lmerge_truncate_lshort(icor, 0, iri)
+                # now we have the intersection, we can deal with the L by
+                # converting it to a straigh and attaching to RI
+                # self._corridor_lmerge_truncate_long(icor, 0, ci.points[1].clone(), iri)
 
         # the remaining cases are the same, its just that the endian-ness of the corridors changes
         elif ci.joins[0] == cj.joins[1]:
             if (g.dist2(cj.points[0], cj.points[1]) < g.dist2(ci.points[0], ci.points[1])):
                 iri = cj.joins[0] # index of intersection room
-                self._corridor_lmerge_truncate_long(icor, 0, cj.points[1].clone(), iri)
+                self._corridor_lmerge_truncate_long(icor, 0, cj.points[0].clone(), iri)
+                # self._corridor_lmerge_truncate_long(icor, 0, cj.points[0].clone(), iri)
                 # there is nothing left to do to the shorter straigh corridor.
             else:
                 # the straight is longer, so we need to split and create a new intersection
                 iri = self._corridor_lmerge_split_hvlong(jcor, 1, ci.points[1].clone())
 
+                # Now convert the L to a straight and attach its old mid point to the intersection
+                self._corridor_lmerge_truncate_lshort(icor, 0, iri)
                 # now we have the intersection, we can deal with the L as above.
-                self._corridor_lmerge_truncate_long(icor, 0, ci.points[1].clone(), iri)
+                # self._corridor_lmerge_truncate_long(icor, 0, ci.points[1].clone(), iri)
 
         elif ci.joins[1] == cj.joins[0]:
 
@@ -467,24 +547,25 @@ class Generator:
                 # the straight is longer, so we need to split and create a new intersection
                 iri = self._corridor_lmerge_split_hvlong(jcor, 0, ci.points[1].clone())
 
+                # Now convert the L to a straight and attach its old mid point to the intersection
+                self._corridor_lmerge_truncate_lshort(icor, 1, iri)
                 # now we have the intersection, we can deal with the L as above.
-                self._corridor_lmerge_truncate_long(icor, 1, ci.points[1].clone(), iri)
+                #self._corridor_lmerge_truncate_long(icor, 1, ci.points[1].clone(), iri)
         else:
 
             if (g.dist2(cj.points[0], cj.points[1]) < g.dist2(ci.points[1], ci.points[2])):
                 iri = cj.joins[0] # index of intersection room
-                self._corridor_lmerge_truncate_long(icor, 1, cj.points[1].clone(), iri)
+                self._corridor_lmerge_truncate_long(icor, 1, cj.points[0].clone(), iri)
                 # there is nothing left to do to the shorter straigh corridor.
             else:
                 # the straight is longer, so we need to split and create a new intersection
                 iri = self._corridor_lmerge_split_hvlong(jcor, 1, ci.points[1].clone())
 
+                # Now convert the L to a straight and attach its old mid point to the intersection
+                self._corridor_lmerge_truncate_lshort(icor, 1, iri)
+
                 # now we have the intersection, we can deal with the L as above.
-                self._corridor_lmerge_truncate_long(icor, 1, ci.points[1].clone(), iri)
-
-        self.corridors[icor].entangled.remove(jcor)
-        self.corridors[jcor].entangled.remove(icor)
-
+                # self._corridor_lmerge_truncate_long(icor, 1, ci.points[1].clone(), iri)
 
 
     def _corridor_lmerge(self, icor, jcor):
@@ -560,10 +641,6 @@ class Generator:
                 iri = self._corridor_lmerge_split_long(jcor, 1, ci.points[1].clone())
                 self._corridor_lmerge_truncate_lshort(icor, 1, iri)
 
-        self.corridors[icor].entangled.remove(jcor)
-        self.corridors[jcor].entangled.remove(icor)
-
-
 
     def _corridor_lmerge_truncate_long(self, icor, r1end, pi, iri):
         """
@@ -588,6 +665,7 @@ class Generator:
 
         # we are truncating the leg of the elbow that rests on the common room r1
         ci.points[r1end * 2] = pi.clone()
+        # ci.points[r1end] = pi.clone()
         ci.clipped += 1
 
         # detach the clipped corridor from its orignal r1, and instead attach it
@@ -906,6 +984,75 @@ class Generator:
                 if len(c1.points) == 2 and len(c2.points) == 3:
                     self._corridor_lmergehv(jc, ic)
                     continue
+
+
+    def _find_first_entangled_corridor_pair(self):
+        for i, r in enumerate(self.rooms):
+
+            for side in range(4):
+                side_corridors = set(r.corridors[side])
+                if len(side_corridors) <= 1:
+                    continue
+
+                # for each pair m, n of corridors see if they are actually
+                # co-incident.  corridors joining intersections will touch as
+                # intersections have zero widith & length so we need on point of
+                # co-incidence plust another on the same x or same y as the co-incident
+
+                for ic in side_corridors:
+                    for jc in side_corridors:
+                        if ic == jc:
+                            continue
+
+                        if not self.corridors[ic].check_entangled(self.corridors[jc]):
+                            continue
+
+                        return ic, jc
+
+    def _generate_corridor_intersection(self, ic, jc):
+        """merge a single pair of entangled corridors"""
+
+        c1, c2 = self.corridors[ic], self.corridors[jc]
+        if not c1.check_entangled(c2):
+            print(f"{ic} & {jc} are not entangled")
+            return False
+
+
+        if len(c1.points) == 3 and len(c2.points) == 3:
+            self._corridor_lmerge(ic, jc)
+            if c1.check_entangled(c2):
+                print('xxx')
+            return True
+
+        if len(c1.points) == 3 and len(c2.points) == 2:
+            self._corridor_lmergehv(ic, jc)
+            if c1.check_entangled(c2):
+                print('xxx')
+
+            return True
+
+        if len(c1.points) == 2 and len(c2.points) == 3:
+            self._corridor_lmergehv(jc, ic)
+            if c1.check_entangled(c2):
+                print('xxx')
+
+            return True
+
+        if len(c1.points) == 2 and len(c2.points) == 2:
+            self._corridor_hvmergehv(ic, jc)
+            if c1.check_entangled(c2):
+                print('xxx')
+
+            return True
+
+
+    def _generate_intersections(self):
+        entangled = self._find_first_entangled_corridor_pair()
+        while entangled:
+            ic, jc = entangled
+            ok = self._generate_corridor_intersection(ic, jc)
+            assert ok
+            entangled = self._find_first_entangled_corridor_pair()
 
 
     def _generate_corridors(self):

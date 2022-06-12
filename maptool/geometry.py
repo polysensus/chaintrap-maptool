@@ -110,6 +110,14 @@ def line_in_line(p1, p2, p3, p4) -> Tuple[bool, Vec2]:
     
     return (True, a)
 
+
+def parallel(p1: Vec2, p2: Vec2, p3: Vec2, p4: Vec2) -> bool:
+    divisor = ((p4.y-p3.y) * (p2.x-p1.x) - (p4.x-p3.x)*(p2.y-p1.y))
+    if essentially_zero(divisor):
+        return True
+    return False
+
+
 def line_line(p1: Vec2, p2: Vec2, p3: Vec2, p4: Vec2) -> Tuple[bool, Vec2]:
     """check for line intersection"""
 

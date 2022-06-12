@@ -45,17 +45,33 @@ class Corridor:
 
     def check_entangled(self, co):
 
-        for i, p in enumerate(self.points):
-            for po in co.points:
-                if g.pt_essentially_same(p, po):
-                    # are any of the other self.points which have same x or y  as the co-incident point
-                    for ii in range(len(self.points)):
-                        if ii == i:
-                            continue
-                        if g.essentially_equal(po.x, self.points[ii].x):
-                            return True
-                        if g.essentially_equal(po.y, self.points[ii].y):
-                            return True
+        # intersections have zero diameter, so co-incident end point is not enough on its own
+        if g.pt_essentially_same(self.points[0], co.points[0]):
+            if self.points[0].x == self.points[1].x and self.points[0].x == co.points[1].x:
+                return True
+            if self.points[0].y == self.points[1].y and self.points[0].y == co.points[1].y:
+                return True
+
+        if g.pt_essentially_same(self.points[0], co.points[-1]):
+            opi = 0 if len(co.points) == 2 else 1
+            if self.points[0].x == self.points[1].x and self.points[0].x == co.points[opi].x:
+                return True
+            if self.points[0].y == self.points[1].y and self.points[0].y == co.points[opi].y:
+                return True
+
+        if g.pt_essentially_same(self.points[-1], co.points[0]):
+            if co.points[0].x == co.points[1].x and co.points[0].x == self.points[0 if len(self.points) == 2 else 1].x:
+                return True
+            if co.points[0].y == co.points[1].y and co.points[0].x == self.points[0 if len(self.points) == 2 else 1].y:
+                return True
+
+        if g.pt_essentially_same(self.points[-1], co.points[-1]):
+            spi = 0 if len(self.points) == 2 else 1
+            opi = 0 if len(co.points) == 2 else 1
+            if self.points[-1].x == self.points[spi].x and self.points[-1].x == co.points[opi].x:
+                return True
+            if self.points[-1].y == self.points[spi].y and self.points[-1].y == co.points[opi].y:
+                return True
 
     def entangle(self, i):
         if not self.entangled:
