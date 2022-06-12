@@ -95,6 +95,76 @@ def rooms3_horizontal_spur_inverted():
 
     return r1, r2, r3
 
+@pytest.fixture
+def llong_hshort(emptymodel, rooms3_horizontal_spur):
+    """
+                 r2
+                  + i2
+                  |     Corridor A
+    r1  i0+-------+ i1
+    r1  j0+----+ j1     Corridor B
+               r3
+    """
+
+    g = emptymodel
+    r1, r2, r3 = rooms3_horizontal_spur
+
+    ca = Corridor(
+        points=[Vec2(4.0, 8.0), Vec2(12.0, 8.0), Vec2(12.0, 4.0)],
+        joins=[0,1],
+        join_sides=[EAST, SOUTH]
+        )
+
+    cb = Corridor(
+        points=[Vec2(4.0, 8.0), Vec2(8.0, 8.0)],
+        joins=[0,2],
+        join_sides=[EAST, WEST]
+        )
+
+    r2.corridors[SOUTH] = [0]
+    r1.corridors[EAST] = [0, 1]
+    r3.corridors[WEST] = [1]
+
+    g.rooms.extend([r1, r2, r3])
+    g.corridors.extend([ca, cb])
+    return g
+
+@pytest.fixture
+def llong_hlong(emptymodel, rooms3_horizontal_spur):
+    """
+                 r2
+                  + i2
+                  |     Corridor A
+    r1  i0+-------+ i1
+    r1  j0+------------+ j1     Corridor B
+                         r3
+    """
+
+    g = emptymodel
+    r1, r2, r3 = rooms3_horizontal_spur
+
+    ca = Corridor(
+        points=[Vec2(4.0, 8.0), Vec2(8.0, 8.0), Vec2(8.0, 4.0)],
+        joins=[0,1],
+        join_sides=[EAST, SOUTH]
+        )
+
+    cb = Corridor(
+        points=[Vec2(4.0, 8.0), Vec2(12.0, 8.0)],
+        joins=[0,2],
+        join_sides=[EAST, WEST]
+        )
+
+    r2.corridors[SOUTH] = [0]
+    r1.corridors[EAST] = [0, 1]
+    r3.corridors[WEST] = [1]
+
+    g.rooms.extend([r1, r2, r3])
+    g.corridors.extend([ca, cb])
+    return g
+
+
+
 
 @pytest.fixture
 def spur_horizontal(emptymodel, rooms3_horizontal_spur):
@@ -280,8 +350,129 @@ def spur_horizontal_inverted_opposed(emptymodel, rooms3_horizontal_spur_inverted
     return g
 
 
+class TestCorridor:
+
+    def test_entangle_horizontal(self, spur_horizontal):
+
+        g = spur_horizontal
+
+        ca = g.corridors[0]
+        cb = g.corridors[1]
+
+        assert ca.check_entangled(cb)
+        assert cb.check_entangled(ca)
+
+    def test_entangle_horizontal_opposed(self, spur_horizontal_opposed):
+
+        g = spur_horizontal_opposed
+
+        ca = g.corridors[0]
+        cb = g.corridors[1]
+
+        assert ca.check_entangled(cb)
+        assert cb.check_entangled(ca)
+
+    def test_entangle_horizontal_inverted(self, spur_horizontal_inverted):
+
+        g = spur_horizontal_inverted
+
+        ca = g.corridors[0]
+        cb = g.corridors[1]
+
+        assert ca.check_entangled(cb)
+        assert cb.check_entangled(ca)
+
+
+    def test_entangle_horizontal_11(self, spur_horizontal_11):
+
+        g = spur_horizontal_11
+
+        ca = g.corridors[0]
+        cb = g.corridors[1]
+
+        assert ca.check_entangled(cb)
+        assert cb.check_entangled(ca)
+
+
 
 class TestModel:
+
+    def test_merge_llong_hlong(self, llong_hlong):
+        """
+             r2
+             | ca
+        r1+--+
+          +-----+ r3
+             cb
+
+
+               ca
+              r2
+            cn|  cb
+         r1+--+----+ r3
+              ri
+
+        """
+
+        g = llong_hlong
+        ca = g.corridors[0]
+        cb = g.corridors[1]
+
+        assert ca.joins[0] == 0
+        assert ca.joins[1] == 1
+
+        assert cb.joins[0] == 0
+        assert cb.joins[1] == 2
+
+        g._generate_corridor_intersections()
+        assert len(g.corridors) == 3
+        assert len(g.rooms) == 4
+
+        cn = g.corridors[2]
+
+        assert ca.joins[0] == 3
+        assert ca.joins[1] == 1
+
+        assert cb.joins[0] == 3
+        assert cb.joins[1] == 2
+        assert cn.joins[0] == 0
+        assert cn.joins[1] == 3
+
+
+    def test_merge_llong_hshort(self, llong_hshort):
+        """
+
+                r2
+                |
+        r1+-----+ 
+          +--+ r3
+                r2
+                |
+        r1+--+--+
+             r3
+        """
+
+        g = llong_hshort
+        ca = g.corridors[0]
+        cb = g.corridors[1]
+
+        assert ca.joins[0] == 0
+        assert ca.joins[1] == 1
+
+        assert cb.joins[0] == 0
+        assert cb.joins[1] == 2
+
+        g._generate_corridor_intersections()
+        assert len(g.corridors) == 2
+        assert len(g.rooms) == 3
+
+        assert ca.joins[0] == 2
+        assert ca.joins[1] == 1
+
+        assert cb.joins[0] == 0
+        assert cb.joins[1] == 2
+
+
 
 
     def test_merge_spur_horizontal(self, spur_horizontal):

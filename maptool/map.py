@@ -139,21 +139,7 @@ class Map:
     def generate(self, model="tinykeep"):
 
         self.model = self.import_model(model)
-
-        # This incremental construction exists only to enable debuging of the evolution
-        generation = 0
-        for _ in self.model.generate(self):
-
-            generation += 1
-
-            if self.args.svgfile and self.args.render_generations != -1:
-                if generation % self.args.render_generations != 0:
-                    continue
-                svgfile = Path(self.args.svgfile)
-                stem = svgfile.stem
-                suffix = svgfile.suffix
-                svgfile = f"{svgfile.parent}/{stem}.{int(generation / self.args.render_generations)}{suffix}"
-                self.render(svgfile)
+        self.model.generate(self)
 
     def import_model(self, model):
         try:
@@ -166,19 +152,6 @@ class Map:
                 f"failed to import model using: {module} relative to {__package__}"
             )
 
-    def get_rng_state(self):
-        """serialize the rng state in a dictionary suitable for json.dump"""
-        state = random.getstate()
-        f = io.BytesIO()
-        pickle.dump(state, f, pickle.HIGHEST_PROTOCOL)
-        return f.getvalue().hex()
-
-    def set_rng_state(self, state):
-        """load a dict compatible with get_rng_state"""
-        f = io.BytesIO(bytes.fromhex(state))
-        state = pickle.load(f)
-        random.setstate(state)
-
     def tojson(self, dumps=True):
 
         map = dict(
@@ -187,12 +160,13 @@ class Map:
             model_type=self.model.NAME,
             model=self.model.tojson(),
         )
+
         if not dumps:
             return map
 
         return json.dumps(map)
 
-    def load(self, source):
+    def load_common(self, source):
 
         if isinstance(source, str):
             map = json.loads(source)
@@ -206,8 +180,22 @@ class Map:
         self._public_key = bytes.fromhex(map["vrf_inputs"]["public_key"])
         self._alpha = map["vrf_inputs"]["alpha"].encode()
 
+        # guarantee on load that the rng state is the same as it was at the
+        # begining of generation.
+        self.reseed_rng()
+
+        return map
+
+    def load_model(self, map):
+
         self.model = self.import_model(map["model_type"])
         self.model.fromjson(self, map["model"])
+
+    def load(self, source):
+
+        map = self.load_common(source)
+        self.load_model(map)
+
 
     def render(self, svgfile):
 

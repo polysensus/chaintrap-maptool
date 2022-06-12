@@ -3,6 +3,7 @@ import json
 from .map import Map
 from .map import run
 from .randprimitives import rand_box, rand_split_box
+from .geometry import *
 
 
 def test_generator_init_noargs():
@@ -56,6 +57,73 @@ def test_generator_deterministic():
     assert rooms1 == rooms3
 
 
+def rooms_eq(ra, rb, ignore_isolated=False, ignore_main=False):
+
+    # round tripping via json is not numerically stable.
+    if not pt_essentially_same(ra.center, rb.center): return False
+
+    if not essentially_equal(ra.width, rb.width): return False
+    if not essentially_equal(ra.length, rb.length): return False
+    if not ignore_main and ra.is_main != rb.is_main: return False
+
+    if ra.corridors is None:
+        if rb.corridors is None: return False
+        return True
+
+    if rb.corridors is None: return False
+
+    for i, sidea in enumerate(ra.corridors):
+        if ignore_isolated:
+            if not sidea or not rb.corridors[i]:
+                continue
+        if sidea != rb.corridors[i]:
+            return False
+    return True
+
+def corridors_eq(ca, cb):
+    if ca.joins[0] != cb.joins[0]: return False
+    if ca.joins[1] != cb.joins[1]: return False
+
+    if ca.join_sides[0] != cb.join_sides[0]: return False
+    if ca.join_sides[1] != cb.join_sides[1]: return False
+
+    if len(ca.points) != len(cb.points): return False
+
+    for i, pa in enumerate(ca.points):
+        if not pt_essentially_same(pa, cb.points[i]): return False
+
+    return True
+
+
+def test_rooms_persist():
+
+    args = Map.defaults()
+    args.gp_model = "tinykeep"
+    g = Map(args)
+    g.generate()
+    rooms1 = g.model.rooms[:]
+    corridors1 = g.model.corridors[:]
+    source = g.tojson(dumps=True)
+
+    g = Map(args)
+    map = g.load_common(source)
+    g.model = g.import_model(map["model_type"])
+    g.model._reset_generator(g.gp)
+    g.model.load_rooms(g, map["model"])
+
+    assert len(rooms1) == len(g.model.rooms)
+
+    for (i, r) in enumerate(rooms1):
+        # corridors and is_main are set post load
+        assert rooms_eq(r, g.model.rooms[i], ignore_isolated=True, ignore_main=True)
+
+    g.model.load_corridors(g, map["model"])
+    for (i, c) in enumerate(corridors1):
+        # corridors and is_main are set post load
+        assert corridors_eq(c, g.model.corridors[i])
+
+
+
 def test_generator_persist():
 
     args = Map.defaults()
@@ -69,9 +137,9 @@ def test_generator_persist():
     g.load(source)
 
     for (i, r) in enumerate(rooms1):
-        if r != g.model.rooms[i]:
+        if rooms_eq(r, g.model.rooms[i]):
             print('x')
-        assert r == g.model.rooms[i]
+        assert rooms_eq(r, g.model.rooms[i])
 
 def test_run():
     status = run(args=["gen", "--svgfile", "x.svg"])

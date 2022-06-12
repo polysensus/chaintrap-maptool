@@ -46,7 +46,7 @@ class Room:
     corridors: List[List[int]] = ()
     generation: int = 0
 
-    def __init__(self, center=Vec2(), width=0.0, length=0.0, is_main=False, corridors=None, generation=0):
+    def __init__(self, center=Vec2(), width=0.0, length=0.0, is_main=False, is_intersection=False, corridors=None, generation=0):
         self.center = center
         self.width = width
         self.length = length
@@ -63,6 +63,34 @@ class Room:
         w = br.x - tl.x if br.x > tl.x else tl.x - br.x
         ln = br.y - tl.y if br.y > tl.y else tl.y - br.y
         return cls(center, w, ln, **kw)
+
+
+    @classmethod
+    def from_encoding(cls, d):
+
+        return cls(
+            center = Vec2(d["x"], d["y"]),
+            width = d["w"],
+            length = d["l"],
+            is_intersection = d["inter"],
+            is_main = d["main"],
+            corridors = [
+                d["corridors"][0][:],
+                d["corridors"][1][:],
+                d["corridors"][2][:],
+                d["corridors"][3][:]]
+        )
+
+    def encode(self):
+        return dict(
+            x=self.center.x,
+            y=self.center.y,
+            w=self.width,
+            l=self.length,
+            inter=self.is_intersection,
+            main=self.is_main,
+            corridors=[self.corridors[0][:],self.corridors[1][:],self.corridors[2][:],self.corridors[3][:]]
+        )
 
     def topleft(self) -> Vec2:
         x = self.center.x - (self.width / 2)

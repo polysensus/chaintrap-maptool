@@ -32,13 +32,39 @@ class Corridor:
     is_inserted: bool = False
 
     entangled: Set[int] = ()
-    # True if the elbows of each L are essentially equal. two such corridors
-    # will merge to 3 straight sections rather than the usual L + 2 straight
-    entangled_even: bool = False
 
     generation: int = 0
+
+    @classmethod
+    def from_encoding(cls, e):
+        return Corridor(
+            points = [Vec2(p[0], p[1]) for p in e['points']],
+            joins = e['joins'][:],
+            join_sides = e['join_sides'][:]
+        )
+
+    def check_entangled(self, co):
+
+        for i, p in enumerate(self.points):
+            for po in co.points:
+                if g.pt_essentially_same(p, po):
+                    # are any of the other self.points which have same x or y  as the co-incident point
+                    for ii in range(len(self.points)):
+                        if ii == i:
+                            continue
+                        if g.essentially_equal(po.x, self.points[ii].x):
+                            return True
+                        if g.essentially_equal(po.y, self.points[ii].y):
+                            return True
 
     def entangle(self, i):
         if not self.entangled:
             self.entangled = set([])
         self.entangled.add(i)
+
+    def encode(self):
+        return dict(
+            points=[(p.x, p.y) for p in self.points],
+            joins=self.joins[:],
+            join_sides=self.join_sides
+        )
