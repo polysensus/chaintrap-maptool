@@ -460,7 +460,7 @@ class Generator:
         elif ci.joins[1] == cj.joins[0]:
 
             if (g.dist2(cj.points[0], cj.points[1]) < g.dist2(ci.points[1], ci.points[2])):
-                iri = cj.joins[0] # index of intersection room
+                iri = cj.joins[1] # index of intersection room
                 self._corridor_lmerge_truncate_long(icor, 1, cj.points[1].clone(), iri)
                 # there is nothing left to do to the shorter straigh corridor.
             else:

@@ -130,6 +130,78 @@ def l_hshort(emptymodel, rooms3_horizontal_spur):
     return g
 
 @pytest.fixture
+def l_inv_hshort(emptymodel, rooms3_horizontal_spur):
+    """
+                 r2
+                  + i0
+                  |     Corridor A
+    r1  i2+-------+ i1
+    r1  j0+----+ j1     Corridor B
+               r3
+    """
+
+    g = emptymodel
+    r1, r2, r3 = rooms3_horizontal_spur
+
+    ca = Corridor(
+        points=[Vec2(12.0, 8.0), Vec2(12.0, 4.0), Vec2(4.0, 8.0)],
+        joins=[1,0],
+        join_sides=[SOUTH, EAST]
+        )
+
+    cb = Corridor(
+        points=[Vec2(4.0, 8.0), Vec2(8.0, 8.0)],
+        joins=[0,2],
+        join_sides=[EAST, WEST]
+        )
+
+    r2.corridors[SOUTH] = [0]
+    r1.corridors[EAST] = [0, 1]
+    r3.corridors[WEST] = [1]
+
+    g.rooms.extend([r1, r2, r3])
+    g.corridors.extend([ca, cb])
+    return g
+
+
+@pytest.fixture
+def l_inv_hshort_inv(emptymodel, rooms3_horizontal_spur):
+    """
+                 r2
+                  + i0
+                  |     Corridor A
+    r1  i2+-------+ i1
+    r1  j2+----+ j0     Corridor B
+               r3
+    """
+
+    g = emptymodel
+    r1, r2, r3 = rooms3_horizontal_spur
+
+    ca = Corridor(
+        points=[Vec2(12.0, 8.0), Vec2(12.0, 4.0), Vec2(4.0, 8.0)],
+        joins=[1,0],
+        join_sides=[SOUTH, EAST]
+        )
+
+    cb = Corridor(
+        points=[Vec2(8.0, 8.0), Vec2(4.0, 8.0)],
+        joins=[2, 0],
+        join_sides=[WEST, EAST]
+        )
+
+    r2.corridors[SOUTH] = [0]
+    r1.corridors[EAST] = [0, 1]
+    r3.corridors[WEST] = [1]
+
+    g.rooms.extend([r1, r2, r3])
+    g.corridors.extend([ca, cb])
+    return g
+
+
+
+
+@pytest.fixture
 def l_hshort_inv(emptymodel, rooms3_horizontal_spur):
     """
                  r2
@@ -549,8 +621,6 @@ class TestModel:
         assert cn.joins[0] == 3
 
 
-
-
     def test_merge_l_hshort(self, l_hshort):
         """
 
@@ -584,6 +654,40 @@ class TestModel:
         assert cb.joins[0] == 0
         assert cb.joins[1] == 2
 
+
+    def test_merge_l_inv_hshort(self, l_inv_hshort):
+        """
+                   i0
+                  r2+
+                    |
+        r1 i2+------+ i1 
+           j0+--+j1 r3
+                r2
+                |
+        r1+--+--+
+             r3
+        """
+
+        g = l_inv_hshort
+        ca = g.corridors[0]
+        cb = g.corridors[1]
+
+        assert ca.joins[0] == 1
+        assert ca.joins[1] == 0
+
+        assert cb.joins[0] == 0
+        assert cb.joins[1] == 2
+
+        g._generate_corridor_intersections()
+        assert len(g.corridors) == 2
+        assert len(g.rooms) == 3
+
+        assert ca.joins[0] == 1
+        assert ca.joins[1] == 2
+
+        assert cb.joins[0] == 0
+ 
+
     def test_merge_l_hshort_inv(self, l_hshort_inv):
         """
 
@@ -614,6 +718,43 @@ class TestModel:
 
         assert ca.joins[0] == 2
         assert ca.joins[1] == 1
+
+        assert cb.joins[0] == 2
+        assert cb.joins[1] == 0
+
+
+    def test_merge_l_inv_hshort_inv(self, l_inv_hshort_inv):
+        """
+                i0
+                + r2
+          i2    |
+        r1+-----+ i1
+          +--+ r3
+          j1  j0
+                r2
+                |
+        r1+--+--+
+             r3
+        """
+
+        g = l_inv_hshort_inv
+        ca = g.corridors[0]
+        cb = g.corridors[1]
+
+        assert ca.joins[0] == 1
+        assert ca.joins[1] == 0
+
+        assert cb.joins[0] == 2
+        assert cb.joins[1] == 0
+
+        g._generate_corridor_intersections()
+        assert len(g.corridors) == 2
+        assert len(g.rooms) == 3
+
+        assert ca.joins[0] == 1
+        assert ca.joins[1] == 2
+        assert ca.join_sides[0] == SOUTH
+        assert ca.join_sides[1] == EAST
 
         assert cb.joins[0] == 2
         assert cb.joins[1] == 0
