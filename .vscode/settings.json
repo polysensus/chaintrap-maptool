@@ -1,4 +1,5 @@
 {
+    "python.testing.pytestPath": "${workspaceFolder}/.venv/bin/pytest",
     "python.testing.pytestArgs": [
         "."
     ],
