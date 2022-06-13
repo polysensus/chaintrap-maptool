@@ -33,8 +33,6 @@ class Corridor:
 
     entangled: Set[int] = ()
 
-    generation: int = 0
-
     @classmethod
     def from_encoding(cls, e):
         return Corridor(

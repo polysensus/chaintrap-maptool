@@ -15,7 +15,6 @@ EAST = RoomSide.EAST
 @pytest.fixture
 def emptymodel():
     g = Generator()
-    g.generation = -1
     g._reset_generator(Map(Map.defaults()).gp)
     return g
 

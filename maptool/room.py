@@ -44,18 +44,16 @@ class Room:
     is_intersection: bool = False
     # corridors[NORTH, WEST, SOUTH, EAST]]
     corridors: List[List[int]] = ()
-    generation: int = 0
 
-    def __init__(self, center=Vec2(), width=0.0, length=0.0, is_main=False, is_intersection=False, corridors=None, generation=0):
+    def __init__(self, center=Vec2(), width=0.0, length=0.0, is_main=False, is_intersection=False, corridors=None):
         self.center = center
         self.width = width
         self.length = length
         self.is_main = is_main
         self.corridors = corridors
+        self.is_intersection = is_intersection
         if self.corridors is None:
             self.corridors = [[], [], [], []]
-
-        self.generation = generation
 
     @classmethod
     def frombox(cls, tl: Vec2, br: Vec2, **kw):
