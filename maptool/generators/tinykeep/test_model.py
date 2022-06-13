@@ -365,7 +365,7 @@ def spur_horizontal_opposed(emptymodel, rooms3_horizontal_spur):
         )
 
     cb = Corridor(
-        points=[Vec2(12.0, 4.0), Vec2(12.0, 8.0), Vec2(4.0, 8.0)],
+        points=[Vec2(8.0, 12.0), Vec2(8.0, 8.0), Vec2(4.0, 8.0)],
         joins=[2, 0],
         join_sides=[NORTH, EAST]
         )

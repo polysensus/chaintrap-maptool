@@ -62,7 +62,7 @@ class Corridor:
         if g.pt_essentially_same(self.points[-1], co.points[0]):
             if co.points[0].x == co.points[1].x and co.points[0].x == self.points[0 if len(self.points) == 2 else 1].x:
                 return True
-            if co.points[0].y == co.points[1].y and co.points[0].x == self.points[0 if len(self.points) == 2 else 1].y:
+            if co.points[0].y == co.points[1].y and co.points[0].y == self.points[0 if len(self.points) == 2 else 1].y:
                 return True
 
         if g.pt_essentially_same(self.points[-1], co.points[-1]):
