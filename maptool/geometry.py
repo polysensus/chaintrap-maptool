@@ -410,11 +410,7 @@ def box_lextrude(b0, b1, factor=0.5, min=0.0):
     b = [b0, b1]
 
     ib0, ib1 = 0, 1
-    ifoot = 0
-    if b[0].tl.x > b[1].tl.x:
-        # flipped case
-        ib0, ib1 = 1, 0
-        ifoot = 1
+    assert b[0].tl.x < b[1].tl.x
 
     b0_right_i = Vec2(b[ib0].br.x, b[ib0].tl.y + (b[ib0].br.y - b[ib0].tl.y) * factor)
     b1_left_i = Vec2(b[ib1].tl.x, b[ib1].tl.y + (b[ib1].br.y - b[ib1].tl.y) * factor)
@@ -453,9 +449,10 @@ def box_lextrude(b0, b1, factor=0.5, min=0.0):
 
             join1[ib0], join1[ib1] = (RIGHT, TOP)
             join2[ib0], join2[ib1] = (BOTTOM, LEFT)
+            # join1[0], join1[1] = (RIGHT, TOP)
+            # join2[0], join2[1] = (BOTTOM, LEFT)
 
-
-            return ifoot, (el_right_top, join1), (el_bot_left, join2)
+            return (el_right_top, join1), (el_bot_left, join2)
 
         else:
             # return identify_ends(el_bot_left), identify_ends(el_right_top)
@@ -463,7 +460,10 @@ def box_lextrude(b0, b1, factor=0.5, min=0.0):
 
             join1[ib0], join1[ib1] = (BOTTOM, LEFT)
             join2[ib0], join2[ib1] = (RIGHT, TOP)
-            return ifoot, (el_bot_left, join1), (el_right_top, join2)
+            # join1[0], join1[1] = (BOTTOM, LEFT)
+            # join2[0], join2[1] = (RIGHT, TOP)
+
+            return (el_bot_left, join1), (el_right_top, join2)
 
     # b1 top to b2 left
     #            +-----+                +-----+
@@ -487,7 +487,11 @@ def box_lextrude(b0, b1, factor=0.5, min=0.0):
 
         join1[ib0], join1[ib1] = (TOP, LEFT)
         join2[ib0], join2[ib1] = (RIGHT, BOTTOM)
-        return ifoot, (el_top_left, join1), (el_right_bot, join2)
+
+        # join1[0], join1[1] = (TOP, LEFT)
+        # join2[0], join2[1] = (RIGHT, BOTTOM)
+
+        return (el_top_left, join1), (el_right_bot, join2)
 
     else:
         # return identify_ends(el_right_bot), identify_ends(el_top_left)
@@ -495,4 +499,8 @@ def box_lextrude(b0, b1, factor=0.5, min=0.0):
 
         join1[ib0], join1[ib1] = (RIGHT, BOTTOM)
         join2[ib0], join2[ib1] = (TOP, LEFT)
-        return ifoot, (el_right_bot, join1), (el_top_left, join2)
+
+        # join1[0], join1[1] = (RIGHT, BOTTOM)
+        # join2[0], join2[1] = (TOP, LEFT)
+
+        return (el_right_bot, join1), (el_top_left, join2)

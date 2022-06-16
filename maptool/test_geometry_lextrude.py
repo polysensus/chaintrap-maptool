@@ -97,7 +97,10 @@ def test_bl_tr(note, bl_tr_cases):
 
     for b1, b2 in bl_tr_cases():
 
-        ifoot, (line1, join1), (line2, join2) = box_lextrude(b1, b2)
+        if b1.tl.x > b2.tl.x:
+            b1, b2 = b2, b1
+
+        (line1, join1), (line2, join2) = box_lextrude(b1, b2)
 
         # b1 -> b2 first
         if join1[0] == TOP:

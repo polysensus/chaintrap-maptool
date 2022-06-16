@@ -9,9 +9,10 @@ from maptool.corridor import Corridor
 
 # cainv, cbinv: indicate if the respective corridors are inverted: runing right
 # to left or running north to south is classed as inverted.
-MergeCase = namedtuple("MergeCase", "cainv cbinv".split())
+# cbca is 1 if the case is identical except that ca and cb are swapped
+MergeCase = namedtuple("MergeCase", "cainv cbinv cbca".split(), defaults=(None, None, None))
 # cai and cbi indicate the index into join & join_sides representing R1
-Merge = namedtuple("MergeSelect", "cai cbi".split(), defaults=(None, None))
+Merge = namedtuple("MergeSelect", "cai cbi cbca".split(), defaults=(None, None, None))
 
 class GenerateIntersections:
 
@@ -25,8 +26,10 @@ class GenerateIntersections:
         #  ca.p[0] = cb.p[1]
         #  ca.j[0] = cb.j[1]
         #  r3.attach(ca, opp(rdetside))
-        MergeCase(cainv=0, cbinv=0): Merge(
+        MergeCase(cainv=0, cbinv=0, cbca=0): Merge(
             cai=0, cbi=0),
+        MergeCase(cainv=0, cbinv=0, cbca=1): Merge(
+            cai=0, cbi=0, cbca=1),
 
         #   +--ca--------> R2
         # R1                      R1 cb R3 R2
@@ -36,8 +39,10 @@ class GenerateIntersections:
         #  ca.p[0] = cb.p[0]
         #  ca.j[0] = cb.j[0]
         #  r3.attach(ca, opp(rdetside))
-        MergeCase(cainv=0, cbinv=1): Merge(
-            cai=0, cbi=1),
+        MergeCase(cainv=0, cbinv=1, cbca=0): Merge(
+            cai=0, cbi=1, cbca=0),
+        MergeCase(cainv=0, cbinv=1, cbca=1): Merge(
+            cai=0, cbi=1, cbca=1),
 
         #   <--ca--------+ R2
         # R1                      R1 cb R3 R2
@@ -47,8 +52,10 @@ class GenerateIntersections:
         #  ca.p[0] = cb.p[1]
         #  ca.j[0] = cb.j[1]
         #  r3.attach(ca, opp(rdetside))
-        MergeCase(cainv=1, cbinv=0): Merge(
-            cai=1, cbi=0),
+        MergeCase(cainv=1, cbinv=0, cbca=0): Merge(
+            cai=1, cbi=0, cbca=0),
+        MergeCase(cainv=1, cbinv=0, cbca=1): Merge(
+            cai=1, cbi=0, cbca=1),
 
         #   <--ca--------+ R2
         # R1                      R1 cb  R3 ca  R2
@@ -58,8 +65,11 @@ class GenerateIntersections:
         #  ca.p[1] = cb.p[1]
         #  ca.j[1] = cb.j[1]
         #  r3.attach(ca, opp(rdetside))
-        MergeCase(cainv=1, cbinv=1): Merge(
-            cai=1, cbi=1),
+        MergeCase(cainv=1, cbinv=1, cbca=0): Merge(
+            cai=1, cbi=1, cbca=0),
+        MergeCase(cainv=1, cbinv=1, cbca=1): Merge(
+            cai=1, cbi=1, cbca=1),
+
     }
 
     LL_CASES = {
@@ -87,8 +97,10 @@ class GenerateIntersections:
         # rn.corridors[opp(cb.join_sides[1])].append(jcor)
 
 
-        MergeCase(cainv=0, cbinv=0): Merge(
-            cai=0, cbi=0),
+        MergeCase(cainv=0, cbinv=0, cbca=0): Merge(
+            cai=0, cbi=0, cbca=0),
+        MergeCase(cainv=0, cbinv=0, cbca=1): Merge(
+            cai=0, cbi=0, cbca=1),
 
         #                 ^
         #                 |R2
@@ -96,8 +108,10 @@ class GenerateIntersections:
         #    <--cb---.
         #            | R3
         #            +
-        MergeCase(cainv=0, cbinv=1): Merge(
-            cai=0, cbi=1),
+        MergeCase(cainv=0, cbinv=1, cbca=0): Merge(
+            cai=0, cbi=1, cbca=0),
+        MergeCase(cainv=0, cbinv=1, cbca=1): Merge(
+            cai=0, cbi=1, cbca=1),
 
         #                 +
         #                 |R2
@@ -105,8 +119,10 @@ class GenerateIntersections:
         #    +--cb---.
         #            | R3
         #            `
-        MergeCase(cainv=1, cbinv=0): Merge(
-            cai=1, cbi=0),
+        MergeCase(cainv=1, cbinv=0, cbca=0): Merge(
+            cai=1, cbi=0, cbca=0),
+        MergeCase(cainv=1, cbinv=0, cbca=1): Merge(
+            cai=1, cbi=0, cbca=1),
 
         #                 +
         #                 |R2
@@ -114,8 +130,10 @@ class GenerateIntersections:
         #    <--cb---.
         #            | R3
         #            +
-        MergeCase(cainv=1, cbinv=1): Merge(
-            cai=1, cbi=1)
+        MergeCase(cainv=1, cbinv=1, cbca=0): Merge(
+            cai=1, cbi=1, cbca=0),
+        MergeCase(cainv=1, cbinv=1, cbca=1): Merge(
+            cai=1, cbi=1, cbca=1)
     }
 
 
@@ -132,16 +150,35 @@ class GenerateIntersections:
         if len(ca.points) != 3 or len(cb.points) != 3:
             raise ValueError("_classify_ll_merge needs two L corridors")
 
+        def mirror_case(capt, cbpt):
+            if capt.y == cbpt.y:
+                # horizontal, a should be the longer
+                if g.essentially_lt(capt.x, cbpt.x):
+                    return 1
+                else:
+                    return 0
+            else:
+                # vertical (south -> north is normal.) a should be the longer so
+                # its mid point should be further north - which is lesser y in
+                # our co-ordinate system
+                if g.essentially_lt(cbpt.y, capt.y):
+                    return 1
+                else:
+                    return 0
+
+
+        cbca = mirror_case(ca.points[1], cb.points[1])
+
         if g.pt_essentially_same(ca.points[0], cb.points[0]):
-            return MergeCase(cainv=0, cbinv=0)
+            return MergeCase(cainv=0, cbinv=0, cbca=cbca)
         
         if g.pt_essentially_same(ca.points[0], cb.points[-1]):
-            return MergeCase(cainv=0, cbinv=1)
+            return MergeCase(cainv=0, cbinv=1, cbca=cbca)
 
         if g.pt_essentially_same(ca.points[-1], cb.points[0]):
-            return MergeCase(cainv=1, cbinv=0)
+            return MergeCase(cainv=1, cbinv=0, cbca=cbca)
         if g.pt_essentially_same(ca.points[-1], cb.points[-1]):
-            return MergeCase(cainv=1, cbinv=1)
+            return MergeCase(cainv=1, cbinv=1, cbca=cbca)
 
         raise ValueError("no co-incident points, corridors are not entanbled")
 
@@ -174,7 +211,7 @@ class GenerateIntersections:
         if g.essentially_lt(cb.points[1].y, cb.points[0].y):
             cbinv = 0
 
-        return MergeCase(cainv, cbinv)
+        return MergeCase(cainv, cbinv, cacb=0)
 
     def _merge_straights(self, icor, jcor):
 
@@ -196,6 +233,7 @@ class GenerateIntersections:
 
         case = self._classify_ll_merge(icor, jcor)
         m = self.LL_CASES[case]
+
         ca = self.corridors[icor]
         cb = self.corridors[jcor]
 
@@ -243,6 +281,13 @@ class GenerateIntersections:
         # connect the new corridor to the rooms
         r1.corridors[cn.join_sides[m.cbi]].append(icn)
         rn.corridors[cn.join_sides[1 - m.cbi]].append(icn)
+
+        if not (
+            (cn.join_sides[0] == g.BOTTOM and cn.join_sides[1] == g.TOP) or
+            (cn.join_sides[1] == g.BOTTOM and cn.join_sides[0] == g.TOP) or
+            (cn.join_sides[0] == g.LEFT and cn.join_sides[1] == g.RIGHT) or
+            (cn.join_sides[1] == g.LEFT and cn.join_sides[0] == g.RIGHT)):
+            print('xxx')
 
         cb.joins[m.cbi] = irn
         cb.join_sides[m.cbi] = RoomSide.opposite(cb.join_sides[1-m.cbi])

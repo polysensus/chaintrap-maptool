@@ -42,9 +42,10 @@ class Generator:
     https://www.gamedeveloper.com/programming/procedural-dungeon-generation-algorithm
     """
 
-    def __init__(self, debug=False):
+    def __init__(self, debug=False, allow_crossing=False):
         self.debug = debug
         self.debug_room_graph = False
+        self.allow_crossing = allow_crossing
 
     def _reset_generator(self, gp):
         self._generated = False
@@ -259,13 +260,18 @@ class Generator:
         for edge in sorted(self.main_room_secondary_connections):
             self.room_graph[edge] = (edge[0], edge[1])
 
-    def _extrude_corridor(self, i, j, allow_crossing=True):
+    def _extrude_corridor(self, i, j):
         """extrude a corridor joining rooms (i, j)"""
 
         ri = self.rooms[i]
         rj = self.rooms[j]
         bi = Box(ri.topleft(), ri.bottomright())
         bj = Box(rj.topleft(), rj.bottomright())
+
+        if bi.tl.x > bj.tl.x:
+            i, j = j, i
+            ri, rj = rj, ri
+            bi, bj = bj, bi
 
         hshadow_min = min(ri.width, rj.width) * 0.25
         vshadow_min = min(ri.length, rj.length) * 0.25
@@ -280,8 +286,8 @@ class Generator:
 
             # record the index of any crossed room, allong with the wall and corridor segment
             cor.crosses = list(rooms_crossing_line(self.rooms, line, i, j))
-            if not cor.crosses or allow_crossing:
-                return cor
+            if not cor.crosses or self.allow_crossing:
+                return cor, i, j
 
         # try plain vertical corridor
         ok, line, join_sides = g.box_vextrude(bi, bj, min=vshadow_min)
@@ -289,26 +295,22 @@ class Generator:
             cor.points = list(line)
             cor.crosses = list(rooms_crossing_line(self.rooms, line, i, j))
             cor.join_sides = list(join_sides)
-            if not cor.crosses or allow_crossing:
-                return cor
+            if not cor.crosses or self.allow_crossing:
+                return cor, i, j
 
         # ok, its an elbow. there are always two to pick from. the joins tuple
         # indicates which side the elbow (LEAVES, ENTERS) and is correct for cor.join_sides 'as is'
 
         print(f"extrude: r{i}, r{j}")
 
-        ifoot, (line1, join1), (line2, join2) = g.box_lextrude(
-            bi, bj
-        )  # each line will be 3 points
+         # each line will be 3 points
+        (line1, join1), (line2, join2) = g.box_lextrude( bi, bj)
         cor.points = list(line1)
         cor.join_sides = list(join1)
-
-        cor.joins[0], cor.joins[1] = cor.joins[ifoot], cor.joins[1-ifoot]
-
         cor.crosses = list(rooms_crossing_line(self.rooms, line1, i, j))
 
         if not cor.crosses:
-            return cor
+            return cor, i, j
 
         cor.alternate = list(line2)
         cor.alternate_join_sides = list(join2)
@@ -317,14 +319,14 @@ class Generator:
         # if the alternate does not cross, just promote it
         if not cor.alternate_crosses:
             cor.points = list(line2)
-            cor.join_sides = list(join2)
             cor.crosses = cor.alternate_crosses
+            cor.join_sides = cor.alternate_join_sides
             cor.alternate = ()
             cor.alternate_join_sides = ()
             cor.alternate_crosses = ()
 
-        if allow_crossing:
-            return cor
+        if self.allow_crossing:
+            return cor, i, j
 
     def _generate_main_corridors(self):
 
@@ -338,10 +340,15 @@ class Generator:
                 continue
 
             cor = self._extrude_corridor(i, j)
-            if self.debug and cor is None:
+            if self.debug and self.allow_crossing and cor is None:
                 raise Error(
                     "extrude corridor should always succeede if crossing is allowed"
                 )
+            if cor is None:
+                print(f"cant join rooms {i}, {j} without a crossing")
+                continue
+
+            cor, i, j = cor
 
             icor = len(corridors)
             # room i is the start of the join, j is the end
@@ -371,14 +378,17 @@ class Generator:
                 if (j, i) in self.joined_rooms:
                     continue
                 cor = self._extrude_corridor(i, j)
-                if cor is not None:
-                    icor = len(self.corridors)
-                    # room i is the start of the join, j is the end
-                    self.rooms[i].corridors[cor.join_sides[0]].append(icor)
-                    self.rooms[j].corridors[cor.join_sides[1]].append(icor)
-                    self.joined_rooms[(i, j)] = icor
-                    self.corridors.append(cor)
-                    break
+                if cor is None:
+                    continue
+
+                cor, i, j = cor
+                icor = len(self.corridors)
+                # room i is the start of the join, j is the end
+                self.rooms[i].corridors[cor.join_sides[0]].append(icor)
+                self.rooms[j].corridors[cor.join_sides[1]].append(icor)
+                self.joined_rooms[(i, j)] = icor
+                self.corridors.append(cor)
+                break
 
 
     def _generate_intersections(self):
