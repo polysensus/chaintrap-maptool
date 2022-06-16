@@ -1,15 +1,264 @@
 """Insert intersections and clip corridors to reconcile partialy co-incident corridors
 
 """
+from collections import namedtuple
+from dataclasses import dataclass
 from maptool import geometry as g
 from maptool.room import Room, RoomSide
 from maptool.corridor import Corridor
 
+# cainv, cbinv: indicate if the respective corridors are inverted: runing right
+# to left or running north to south is classed as inverted.
+MergeCase = namedtuple("MergeCase", "cainv cbinv".split())
+# cai and cbi indicate the index into join & join_sides representing R1
+Merge = namedtuple("MergeSelect", "cai cbi".split(), defaults=(None, None))
+
 class GenerateIntersections:
+
+    STRAIGHT_CASES = {
+
+        #   +--ca--------> R2
+        # R1                      R1 cb R3 R2
+        #   +--cb---> R3
+        #
+        #  r1.detach(ca) -> rdetside
+        #  ca.p[0] = cb.p[1]
+        #  ca.j[0] = cb.j[1]
+        #  r3.attach(ca, opp(rdetside))
+        MergeCase(cainv=0, cbinv=0): Merge(
+            cai=0, cbi=0),
+
+        #   +--ca--------> R2
+        # R1                      R1 cb R3 R2
+        #   <--cb---+ R3
+        #
+        #  r1.detach(ca) -> rdetside
+        #  ca.p[0] = cb.p[0]
+        #  ca.j[0] = cb.j[0]
+        #  r3.attach(ca, opp(rdetside))
+        MergeCase(cainv=0, cbinv=1): Merge(
+            cai=0, cbi=1),
+
+        #   <--ca--------+ R2
+        # R1                      R1 cb R3 R2
+        #   +--cb---> R3
+        #
+        #  r1.detach(ca) -> rdetside
+        #  ca.p[0] = cb.p[1]
+        #  ca.j[0] = cb.j[1]
+        #  r3.attach(ca, opp(rdetside))
+        MergeCase(cainv=1, cbinv=0): Merge(
+            cai=1, cbi=0),
+
+        #   <--ca--------+ R2
+        # R1                      R1 cb  R3 ca  R2
+        #   <--cb---+ R3
+        #
+        #  r1.detach(ca) -> rdetside
+        #  ca.p[1] = cb.p[1]
+        #  ca.j[1] = cb.j[1]
+        #  r3.attach(ca, opp(rdetside))
+        MergeCase(cainv=1, cbinv=1): Merge(
+            cai=1, cbi=1),
+    }
+
+    LL_CASES = {
+        #                 ^
+        #                 |R2
+        # R1 +--ca--------.
+        #    +--cb---.
+        #            | R3
+        #            `
+        # ir1  = cb.join[0]
+        # r1   = rooms[ir1]
+        # rn.c = cb.points[1]
+        # irn = len(rooms)
+        #
+        # cn.p[0] = cb.points[0]
+        # cn.p[1] = cb.points[1]
+        # cn.joins[0] = cb.joins[0]
+        # cn.joins[1] = irn
+        # cn.join_sides[0] = cb.join_sides[0]
+        # cn.join_sides[1] = opposite(cb.join_sides[0])
+        #
+        # cb.points  = cb.points[1:3]
+        # cb.join[0] = irn
+        # cb.join_sides[0] = opp(cb.join_sides[1])
+        # rn.corridors[opp(cb.join_sides[1])].append(jcor)
+
+
+        MergeCase(cainv=0, cbinv=0): Merge(
+            cai=0, cbi=0),
+
+        #                 ^
+        #                 |R2
+        # R1 +--ca--------.
+        #    <--cb---.
+        #            | R3
+        #            +
+        MergeCase(cainv=0, cbinv=1): Merge(
+            cai=0, cbi=1),
+
+        #                 +
+        #                 |R2
+        # R1 <--ca--------.
+        #    +--cb---.
+        #            | R3
+        #            `
+        MergeCase(cainv=1, cbinv=0): Merge(
+            cai=1, cbi=0),
+
+        #                 +
+        #                 |R2
+        # R1 <--ca--------.
+        #    <--cb---.
+        #            | R3
+        #            +
+        MergeCase(cainv=1, cbinv=1): Merge(
+            cai=1, cbi=1)
+    }
+
+
     def __init__(self, rooms, corridors):
         self.rooms = rooms
         self.corridors = corridors
 
+    # ---
+    def _classify_ll_merge(self, icor, jcor) -> MergeCase:
+
+        ca = self.corridors[icor]
+        cb = self.corridors[jcor]
+
+        if len(ca.points) != 3 or len(cb.points) != 3:
+            raise ValueError("_classify_ll_merge needs two L corridors")
+
+        if g.pt_essentially_same(ca.points[0], cb.points[0]):
+            return MergeCase(cainv=0, cbinv=0)
+        
+        if g.pt_essentially_same(ca.points[0], cb.points[-1]):
+            return MergeCase(cainv=0, cbinv=1)
+
+        if g.pt_essentially_same(ca.points[-1], cb.points[0]):
+            return MergeCase(cainv=1, cbinv=0)
+        if g.pt_essentially_same(ca.points[-1], cb.points[-1]):
+            return MergeCase(cainv=1, cbinv=1)
+
+        raise ValueError("no co-incident points, corridors are not entanbled")
+
+
+    def _classify_straight_merge(self, icor, jcor) -> MergeCase:
+
+        ca = self.corridors[icor]
+        cb = self.corridors[jcor]
+
+        if len(ca.points) != 2 or len(cb.points) != 2:
+            raise ValueError("_classify_straight_merge needs two straight corridors")
+
+        cainv = cbinv = 1
+
+        if ca.join_sides[0] in [g.LEFT, g.RIGHT]:
+
+            if g.essentially_lt(ca.points[0].x, ca.points[1].x):
+                # not inverted, normal is reading order. lower x first
+                cainv = 0
+
+            if g.essentially_lt(cb.points[0].x, cb.points[1].x):
+                # not inverted, normal is reading order. lower x first
+                cbinv = 0
+            return MergeCase(cainv, cbinv)
+
+        # lower y is 'north'. north -> south is inverted.
+        if g.essentially_lt(ca.points[1].y, ca.points[0].y):
+            # second point has lower y, not inverted
+            cainv = 0
+        if g.essentially_lt(cb.points[1].y, cb.points[0].y):
+            cbinv = 0
+
+        return MergeCase(cainv, cbinv)
+
+    def _merge_straights(self, icor, jcor):
+
+        case = self._classify_straight_merge(icor, jcor)
+        m = self.STRAIGHT_CASES[case]
+        ca = self.corridors[icor]
+        cb = self.corridors[jcor]
+
+        rd = ca.joins[m.cai]
+        ir3 = cb.joins[1 - m.cbi]
+        r3 = self.rooms[ir3]
+        rdetside = rd.detach_corridor(icor)
+        ca.points[m.cai] = cb.points[1 - m.cbi].clone()
+        ca.joins[m.cai] = ir3
+        #r3.corridors[RoomSide.opposite(rdetside)].append(icor)
+        r3.corridors[rdetside].append(icor)
+
+    def _merge_ll(self, icor, jcor):
+
+        case = self._classify_ll_merge(icor, jcor)
+        m = self.LL_CASES[case]
+        ca = self.corridors[icor]
+        cb = self.corridors[jcor]
+
+        # deal with cb (jcor) first as we create the new intersection based on its mid point.
+
+        # remove the start of cb from R1, create the intersection RN, convert cb
+        # to a straight, attach the remaining leg of cb to RN
+
+        ir1 = cb.joins[m.cbi]
+        r1 = self.rooms[ir1]
+        r1.detach_corridor(jcor)
+        rn = Room()  # intersection
+        rn.is_intersection = True
+        rn.center = cb.points[1]
+        irn = len(self.rooms)
+        self.rooms.append(rn)
+
+        # insert the new corridor segment replacing the co-incident sections of the entangled pair
+
+        # cn.p[0] = cb.points[0]
+        # cn.p[1] = cb.points[1]
+        # cn.joins[0] = cb.joins[0]
+        # cn.joins[1] = irn
+        # cn.join_sides[0] = cb.join_sides[0]
+        # cn.join_sides[1] = opposite(cb.join_sides[0])
+        cn = Corridor(
+            points=[None, None],
+            joins=[None, None],
+            join_sides=[None, None],
+            is_inserted=True
+        )
+
+        # cn is a straight so we don't need to double cbi to get the right index into points
+        cn.points[m.cbi] = cb.points[m.cbi * 2].clone() 
+        cn.points[1 - m.cbi] = cb.points[1].clone()
+
+        cn.joins[m.cbi] = cb.joins[m.cbi] 
+        cn.join_sides[m.cbi] = cb.join_sides[m.cbi]
+        cn.joins[1 - m.cbi] = irn
+        cn.join_sides[1 - m.cbi] = RoomSide.opposite(cb.join_sides[m.cbi])
+        icn = len(self.corridors)
+
+        self.corridors.append(cn)
+
+        # connect the new corridor to the rooms
+        r1.corridors[cn.join_sides[m.cbi]].append(icn)
+        rn.corridors[cn.join_sides[1 - m.cbi]].append(icn)
+
+        cb.joins[m.cbi] = irn
+        cb.join_sides[m.cbi] = RoomSide.opposite(cb.join_sides[1-m.cbi])
+        cb.points = cb.points[(1-m.cbi):2+(1-m.cbi)]
+        cb.clipped += 1
+
+        rn.corridors[cb.join_sides[m.cbi]].append(jcor)
+
+        # now deal with ca
+        # truncate the R1 end of ca and attach it to RN
+        r1side = r1.detach_corridor(icor)
+        ca.points[m.cai] = rn.center.clone()
+        ca.clipped += 1
+        ca.joins[m.cai] = irn
+        # join side from R1 is preserved on RN
+        rn.corridors[r1side].append(icor)
 
     # ---
     def find_first_entangled_corridor_pair(self):
@@ -45,9 +294,8 @@ class GenerateIntersections:
 
 
         if len(c1.points) == 3 and len(c2.points) == 3:
-            self._corridor_lmerge(ic, jc)
-            if c1.check_entangled(c2):
-                print('xxx')
+            self._merge_ll(ic, jc)
+            assert not c1.check_entangled(c2)
             return True
 
         if len(c1.points) == 3 and len(c2.points) == 2:
@@ -65,12 +313,12 @@ class GenerateIntersections:
             return True
 
         if len(c1.points) == 2 and len(c2.points) == 2:
-            self._corridor_hvmergehv(ic, jc)
-            if c1.check_entangled(c2):
-                print('xxx')
-
+            self._merge_straights(ic, jc)
+            assert not c1.check_entangled(c2)
             return True
 
+
+    # ---
 
     # ---
     def _corridor_lmerge(self, icor, jcor):
@@ -97,6 +345,8 @@ class GenerateIntersections:
                 +1
 
         """
+
+        self._merge_ll(icor, jcor)
 
         # if its the even case pick c
         ci = self.corridors[icor]
@@ -240,82 +490,7 @@ class GenerateIntersections:
 
                 # now we have the intersection, we can deal with the L as above.
                 # self._corridor_lmerge_truncate_long(icor, 1, ci.points[1].clone(), iri)
-
-
-    def _corridor_hvmergehv(self, icor, jcor):
-        """
-        merge a co-incident pair of straight corridors. either horizontal or vertical
-        """
-        ci = self.corridors[icor]
-        cj = self.corridors[jcor]
-
-        if len(ci.points) != 2 or len(cj.points) != 2:
-            raise ValueError("corridor_hvmergehv needs two straight corridors")
-
-        if ci.joins[0] == cj.joins[0]:
-            pi = cj.points[1].clone()
-            if (g.dist2(cj.points[0], cj.points[1]) < g.dist2(ci.points[0], ci.points[1])):
-                self._corridor_merge_hvhv(icor, 0, cj.points[1].clone(), cj.joins[1])
-            else:
-                self._corridor_merge_hvhv(jcor, 0, ci.points[1].clone(), ci.joins[1])
-        elif ci.joins[0] == cj.joins[1]:
-            if (g.dist2(cj.points[0], cj.points[1]) < g.dist2(ci.points[0], ci.points[1])):
-                self._corridor_merge_hvhv(icor, 0, cj.points[0].clone(), cj.joins[0])
-            else:
-                self._corridor_merge_hvhv(jcor, 1, ci.points[1].clone(), ci.joins[1])
-        elif ci.joins[1] == cj.joins[0]:
-            if (g.dist2(cj.points[0], cj.points[1]) < g.dist2(ci.points[0], ci.points[1])):
-                self._corridor_merge_hvhv(icor, 1, cj.points[1].clone(), cj.joins[1])
-            else:
-                self._corridor_merge_hvhv(jcor, 0, ci.points[0].clone(), ci.joins[0])
-        else:
-            if (g.dist2(cj.points[0], cj.points[1]) < g.dist2(ci.points[0], ci.points[1])):
-                self._corridor_merge_hvhv(icor, 1, cj.points[0].clone(), cj.joins[0])
-            else:
-                self._corridor_merge_hvhv(jcor, 1, ci.points[0].clone(), ci.joins[0])
-
-
     # ---
-    def _corridor_merge_hvhv(self, icor, r1end, pi, iri):
-        """
-        Merge two co-incident straight corridors.
-
-        icor is the longer
-
-
-        r1end   ci
-        j0+-------------+ j1 R2  icor
-    R1  i0+-----+ i1 pi
-            cj  R3
-
-            cj     ci     R2
-    R1  i0+-----+-------- i1  icor
-               R3
-
-        """
-        ci = self.corridors[icor]
-        r1 = self.rooms[ci.joins[r1end]]
-        ri = self.rooms[iri]
-
-        # adjust the corridor ci join to end at the RI intersection rather than R1
-        orig = ci.joins[:]
-        orig_sides = ci.join_sides[:]
-
-        # detach ci from room 1 and clip it
-
-        r1iside = r1.detach_corridor(icor)
-
-        # attach it to the intersection the side of attachment is the *same*
-        # side as it was previously attached to R1 on.
-        ri.corridors[r1iside].append(icor)
-
-        # The intersection point is the other end of cj from the end co-incident with ci
-        ci.points[r1end] = pi.clone()
-        ci.clipped += 1 
-        ci.joins[r1end] = iri 
-        # join_sides stays the same
-
-        print(f"merge-hhv: cors: {icor} ci: {str(orig)} -> {ci.joins}. joins")    
 
 
     def _corridor_lmerge_truncate_long(self, icor, r1end, pi, iri):

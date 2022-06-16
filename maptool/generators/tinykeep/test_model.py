@@ -879,10 +879,10 @@ class TestModel:
 
         # check the new corridor
         cnew = g.corridors[2]
-        assert cnew.joins[0] == 0
-        assert cnew.joins[1] == 3
-        assert cnew.join_sides[0] == EAST
-        assert cnew.join_sides[1] == WEST
+        assert cnew.joins[0] == 3
+        assert cnew.joins[1] == 0
+        assert cnew.join_sides[0] == WEST
+        assert cnew.join_sides[1] == EAST
 
         # check the clipped side
         assert ca.join_sides[0] == EAST
@@ -991,10 +991,10 @@ class TestModel:
 
         # check the new corridor
         cnew = g.corridors[2]
-        assert cnew.joins[0] == 0
-        assert cnew.joins[1] == 3 # rnew
-        assert cnew.join_sides[0] == WEST
-        assert cnew.join_sides[1] == EAST
+        assert cnew.joins[0] == 3 # rnew
+        assert cnew.joins[1] == 0
+        assert cnew.join_sides[0] == EAST
+        assert cnew.join_sides[1] == WEST
 
         # major side
         assert ca.join_sides[0] == WEST

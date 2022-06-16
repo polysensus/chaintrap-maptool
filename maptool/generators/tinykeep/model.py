@@ -392,13 +392,21 @@ class Generator:
             entangled = gi.find_first_entangled_corridor_pair()
 
 
-    def _generate_corridors(self):
+    def _generate_corridors(self, map):
 
         self._mark_main_rooms()
         self._main_rooms_delaunay_triangulation()
         self._main_rooms_minimal_spanning_tree()
         self._generate_main_corridors()
+
+        opts = self.create_render_opts(map.args)
         self._generate_secondary_corridors()
+
+        import svgwrite
+        dwg = svgwrite.Drawing(filename="x-pre.svg")
+        arena = dwg.add(dwg.g(id="arena", fill="blue"))
+        self.render(dwg, arena, opts=opts)
+        dwg.save(pretty=True)
 
         self._generate_intersections()
 
@@ -410,7 +418,7 @@ class Generator:
 
 
     def generate_corridors(self, map):
-        self._generate_corridors()
+        self._generate_corridors(map)
 
 
     def generate(self, map):

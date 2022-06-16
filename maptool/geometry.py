@@ -27,6 +27,10 @@ def essentially_zero(x):
 def essentially_equal(a, b):
     return essentially_zero(a - b)
 
+def essentially_lt(a, b):
+    e = sys.float_info.epsilon * 2
+    return (a + e) < b
+
 def pt_within_radi2(p: Vec2, c: Vec2, radi2: float):
     dx = p.x - c.x
     dy = p.y - c.y
@@ -407,7 +411,7 @@ def box_lextrude(b0, b1, factor=0.5, min=0.0):
 
     ib0, ib1 = 0, 1
     ifoot = 0
-    if b[0].tl.x > b[1].br.x:
+    if b[0].tl.x > b[1].tl.x:
         # flipped case
         ib0, ib1 = 1, 0
         ifoot = 1
@@ -450,6 +454,7 @@ def box_lextrude(b0, b1, factor=0.5, min=0.0):
             join1[ib0], join1[ib1] = (RIGHT, TOP)
             join2[ib0], join2[ib1] = (BOTTOM, LEFT)
 
+
             return ifoot, (el_right_top, join1), (el_bot_left, join2)
 
         else:
@@ -491,72 +496,3 @@ def box_lextrude(b0, b1, factor=0.5, min=0.0):
         join1[ib0], join1[ib1] = (RIGHT, BOTTOM)
         join2[ib0], join2[ib1] = (TOP, LEFT)
         return ifoot, (el_right_bot, join1), (el_top_left, join2)
-
-
-def xbox_lextrude(b1, b2, factor=0.5, min=0.0):
-    """assume the boxes are neither horizonatly nor verticaly aligned and create
-    a pair of elbows. The caller can pick the one they like
-
-                           We deal with the opposite cases by flipping the points around
-    +-----+b1_i            +-----+b2_i
-    |b1   |-----+          |b2   |-----+
-    +-----+     |          +-----+     |
-        |      +-----+         |      +-----+
-        +______|b2   |         +______|b1   |
-               |     |                |     |
-               +-----+                +-----+
-
-               +-----+                +-----+
-        +____  |b2   |         +____  |b1   |
-        |      +-----+         |      +-----+
-    +-----+      |         +-----+      |
-    |b1   |------+         |b2   |------+
-    +-----+ b1_i           +-----+ b2_i
-    """
-
-    # we return an indication to the caller of which wall the corridor leaves b1
-    # and which it enters b2. to reduce the cases here, we sometimes swap b1 &
-    # b2. When we do so, we need to rememer to also swap the leaves/enters order
-    # back to that which the caller originally provided.
-
-    # which ever case, we need an insertion point on the right edge of b1
-
-    b1_right_i = Vec2(b1.br.x, b1.tl.y + (b1.br.y - b1.tl.y) * factor)
-    b2_left_i = Vec2(b2.tl.x, b2.tl.y + (b2.br.y - b2.tl.y) * factor)
-
-    b1_top_i = Vec2(b1.tl.x + (b1.br.x - b1.tl.x) * factor, b1.tl.y)
-    b1_bot_i = Vec2(b1.tl.x + (b1.br.x - b1.tl.x) * factor, b1.br.y)
-
-    b2_top_i = Vec2(b2.tl.x + (b2.br.x - b2.tl.x) * factor, b2.tl.y)
-    b2_bot_i = Vec2(b2.tl.x + (b2.br.x - b2.tl.x) * factor, b2.br.y)
-
-    # b1 right to b2 top
-    if b1.tl.y < b2.tl.y:
-
-        # b1.x is always < b2.x
-        el_right_top = (b1_right_i, Vec2(b2_top_i.x, b1_right_i.y), b2_top_i)
-        el_bot_left = (b1_bot_i, Vec2(b1_bot_i.x, b2_left_i.y), b2_left_i)
-
-        # return the shortest first
-        d2_right_top = dist2(el_right_top[0], el_right_top[1])
-        d2_right_top += dist2(el_right_top[1], el_right_top[2])
-        d2_bot_left = dist2(el_bot_left[0], el_bot_left[1])
-        d2_bot_left += dist2(el_bot_left[1], el_bot_left[2])
-
-        if d2_right_top < d2_bot_left:
-            return identify_ends(el_right_top), identify_ends(el_bot_left)
-        else:
-            return identify_ends(el_bot_left), identify_ends(el_right_top)
-
-    el_top_right = (b1_top_i, Vec2(b1_top_i.x, b2_left_i.y), b2_left_i)
-    el_right_bot = (b1_right_i, Vec2(b2_bot_i.x, b1_right_i.y), b2_bot_i)
-
-    d2_top_right = dist2(el_top_right[0], el_top_right[1])
-    d2_top_right += dist2(el_top_right[1], el_top_right[2])
-    d2_right_bot = dist2(el_right_bot[0], el_right_bot[1])
-    d2_right_bot += dist2(el_right_bot[1], el_right_bot[1])
-
-    if d2_top_right < d2_right_bot:
-        return identify_ends(el_top_right), identify_ends(el_right_bot)
-    else:
-        return identify_ends(el_right_bot), identify_ends(el_top_right)
