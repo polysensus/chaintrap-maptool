@@ -323,10 +323,13 @@ def box_vextrude(b1, b2, factor=0.5, min=0.0):
     if shadow <= min:
         return False, (None, None), (None, None)
 
-    b1_i = Vec2(b2.tl.x, b1.br.y)
-    b2_i = Vec2(b1.br.x, b2.tl.y)
+    if b1.tl.x < b2.tl.x:
+        x0, x1 = b2.tl.x, b1.br.x
+    else:
+        x0, x1 = b1.tl.x, b2.br.x
+    
+    ix = x0 + (x1 - x0) * factor
 
-    ix = b1_i.x + (b2_i.x - b1_i.x) * factor
     p1 = Vec2(ix, b1.br.y)
     p2 = Vec2(ix, b2.tl.y)
 
