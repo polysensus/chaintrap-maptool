@@ -69,8 +69,83 @@ class GenerateIntersections:
             cai=1, cbi=1, cbca=0),
         MergeCase(cainv=1, cbinv=1, cbca=1): Merge(
             cai=1, cbi=1, cbca=1),
-
     }
+
+    LL_CONVERGENT_CASES = {
+        #    i0
+        # R1 o-----ca---------+ 
+        #    o--cb--+         |       
+        #    j0     |R2       | R3
+        #            `        `
+        #           rn
+        # R1 o--cn---+---ca--+
+        #          cb|R2     | R3
+        #            `       `
+ 
+        MergeCase(cainv=0, cbinv=0, cbca=0): Merge(
+            cai=0, cbi=0, cbca=0),
+        MergeCase(cainv=0, cbinv=0, cbca=1): Merge(
+            cai=0, cbi=0, cbca=1)
+    }
+
+    def case_00(rooms, corridors, icor, jcor):
+
+        ca = corridors[icor]
+        cb = corridors[jcor]
+        irn = len(rooms)
+        rn = Room()
+        cn = Corridor()
+        corridors.append(cn)
+        rooms.append(rn)
+
+        r1 = cb.joins[0]
+        icn = len
+
+        # --- new room create 
+        # new room at the elbow of cb
+        rn.c = cb.points[1]
+
+        # --- new corridor
+        # new corridor from r1 to rn
+        cn.p[0] = cb.points[0]
+        cn.p[1] = cb.points[1]
+        cn.joins[0] = cb.joins[0]
+        cn.joins[1] = irn
+        cn.join_sides[0] = cb.join_sides[0]
+        cn.join_sides[1] = opp(cb.join_sides[0])
+
+        # attach the new corridor to r1
+        r1.corridors[cn.join_sides[0]].append(icn)
+
+        # attach the new corridor to rn
+        rn.corridors[cn.join_sides[1]].append(icn)
+        # --- new corridor complete
+
+        # --- update ca
+        # move first point on ca to the new room
+        ca.joins[0] = irn
+        ca.points[0] = rn.c
+
+        # detach ca from r1 and attach to rn
+        r1side = r1.detach_corridor(icor)
+        rn.corridors[r1side].append(icor)
+        # --- ca update complete
+
+        # --- update cb
+        # convert cb to a straight between r1 and rn
+        cb.points = cb.points[1:3]
+        cb.joins[0] = irn
+        cb.join_sides[0] = opp(cb.join_sides[1])
+
+        # detach cb from r1 and attach to rn
+        r1side = r1.detach_corridor(jcor)
+        rn.corridors[r1side].append(jcor)
+        # --- cb update complete
+        # --- new room complete
+
+
+        rn.corridors()
+
 
     LL_CASES = {
         #                 ^
@@ -236,29 +311,19 @@ class GenerateIntersections:
 
         ca = self.corridors[icor]
         cb = self.corridors[jcor]
-
-        # deal with cb (jcor) first as we create the new intersection based on its mid point.
-
-        # remove the start of cb from R1, create the intersection RN, convert cb
-        # to a straight, attach the remaining leg of cb to RN
-
         ir1 = cb.joins[m.cbi]
         r1 = self.rooms[ir1]
-        r1.detach_corridor(jcor)
+
+        # --- new room create 
+        # new room at the elbow of cb
         rn = Room()  # intersection
         rn.is_intersection = True
         rn.center = cb.points[1]
         irn = len(self.rooms)
         self.rooms.append(rn)
 
-        # insert the new corridor segment replacing the co-incident sections of the entangled pair
-
-        # cn.p[0] = cb.points[0]
-        # cn.p[1] = cb.points[1]
-        # cn.joins[0] = cb.joins[0]
-        # cn.joins[1] = irn
-        # cn.join_sides[0] = cb.join_sides[0]
-        # cn.join_sides[1] = opposite(cb.join_sides[0])
+        # --- new corridor
+        # new corridor from r1 to rn, replacing the co-incident sections of the entangled pair
         cn = Corridor(
             points=[None, None],
             joins=[None, None],
@@ -278,16 +343,30 @@ class GenerateIntersections:
 
         self.corridors.append(cn)
 
-        # connect the new corridor to the rooms
+        # attach the new corridor to r1
         r1.corridors[cn.join_sides[m.cbi]].append(icn)
+        # attach the new corridor to rn
         rn.corridors[cn.join_sides[1 - m.cbi]].append(icn)
+        # --- new corridor complete
 
-        if not (
-            (cn.join_sides[0] == g.BOTTOM and cn.join_sides[1] == g.TOP) or
-            (cn.join_sides[1] == g.BOTTOM and cn.join_sides[0] == g.TOP) or
-            (cn.join_sides[0] == g.LEFT and cn.join_sides[1] == g.RIGHT) or
-            (cn.join_sides[1] == g.LEFT and cn.join_sides[0] == g.RIGHT)):
-            print('xxx')
+        # --- update ca
+        # move first point on ca to the new room
+        # truncate the R1 end of ca and attach it to RN
+        r1side = r1.detach_corridor(icor)
+
+        # note the * 2 gets us to the 'first' point on the corridor independently of its direction
+        ca.points[m.cai * 2] = rn.center.clone()
+        ca.clipped += 1
+        ca.joins[m.cai] = irn
+        # join side from R1 is preserved on RN
+        rn.corridors[r1side].append(icor)
+        # --- ca update complete
+
+        # --- update cb
+        # remove the start of cb from R1, create the intersection RN, convert cb
+        # to a straight, attach the remaining leg of cb to RN
+
+        r1.detach_corridor(jcor)
 
         cb.joins[m.cbi] = irn
         cb.join_sides[m.cbi] = RoomSide.opposite(cb.join_sides[1-m.cbi])
@@ -295,15 +374,8 @@ class GenerateIntersections:
         cb.clipped += 1
 
         rn.corridors[cb.join_sides[m.cbi]].append(jcor)
-
-        # now deal with ca
-        # truncate the R1 end of ca and attach it to RN
-        r1side = r1.detach_corridor(icor)
-        ca.points[m.cai] = rn.center.clone()
-        ca.clipped += 1
-        ca.joins[m.cai] = irn
-        # join side from R1 is preserved on RN
-        rn.corridors[r1side].append(icor)
+        # --- cb update complete
+        # --- new room complete
 
     # ---
     def find_first_entangled_corridor_pair(self):

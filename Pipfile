@@ -12,6 +12,7 @@ bs4 = "*"
 
 [dev-packages]
 pytest = "*"
+black = "*"
 
 [requires]
 python_version = "3.8"

@@ -20,6 +20,37 @@ def emptymodel():
 
 
 @pytest.fixture
+def room3_horizontal_converge():
+    """
+                            (14,0)+--+
+                                 |r2|
+                                 +--+ (18,4)
+                      
+ (0,6)+--+         
+      |r1|         (6,8)+--+ 
+      +--+ (4,10)        |r3|
+                         +--+ (10,12)
+                 
+    """
+    ox, oy = 0.0, 0.0
+    def frombox(tl, br, **kw):
+        return Room.frombox(Vec2(ox + tl.x, oy+tl.y), Vec2(ox+br.x, oy+br.y), corridors=[[], [], [], []], **kw)
+
+    r2 = frombox(Vec2(14.0, 0.0), Vec2(18.0, 4.0))
+    #                      (14,0)
+    #                         +--+
+    #        .--------------->|r2|
+    #        |           |    +--+ (18,4)
+    r3 = frombox(Vec2(6.0, 8.0), Vec2(10.0, 12.0))
+    #        |           |       
+    #  (0,6)+--+   (6,8)+--+
+    #       |r1|        |r3|
+    #       +--+        +--+
+    #        (4,10)       (10,12)
+    r1 = frombox(Vec2(0.0, 6.0), Vec2(4.0, 10.0))
+    return r1, r2, r3
+
+@pytest.fixture
 def rooms3_horizontal_spur():
     """
                (10,0)+--+
@@ -93,6 +124,38 @@ def rooms3_horizontal_spur_inverted():
     r3 = frombox(Vec2(6.0, 12.0), Vec2(10.0, 16.0))
 
     return r1, r2, r3
+
+@pytest.fixture
+def ll_converge_right(emptymodel, room3_horizontal_converge):
+    g = emptymodel
+    r1, r2, r3 = room3_horizontal_converge
+
+    ca = Corridor(
+        points=[r1.pt_top(), None, r2.pt_left()],
+        joins=[0,1],
+        join_sides=[NORTH, WEST]
+        )
+    ca.points[1].x = ca.points[0].x
+    ca.points[1].y = ca.points[2].y
+
+    cb = Corridor(
+        points=[r3.pt_top(), None, r2.pt_left()],
+        joins=[2,1],
+        join_sides=[NORTH, WEST]
+        )
+
+    cb.points[1].x = cb.points[0].x
+    cb.points[1].y = cb.points[2].y
+
+    g.rooms.extend([r1, r2, r3])
+    g.corridors.extend([ca, cb])
+
+    r1.corridors[NORTH] = [0]
+    r2.corridors[WEST] = [0, 1]
+    r3.corridors[NORTH] = [1]
+
+    return g
+
 
 @pytest.fixture
 def l_hshort(emptymodel, rooms3_horizontal_spur):
@@ -196,8 +259,6 @@ def l_inv_hshort_inv(emptymodel, rooms3_horizontal_spur):
     g.rooms.extend([r1, r2, r3])
     g.corridors.extend([ca, cb])
     return g
-
-
 
 
 @pytest.fixture
@@ -535,6 +596,72 @@ class TestCorridor:
 
 
 class TestModel:
+
+    def test_merge_ll_converge_right(self, emptymodel, room3_horizontal_converge):
+        """
+        .----------+ r2  ca
+        |     .----+     cb
+        |     |
+        +i0   +j0
+        r1    r3
+
+           ca rn  cn
+        .-----+-----+ r2  ca
+        |     |cb
+        +i0   +j0
+        r1    r3
+
+        """
+
+        # --- setup
+        g = emptymodel
+        r1, r2, r3 = room3_horizontal_converge
+
+        ca = Corridor(
+            points=[r1.pt_top(), None, r2.pt_left()],
+            joins=[0,1],
+            join_sides=[NORTH, WEST]
+            )
+        ca.points[1] = Vec2(ca.points[0].x, ca.points[2].y)
+
+        cb = Corridor(
+            points=[r3.pt_top(), None, r2.pt_left()],
+            joins=[2,1],
+            join_sides=[NORTH, WEST]
+            )
+
+        cb.points[1] = Vec2(cb.points[0].x, cb.points[2].y)
+
+        g.rooms.extend([r1, r2, r3])
+        g.corridors.extend([ca, cb])
+
+        r1.corridors[NORTH] = [0]
+        r2.corridors[WEST] = [0, 1]
+        r3.corridors[NORTH] = [1]
+
+        # --- test
+        g._generate_intersections()
+        assert len(g.corridors) == 3
+        assert len(g.rooms) == 4
+
+        cn = g.corridors[-1]
+        rn = g.rooms[-1]
+        irn = len(g.rooms) - 1
+
+        assert cn.join_sides == [EAST, WEST]
+        assert cn.joins == [irn, 1]
+        assert essentially_equal(cn.points[0].x, rn.center.x)
+        assert essentially_equal(cn.points[0].y, rn.center.y)
+        assert essentially_equal(cn.points[-1].x, r2.pt_left().x)
+
+        assert ca.join_sides == [NORTH, WEST]
+        assert ca.joins == [0, irn]
+        assert pt_essentially_same(ca.points[-1], rn.center)
+
+        assert cb.join_sides == [NORTH, SOUTH]
+        assert cb.joins == [2, irn]
+        assert pt_essentially_same(cb.points[-1], rn.center)
+
 
     def test_merge_l_hlong(self, l_hlong_inv):
         """

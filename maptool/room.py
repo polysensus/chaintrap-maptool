@@ -90,15 +90,58 @@ class Room:
             corridors=[self.corridors[0][:],self.corridors[1][:],self.corridors[2][:],self.corridors[3][:]]
         )
 
+
     def topleft(self) -> Vec2:
         x = self.center.x - (self.width / 2)
         y = self.center.y - (self.length / 2)
         return Vec2(x, y)
 
+
     def bottomright(self) -> Vec2:
         x = self.center.x + (self.width / 2)
         y = self.center.y + (self.length / 2)
         return Vec2(x, y)
+
+
+    def pt_left(self, factor=0.5):
+
+        tlx = self.center.x - (self.width / 2)
+        tly = self.center.y - (self.length / 2)
+        bry = self.center.y + (self.length / 2) 
+
+        y = tly + (bry - tly) * factor
+        return Vec2(tlx, y)
+
+
+    def pt_right(self, factor=0.5):
+
+        tly = self.center.y - (self.length / 2)
+        brx = self.center.x + (self.width / 2)
+        bry = self.center.y + (self.length / 2)
+
+        # larger y is down
+        y = tly + (bry - tly) * factor 
+        return Vec2(brx, y)
+
+
+    def pt_top(self, factor=0.5):
+
+        tlx = self.center.x - (self.width / 2)
+        tly = self.center.y - (self.length / 2)
+        brx = self.center.x + (self.width / 2)
+        x = tlx + (brx - tlx) * factor
+        return Vec2(x, tly)
+
+    
+    def pt_bottom(self, factor=0.5):
+
+        tlx = self.center.x - (self.width / 2)
+        brx = self.center.x + (self.width / 2)
+        bry = self.center.y + (self.length / 2)
+
+        x = tlx + (brx - tlx) * factor
+        return Vec2(x, bry)
+
 
     def euclidean_dist(self, other) -> float:
         return g.pt_dist(self.center, other.center)
