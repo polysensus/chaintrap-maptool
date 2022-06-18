@@ -403,10 +403,9 @@ def box_lextrude(b0, b1, factor=0.5, min=0.0):
     +-----+ b1_i           +-----+ b2_i
     """
 
-    # we return an indication to the caller of which wall the corridor leaves b1
-    # and which it enters b2. to reduce the cases here, we sometimes swap b1 &
-    # b2.
-
+    # TODO: thought we needed to explicitly allow for inverse cases. But it
+    # seems best to check for the caller to check those and pass in b0 and b1 in
+    # a consistent layout. So can simplify accordingly and use b0, b1 directly
     b = [b0, b1]
 
     ib0, ib1 = 0, 1
@@ -429,10 +428,8 @@ def box_lextrude(b0, b1, factor=0.5, min=0.0):
     #     +______|b2   |         +______|b1   |
     #            |     |                |     |
     #            +-----+                +-----+
-    #if b[ib0].tl.y < b[ib1].tl.y:
     if b[ib0].br.y < b[ib1].tl.y:
 
-        # b[0].x is always < b[1].x
         el_right_top = (b0_right_i, Vec2(b1_top_i.x, b0_right_i.y), b1_top_i)
         el_bot_left = (b0_bot_i, Vec2(b0_bot_i.x, b1_left_i.y), b1_left_i)
 
@@ -444,24 +441,18 @@ def box_lextrude(b0, b1, factor=0.5, min=0.0):
 
         if d2_right_top < d2_bot_left:
 
-            # return identify_ends(el_right_top), identify_ends(el_bot_left)
             join1, join2 = [None, None], [None, None]
 
             join1[ib0], join1[ib1] = (RIGHT, TOP)
             join2[ib0], join2[ib1] = (BOTTOM, LEFT)
-            # join1[0], join1[1] = (RIGHT, TOP)
-            # join2[0], join2[1] = (BOTTOM, LEFT)
 
             return (el_right_top, join1), (el_bot_left, join2)
 
         else:
-            # return identify_ends(el_bot_left), identify_ends(el_right_top)
             join1, join2 = [None, None], [None, None]
 
             join1[ib0], join1[ib1] = (BOTTOM, LEFT)
             join2[ib0], join2[ib1] = (RIGHT, TOP)
-            # join1[0], join1[1] = (BOTTOM, LEFT)
-            # join2[0], join2[1] = (RIGHT, TOP)
 
             return (el_bot_left, join1), (el_right_top, join2)
 
@@ -482,25 +473,17 @@ def box_lextrude(b0, b1, factor=0.5, min=0.0):
     d2_right_bot += dist2(el_right_bot[1], el_right_bot[1])
 
     if d2_top_left < d2_right_bot:
-        # return identify_ends(el_top_left), identify_ends(el_right_bot)
         join1, join2 = [None, None], [None, None]
 
         join1[ib0], join1[ib1] = (TOP, LEFT)
         join2[ib0], join2[ib1] = (RIGHT, BOTTOM)
 
-        # join1[0], join1[1] = (TOP, LEFT)
-        # join2[0], join2[1] = (RIGHT, BOTTOM)
-
         return (el_top_left, join1), (el_right_bot, join2)
 
     else:
-        # return identify_ends(el_right_bot), identify_ends(el_top_left)
         join1, join2 = [None, None], [None, None]
 
         join1[ib0], join1[ib1] = (RIGHT, BOTTOM)
         join2[ib0], join2[ib1] = (TOP, LEFT)
-
-        # join1[0], join1[1] = (RIGHT, BOTTOM)
-        # join2[0], join2[1] = (TOP, LEFT)
 
         return (el_right_bot, join1), (el_top_left, join2)

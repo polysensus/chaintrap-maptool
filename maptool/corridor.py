@@ -43,33 +43,24 @@ class Corridor:
 
     def check_entangled(self, co):
 
-        # intersections have zero diameter, so co-incident end point is not enough on its own
-        if g.pt_essentially_same(self.points[0], co.points[0]):
-            if self.points[0].x == self.points[1].x and self.points[0].x == co.points[1].x:
-                return True
-            if self.points[0].y == self.points[1].y and self.points[0].y == co.points[1].y:
-                return True
+        for i in range(2):
 
-        if g.pt_essentially_same(self.points[0], co.points[-1]):
-            opi = 0 if len(co.points) == 2 else 1
-            if self.points[0].x == self.points[1].x and self.points[0].x == co.points[opi].x:
-                return True
-            if self.points[0].y == self.points[1].y and self.points[0].y == co.points[opi].y:
-                return True
+            if i+1 >= len(self.points):
+                continue
+            lap1, lap2 = self.points[i], self.points[i+1]
 
-        if g.pt_essentially_same(self.points[-1], co.points[0]):
-            if co.points[0].x == co.points[1].x and co.points[0].x == self.points[0 if len(self.points) == 2 else 1].x:
-                return True
-            if co.points[0].y == co.points[1].y and co.points[0].y == self.points[0 if len(self.points) == 2 else 1].y:
-                return True
+            for j in range(2):
+                if j+1 >= len(co.points):
+                    continue
+                lbp1, lbp2 = co.points[j], co.points[j+1]
 
-        if g.pt_essentially_same(self.points[-1], co.points[-1]):
-            spi = 0 if len(self.points) == 2 else 1
-            opi = 0 if len(co.points) == 2 else 1
-            if self.points[-1].x == self.points[spi].x and self.points[-1].x == co.points[opi].x:
-                return True
-            if self.points[-1].y == self.points[spi].y and self.points[-1].y == co.points[opi].y:
-                return True
+                # p1 and p2 will be the points of la or None if they are not on lb
+                ok, p1, p2 = g.xline_in_line(lap1, lap2, lbp1, lbp2)
+
+                # For an entanglement we need two points of intersection
+                if ok and p1 and p2:
+                    return True
+        return False
 
     def entangle(self, i):
         if not self.entangled:
