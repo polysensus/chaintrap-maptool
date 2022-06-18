@@ -435,7 +435,10 @@ def box_lextrude(b0, b1, factor=0.5, min=0.0):
     #     +______|b2   |         +______|b1   |
     #            |     |                |     |
     #            +-----+                +-----+
-    if b[ib0].br.y < b[ib1].tl.y:
+    #
+    # also the cases where b1 and b2 have a slight over lap - because we reject
+    # horizontal and vertical corridors where the overlap shadow is to narrow
+    if essentially_lt(b[ib0].tl.y, b[ib1].tl.y):
 
         el_right_top = (b0_right_i, Vec2(b1_top_i.x, b0_right_i.y), b1_top_i)
         el_bot_left = (b0_bot_i, Vec2(b0_bot_i.x, b1_left_i.y), b1_left_i)
