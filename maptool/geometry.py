@@ -281,10 +281,14 @@ def box_hextrude(b1, b2, factor=0.5, min=0.0):
         b2, b1 = b1, b2
         swaped = True
 
-    b1_i = Vec2(b1.br.x, b2.tl.y)
-    b2_i = Vec2(b2.tl.x, b1.br.y)
+    # b1 vertically lower (larger y) than b2 ?
+    if b1.tl.y >= b2.tl.y:
+        y0, y1 = b1.tl.y, b2.br.y
+    else:
+        y0, y1 = b2.tl.y, b2.br.y
 
-    iy = b1_i.y + (b2_i.y - b1_i.y) * factor
+    iy = y0 + (y1 - y0) * factor
+
     p1 = Vec2(b1.br.x, iy)
     p2 = Vec2(b2.tl.x, iy)
 

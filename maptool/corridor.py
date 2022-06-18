@@ -56,6 +56,9 @@ class Corridor:
 
                 # p1 and p2 will be the points of la or None if they are not on lb
                 ok, p1, p2 = g.xline_in_line(lap1, lap2, lbp1, lbp2)
+                if ok and not (p1 and p2):
+                    # try the otherway round - if lap1 -> lap2 is longer lap2 will be off the line
+                    ok, p1, p2 = g.xline_in_line(lbp1, lbp2, lap1, lap2)
 
                 # For an entanglement we need two points of intersection
                 if ok and p1 and p2:

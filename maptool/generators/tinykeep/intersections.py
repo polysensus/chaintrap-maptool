@@ -18,6 +18,27 @@ class GenerateIntersections:
         self.corridors = corridors
 
     # ---
+
+    def _classify_lhv_merge(self, ica, icb) -> Merge:
+
+        """
+        ic is the index of the L corridor
+        jc is the index of the horizontal or vertical corridor
+
+                + i2   jc is the shorter.
+                |      For this case, c1 remains an L and its i0 foot
+        i0+-----+ i1   goes on a new intersection inserted at j1
+        j0+--+ j1
+
+
+                + i2   jc is the longer 
+                |      For this case c1 is converted to a straight and
+        i0+-----+ i1   the mid point at i1 ends up attached to the new intersection
+        j0+-------------+ j1
+
+
+        """
+
     def _classify_ll_merge(self, ica, icb) -> Merge:
         """
                         ^
@@ -549,102 +570,6 @@ class GenerateIntersections:
         print(f"split-hvlong: cor: {icor} ci: {str(orig_sides)} -> {str(ci.join_sides)}. join_sides")
 
         # Return new room index so the L can be attached to it
-        return iri
-
-
-    def _corridor_lmerge_split_long(self, icor, r1end, pi):
-        """
-        Here we are spliting the L between R1 - R2 on the leg joining R1 and inserting a new straight corridor segment
-        to join the new intersection to R1
-
-                   R2
-            RI(pi) | ci
-        R1 --+-----+ r1end=0
-             |
-               R1 r1end=1
-                |
-          RI(pi)+--
-             ci |
-        R2 -----+
-        """
-
-        ci = self.corridors[icor]
-
-        # the corridor foot rests on the room attached to the side we are splitting
-        ipfoot = r1end * 2 # 0 or 2
-
-        # the corridor head rests on the room attached to the side we are not splitting
-        iphead = (1-r1end) * 2 # 0 or 2
-
-
-        # Make a new corridor joining R1 to the intersection point. The
-        # intersection point is the elbow point of the shorter leg of cj.
-        ir1 = ci.joins[r1end]
-        r1 = self.rooms[ir1]
-
-        # The foot of the new corridor will rest on r1
-        p1 = ci.points[ipfoot].clone()
-
-        # create the new corridor segment and the intersection
-        cn = Corridor(
-            points=[None, None],
-            joins=[None, None],
-            join_sides=[None, None],
-            is_inserted=True
-        )
-
-        # note: use r1end directly as cn is a straight with 2 points
-        cn.points[r1end] = p1 # R1
-        cn.points[1- r1end] = pi # RI
-
-        ri = Room()  # intersection
-        ri.is_intersection = True
-        ri.center = pi.clone()
-
-        # The new intersection room index
-        iri = len(self.rooms)
-        ici = len(self.corridors)
-
-        self.corridors.append(cn)
-        self.rooms.append(ri)
-
-        # detach ci from room 1 and clip it
-
-        # set the foot of the second leg to the intersection position
-        ci.points[ipfoot] = pi.clone()
-        ci.clipped += 1 
-
-        # detach ci from room 1
-        r1iside = r1.detach_corridor(icor)
-
-        # attach it to the intersection the side of attachment is the *same*
-        # side as it was previously attached to R1 on.
-        ri.corridors[r1iside].append(icor)
-
-        # update the join for the clipped end so it joins to the new intersection
-        orig = ci.joins[:]
-        orig_sides = ci.join_sides[:]
-        assert ci.joins[r1end] == ir1
-        ci.joins[r1end] = iri
-
-        print(f"split-long: cor: {icor} ci: {str(ci.joins)} -> {ci.joins}. joins")    
-
-        # make the new corridor segment have the same direction, towards R1, as
-        # did ci's leg that we split.
-
-        orig = cn.joins[:] # so we can log before and after
-        cn.joins[r1end] = ir1 # R1
-        cn.joins[1 - r1end] = iri # intersection
-        cn.join_sides[r1end] = r1iside
-        cn.join_sides[1 - r1end] = RoomSide.opposite(r1iside)
-        r1.corridors[cn.join_sides[r1end]].append(ici)
-        ri.corridors[cn.join_sides[1 - r1end]].append(ici)
-
-        print(f"split-long: cor: {icor} cn: {str(orig)} -> {str(cn.joins)}. joins")
-        print(f"split-long: cor: {icor} cn: {str(orig_sides)} -> {str(cn.join_sides)}. join_sides")
-        print(f"split-long: cor: {icor} cn: {str(r1.corridors)}. r[{ir1}].corridors")
-        print(f"split-long: cor: {icor} cn: {str(ri.corridors)}. r[{iri}].corridors")
-
         return iri
 
 
