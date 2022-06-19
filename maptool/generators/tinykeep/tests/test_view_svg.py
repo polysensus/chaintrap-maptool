@@ -1,4 +1,4 @@
-from .view_svg import *
+from ..view_svg import *
 from maptool.datatypes import Vec2
 
 

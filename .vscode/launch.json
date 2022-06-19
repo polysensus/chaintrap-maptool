@@ -16,10 +16,14 @@
             "args": [
                 "gen",
 
+                // test case: single crossing corridor L + straight
+                "--secret", "938935293bde47868386d9f32b141f51e101323cd276fcb57447602b8c4abc9f",
+                "--seed", "af3cffbda46b58b4",
+
                 // test case: hextrude case that was broken. and also a corridor
                 // pair that are very close but not quite entangled
-                "--seed", "e7098b383bd3a558",
-                "--secret", "07eb9d018bf3fee7ca33db4761c753f88d1474f832ec4e65b0d8e24f64c304e2",
+                // "--seed", "e7098b383bd3a558",
+                // "--secret", "07eb9d018bf3fee7ca33db4761c753f88d1474f832ec4e65b0d8e24f64c304e2",
 
                 // tee case (quite nasty)
                 // "--seed", "49febb61d5f15e9e",
