@@ -12,24 +12,29 @@ import math
 
 from .datatypes import Error, Box, Vec2
 
-TOP=0
-LEFT=1
-BOTTOM=2
-RIGHT=3
+TOP = 0
+LEFT = 1
+BOTTOM = 2
+RIGHT = 3
+
 
 class GeometryError(Error):
     """An error with the math, geometry or spatial logic"""
+
 
 def essentially_zero(x):
     e = sys.float_info.epsilon * 2
     return x >= -e and x <= e
 
+
 def essentially_equal(a, b):
     return essentially_zero(a - b)
+
 
 def essentially_lt(a, b):
     e = sys.float_info.epsilon * 2
     return (a + e) < b
+
 
 def pt_within_radi2(p: Vec2, c: Vec2, radi2: float):
     dx = p.x - c.x
@@ -38,21 +43,26 @@ def pt_within_radi2(p: Vec2, c: Vec2, radi2: float):
         return True
     return False
 
+
 def pt_dist2(p1: Vec2, p2: Vec2) -> float:
     dx = p2.x - p1.x
     dy = p2.y - p1.y
-    return dx*dx+dy*dy
+    return dx * dx + dy * dy
+
 
 def pt_dist(p1: Vec2, p2: Vec2) -> float:
     return math.sqrt(pt_dist2(p1, p2))
+
 
 def pt_essentially_same(p1: Vec2, p2: Vec2) -> float:
     x = math.sqrt(pt_dist2(p1, p2))
     return essentially_zero(x)
 
+
 def check_pt_dist(p1: Vec2, p2: Vec2, dist: float) -> bool:
     x = math.sqrt(pt_dist2(p1, p2))
     return x < dist
+
 
 def check_pt_on_line(p, l1, l2, margin=0.1, margin_factor=None) -> bool:
     """
@@ -79,13 +89,14 @@ def check_pt_on_line(p, l1, l2, margin=0.1, margin_factor=None) -> bool:
     # the only situation where d1 and d2 can be equal is if the point is on the
     # line. we allow margin due to float precission
     x = d1 + d2
-    if x >= line_len-margin and x <=line_len + margin:
+    if x >= line_len - margin and x <= line_len + margin:
         return True
     return False
 
+
 def check_line_in_line(l1a, l1b, l2a, l2b, margin=0.1) -> bool:
-    """ if l1 is completely contained by l1
-    
+    """if l1 is completely contained by l1
+
     Note that if they are co linear and l2 is shorter than l1 then the test fails.
     So, depending on context, you may need to call twice."""
 
@@ -94,12 +105,15 @@ def check_line_in_line(l1a, l1b, l2a, l2b, margin=0.1) -> bool:
 
     if not check_pt_on_line(l1b, l2a, l2b, margin=margin):
         return False
-    
+
     return True
 
-def xline_in_line(p1, p2, p3, p4, margin=0.1, margin_factor=None) -> Tuple[bool, Vec2, Vec2]:
+
+def xline_in_line(
+    p1, p2, p3, p4, margin=0.1, margin_factor=None
+) -> Tuple[bool, Vec2, Vec2]:
     """for cases where the lines are co-linear, return the pt(s) of overlap
-    
+
     Note: margin_factor and margine can cause unexpected results from pt_essentially_same"""
 
     p1_on = check_pt_on_line(p1, p3, p4, margin=margin, margin_factor=margin_factor)
@@ -108,7 +122,7 @@ def xline_in_line(p1, p2, p3, p4, margin=0.1, margin_factor=None) -> Tuple[bool,
     if not (p1_on or p2_on):
         return (False, None, None)
 
-    if (p1_on and p2_on):
+    if p1_on and p2_on:
         return (True, p1, p2)
 
     if p1_on:
@@ -126,15 +140,15 @@ def line_in_line(p1, p2, p3, p4) -> Tuple[bool, Vec2]:
     ok, a, b = xline_in_line(p1, p2, p3, p4)
     if not ok:
         return (False, None)
-    
+
     if b is not None:
         return (True, b)
-    
+
     return (True, a)
 
 
 def parallel(p1: Vec2, p2: Vec2, p3: Vec2, p4: Vec2) -> bool:
-    divisor = ((p4.y-p3.y) * (p2.x-p1.x) - (p4.x-p3.x)*(p2.y-p1.y))
+    divisor = (p4.y - p3.y) * (p2.x - p1.x) - (p4.x - p3.x) * (p2.y - p1.y)
     if essentially_zero(divisor):
         return True
     return False
@@ -147,25 +161,25 @@ def line_line(p1: Vec2, p2: Vec2, p3: Vec2, p4: Vec2) -> Tuple[bool, Vec2]:
 
     # check for infinities
 
-    divisor = ((p4.y-p3.y) * (p2.x-p1.x) - (p4.x-p3.x)*(p2.y-p1.y))
+    divisor = (p4.y - p3.y) * (p2.x - p1.x) - (p4.x - p3.x) * (p2.y - p1.y)
     if essentially_zero(divisor):
         # catch the parallel case
         return line_in_line(p1, p2, p3, p4)
 
-    ua = ((p4.x - p3.x)*(p1.y-p3.y) - (p4.y-p3.y)*(p1.x-p3.x)) / divisor
+    ua = ((p4.x - p3.x) * (p1.y - p3.y) - (p4.y - p3.y) * (p1.x - p3.x)) / divisor
 
     # uB = ((x2-x1)*(y1-y3) - (y2-y1)*(x1-x3)) / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1))
 
-    divisor = ((p4.y-p3.y)*(p2.x-p1.x) - (p4.x-p3.x)*(p2.y-p1.y))
+    divisor = (p4.y - p3.y) * (p2.x - p1.x) - (p4.x - p3.x) * (p2.y - p1.y)
     if essentially_zero(divisor):
         return line_in_line(p1, p2, p3, p4)
 
-    ub = ((p2.x-p1.x)*(p1.y-p3.y) - (p2.y-p1.y)*(p1.x-p3.x)) / divisor
+    ub = ((p2.x - p1.x) * (p1.y - p3.y) - (p2.y - p1.y) * (p1.x - p3.x)) / divisor
 
     if ua < 0.0 or ua > 1.0 or ub < 0.0 or ub > 1.0:
         return (False, Vec2())
     # if there is a colision 0 <= ua and ub <= 1
-    #if ua >=0.0 and ua <= 1.0 and ub >=0.0 and ub <= 1.0:
+    # if ua >=0.0 and ua <= 1.0 and ub >=0.0 and ub <= 1.0:
     #    return True
 
     return (True, Vec2(p1.x + ua * (p2.x - p1.x), p1.y + (ua * (p2.y - p1.y))))
@@ -178,22 +192,22 @@ def check_line_line(p1: Vec2, p2: Vec2, p3: Vec2, p4: Vec2) -> bool:
 
     # check for infinities
 
-    divisor = ((p4.y-p3.y) * (p2.x-p1.x) - (p4.x-p3.x)*(p2.y-p1.y))
+    divisor = (p4.y - p3.y) * (p2.x - p1.x) - (p4.x - p3.x) * (p2.y - p1.y)
     if essentially_zero(divisor):
         return False
 
-    ua = ((p4.x - p3.x)*(p1.y-p3.y) - (p4.y-p3.y)*(p1.x-p3.x)) / divisor
+    ua = ((p4.x - p3.x) * (p1.y - p3.y) - (p4.y - p3.y) * (p1.x - p3.x)) / divisor
 
     # uB = ((x2-x1)*(y1-y3) - (y2-y1)*(x1-x3)) / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1))
 
-    divisor = ((p4.y-p3.y)*(p2.x-p1.x) - (p4.x-p3.x)*(p2.y-p1.y))
+    divisor = (p4.y - p3.y) * (p2.x - p1.x) - (p4.x - p3.x) * (p2.y - p1.y)
     if essentially_zero(divisor):
         return False
 
-    ub = ((p2.x-p1.x)*(p1.y-p3.y) - (p2.y-p1.y)*(p1.x-p3.x)) / divisor
+    ub = ((p2.x - p1.x) * (p1.y - p3.y) - (p2.y - p1.y) * (p1.x - p3.x)) / divisor
 
     # if there is a colision 0 <= ua and ub <= 1
-    if ua >=0.0 and ua <= 1.0 and ub >=0.0 and ub <= 1.0:
+    if ua >= 0.0 and ua <= 1.0 and ub >= 0.0 and ub <= 1.0:
         return True
 
     return False
@@ -201,7 +215,7 @@ def check_line_line(p1: Vec2, p2: Vec2, p3: Vec2, p4: Vec2) -> bool:
 
 def check_box_line(b: Box, p1: Vec2, p2: Vec2) -> int:
     """return an integer indicating which box side is intersected by the line or -1 if it doesn't
-    
+
     anticlockwise from top:
 
     top = 0, left =1, bottom=2, right=3
@@ -221,7 +235,7 @@ def check_box_line(b: Box, p1: Vec2, p2: Vec2) -> int:
     # right side
     if check_line_line(Vec2(b.br.x, b.tl.y), Vec2(b.br.x, b.br.y), p1, p2):
         return RIGHT
-    
+
     return -1
 
 
@@ -345,7 +359,7 @@ def box_vextrude(b1, b2, factor=0.5, min=0.0):
         x0, x1 = b2.tl.x, b1.br.x
     else:
         x0, x1 = b1.tl.x, b2.br.x
-    
+
     ix = x0 + (x1 - x0) * factor
 
     p1 = Vec2(ix, b1.br.y)
@@ -385,7 +399,7 @@ def identify_ends(points):
                 return TOP, LEFT
             else:
                 return TOP, RIGHT
- 
+
         # ok, it must be
         #   --+  or b) |
         #  a) |      --+

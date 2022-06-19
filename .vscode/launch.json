@@ -17,8 +17,8 @@
                 "gen",
 
                 // test case: single crossing corridor L + straight
-                "--secret", "938935293bde47868386d9f32b141f51e101323cd276fcb57447602b8c4abc9f",
-                "--seed", "af3cffbda46b58b4",
+                // "--secret", "938935293bde47868386d9f32b141f51e101323cd276fcb57447602b8c4abc9f",
+                // "--seed", "af3cffbda46b58b4",
 
                 // test case: hextrude case that was broken. and also a corridor
                 // pair that are very close but not quite entangled

@@ -72,7 +72,7 @@ class Map:
                 render_generations=-1,
                 no_label_rooms=False,
                 no_label_corridors=False,
-                no_legend=False
+                no_legend=False,
             ),
         )
 
@@ -195,7 +195,6 @@ class Map:
 
         map = self.load_common(source)
         self.load_model(map)
-
 
     def render(self, svgfile):
 

@@ -303,8 +303,8 @@ class Generator:
 
         print(f"extrude: r{i}, r{j}")
 
-         # each line will be 3 points
-        (line1, join1), (line2, join2) = g.box_lextrude( bi, bj)
+        # each line will be 3 points
+        (line1, join1), (line2, join2) = g.box_lextrude(bi, bj)
         cor.points = list(line1)
         cor.join_sides = list(join1)
         cor.crosses = list(rooms_crossing_line(self.rooms, line1, i, j))
@@ -390,7 +390,6 @@ class Generator:
                 self.corridors.append(cor)
                 break
 
-
     def _generate_intersections(self):
 
         gi = GenerateIntersections(self.rooms, self.corridors)
@@ -422,6 +421,7 @@ class Generator:
         self._generate_secondary_corridors()
 
         import svgwrite
+
         dwg = svgwrite.Drawing(filename="x-pre.svg")
         arena = dwg.add(dwg.g(id="arena", fill="blue"))
         self.render(dwg, arena, opts=opts)
@@ -429,16 +429,13 @@ class Generator:
 
         self._generate_intersections()
 
-
     def generate_rooms(self, map):
 
         self._reset_generator(map.gp)
         list(self._position_rooms())
 
-
     def generate_corridors(self, map):
         self._generate_corridors(map)
-
 
     def generate(self, map):
 
@@ -459,7 +456,6 @@ class Generator:
 
         for c in model["corridors"]:
             self.corridors.append(Corridor.from_encoding(c))
-
 
     def fromjson(self, map, model):
         """load the model"""

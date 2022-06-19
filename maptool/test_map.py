@@ -39,14 +39,33 @@ def test_generator_vrf_inputs():
     assert args.seed == r["seed"]
     assert args.seed in r["alpha"]
 
-@pytest.mark.parametrize("note,seed,secret", [
-    ("regression-demo-map", "9c9d1793f1e2c6db", "b6eb87339ec3b87f70308f471e02b544325e88f30bd56e8bf9ff530cb1223325"),
-    ("regression-clip-indirectly-disentangles", b'K\x92\xa1o\xa6\xff\xc4\x0c'.hex(), b'\x11\x19)~\xcc]\\5\x94\xfe\x92\xea\x0e\xca \x85\xbbd^\x9b\xf7GN\xcc\\\xa7u3\xc3q)k'.hex()),
-    ("regression-2", "e7357c72ae6861ae", "a23cccec37055701674748316860eac927212048f0666ea02ef0bf1737e2195e"),
-    ("regression-3", "49febb61d5f15e9e", "a80a2426333f59f9b585d8e6698d01163f959dbd196d44d43d35b4ce699646d0"),
 
-    ("random", None, None)
-    ])
+@pytest.mark.parametrize(
+    "note,seed,secret",
+    [
+        (
+            "regression-demo-map",
+            "9c9d1793f1e2c6db",
+            "b6eb87339ec3b87f70308f471e02b544325e88f30bd56e8bf9ff530cb1223325",
+        ),
+        (
+            "regression-clip-indirectly-disentangles",
+            b"K\x92\xa1o\xa6\xff\xc4\x0c".hex(),
+            b"\x11\x19)~\xcc]\\5\x94\xfe\x92\xea\x0e\xca \x85\xbbd^\x9b\xf7GN\xcc\\\xa7u3\xc3q)k".hex(),
+        ),
+        (
+            "regression-2",
+            "e7357c72ae6861ae",
+            "a23cccec37055701674748316860eac927212048f0666ea02ef0bf1737e2195e",
+        ),
+        (
+            "regression-3",
+            "49febb61d5f15e9e",
+            "a80a2426333f59f9b585d8e6698d01163f959dbd196d44d43d35b4ce699646d0",
+        ),
+        ("random", None, None),
+    ],
+)
 def test_generator_deterministic(note, seed, secret):
 
     print(note)
@@ -76,17 +95,23 @@ def test_generator_deterministic(note, seed, secret):
 def rooms_eq(ra, rb, ignore_isolated=False, ignore_main=False):
 
     # round tripping via json is not numerically stable.
-    if not pt_essentially_same(ra.center, rb.center): return False
+    if not pt_essentially_same(ra.center, rb.center):
+        return False
 
-    if not essentially_equal(ra.width, rb.width): return False
-    if not essentially_equal(ra.length, rb.length): return False
-    if not ignore_main and ra.is_main != rb.is_main: return False
+    if not essentially_equal(ra.width, rb.width):
+        return False
+    if not essentially_equal(ra.length, rb.length):
+        return False
+    if not ignore_main and ra.is_main != rb.is_main:
+        return False
 
     if ra.corridors is None:
-        if rb.corridors is None: return False
+        if rb.corridors is None:
+            return False
         return True
 
-    if rb.corridors is None: return False
+    if rb.corridors is None:
+        return False
 
     for i, sidea in enumerate(ra.corridors):
         if ignore_isolated:
@@ -96,17 +121,24 @@ def rooms_eq(ra, rb, ignore_isolated=False, ignore_main=False):
             return False
     return True
 
+
 def corridors_eq(ca, cb):
-    if ca.joins[0] != cb.joins[0]: return False
-    if ca.joins[1] != cb.joins[1]: return False
+    if ca.joins[0] != cb.joins[0]:
+        return False
+    if ca.joins[1] != cb.joins[1]:
+        return False
 
-    if ca.join_sides[0] != cb.join_sides[0]: return False
-    if ca.join_sides[1] != cb.join_sides[1]: return False
+    if ca.join_sides[0] != cb.join_sides[0]:
+        return False
+    if ca.join_sides[1] != cb.join_sides[1]:
+        return False
 
-    if len(ca.points) != len(cb.points): return False
+    if len(ca.points) != len(cb.points):
+        return False
 
     for i, pa in enumerate(ca.points):
-        if not pt_essentially_same(pa, cb.points[i]): return False
+        if not pt_essentially_same(pa, cb.points[i]):
+            return False
 
     return True
 
@@ -139,7 +171,6 @@ def test_rooms_persist():
         assert corridors_eq(c, g.model.corridors[i])
 
 
-
 def test_generator_persist():
 
     args = Map.defaults()
@@ -154,8 +185,9 @@ def test_generator_persist():
 
     for (i, r) in enumerate(rooms1):
         if rooms_eq(r, g.model.rooms[i]):
-            print('x')
+            print("x")
         assert rooms_eq(r, g.model.rooms[i])
+
 
 def test_run():
     status = run(args=["gen", "--svgfile", "x.svg"])

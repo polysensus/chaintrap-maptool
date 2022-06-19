@@ -17,10 +17,10 @@ _fields = "irca ircb cai cbi ica icb aleg bleg".split()
 CrossMerge = namedtuple("CrossMerge", _fields, defaults=(None,) * len(_fields))
 
 _fields = "ir side ic jc ileg jleg pi".split()
-Crossing = namedtuple("Crossing", _fields, defaults=(None,)*len(_fields))
+Crossing = namedtuple("Crossing", _fields, defaults=(None,) * len(_fields))
+
 
 class GenerateIntersections:
-
     def __init__(self, rooms, corridors):
         self.rooms = rooms
         self.corridors = corridors
@@ -28,9 +28,7 @@ class GenerateIntersections:
     # ---
 
     def _classify_crossing(self, cx: Crossing):
-        """
-
-        """
+        """ """
         r1 = self.rooms[cx.ir]
 
         ic = cx.ic
@@ -63,29 +61,37 @@ class GenerateIntersections:
             aleg = cx.jleg
             bleg = cx.ileg
 
-        return CrossMerge(irca=irca, ircb=ircb, ica=ica, icb=icb, cai=cai, cbi=cbi, aleg=aleg, bleg=bleg)
-
+        return CrossMerge(
+            irca=irca,
+            ircb=ircb,
+            ica=ica,
+            icb=icb,
+            cai=cai,
+            cbi=cbi,
+            aleg=aleg,
+            bleg=bleg,
+        )
 
     def _classify_lhv_merge(self, ica, icb) -> Merge:
 
         """
-        ic is the index of the L corridor
-        jc is the index of the horizontal or vertical corridor
+           ic is the index of the L corridor
+           jc is the index of the horizontal or vertical corridor
 
-                R3
-                + i2   jc is the shorter.
-            ca  |      For this case, c1 remains an L and its i0 foot
-        i0+-----+ i1   goes on a new intersection inserted at j1
-     R1 j0+--+ j1
-            cb R3
-                
-            ca
-        j0+-------------+ j1 R2
-      R1
-        i0+-----+ i1   the mid point at i1 ends up attached to the new intersection
-            cb  |      For this case c1 is converted to a straight and
-                + i2   jc is the longer 
-               R3
+                   R3
+                   + i2   jc is the shorter.
+               ca  |      For this case, c1 remains an L and its i0 foot
+           i0+-----+ i1   goes on a new intersection inserted at j1
+        R1 j0+--+ j1
+               cb R3
+
+               ca
+           j0+-------------+ j1 R2
+         R1
+           i0+-----+ i1   the mid point at i1 ends up attached to the new intersection
+               cb  |      For this case c1 is converted to a straight and
+                   + i2   jc is the longer
+                  R3
 
         """
         ca = self.corridors[ica]
@@ -111,13 +117,14 @@ class GenerateIntersections:
             raise ValueError("no co-incident points, corridors are not entanbled")
 
         cbshort = 0
-        if g.pt_dist2(ca.points[cai], ca.points[1-cai]) < g.pt_dist2(cb.points[cbi*2], cb.points[1]):
+        if g.pt_dist2(ca.points[cai], ca.points[1 - cai]) < g.pt_dist2(
+            cb.points[cbi * 2], cb.points[1]
+        ):
             cai, cbi = cbi, cai
             ica, icb = icb, ica
             cbshort = 1
 
         return Merge(cai, cbi, ica, icb, cbshort=cbshort)
-
 
     def _classify_ll_merge(self, ica, icb) -> Merge:
         """
@@ -131,14 +138,14 @@ class GenerateIntersections:
         r1   = rooms[ir1]
         rn.c = cb.points[1]
         irn = len(rooms)
-        
+
         cn.p[0] = cb.points[0]
         cn.p[1] = cb.points[1]
         cn.joins[0] = cb.joins[0]
         cn.joins[1] = irn
         cn.join_sides[0] = cb.join_sides[0]
         cn.join_sides[1] = opposite(cb.join_sides[0])
-        
+
         cb.points  = cb.points[1:3]
         cb.join[0] = irn
         cb.join_sides[0] = opp(cb.join_sides[1])
@@ -173,8 +180,8 @@ class GenerateIntersections:
         convergent cases do not require special treatment
         eg
            i0
-        R1 o-----ca---------+ 
-           o--cb--+         |       
+        R1 o-----ca---------+
+           o--cb--+         |
            j0     |R2       | R3
                    `        `
                   rn
@@ -190,7 +197,6 @@ class GenerateIntersections:
 
         if len(ca.points) != 3 or len(cb.points) != 3:
             raise ValueError("_classify_ll_merge needs two L corridors")
-
 
         cai = cbi = None
         if g.pt_essentially_same(ca.points[0], cb.points[0]):
@@ -208,19 +214,20 @@ class GenerateIntersections:
         if g.pt_essentially_same(ca.points[1], cb.points[1]):
             tee = 1
 
-        if g.pt_dist2(ca.points[cai*2], ca.points[1]) < g.pt_dist2(cb.points[cbi*2], cb.points[1]):
+        if g.pt_dist2(ca.points[cai * 2], ca.points[1]) < g.pt_dist2(
+            cb.points[cbi * 2], cb.points[1]
+        ):
             cai, cbi = cbi, cai
             ica, icb = icb, ica
 
         return Merge(cai, cbi, ica, icb, tee=tee)
-
 
     def _classify_straight_merge(self, ica, icb) -> Merge:
         """
           +--ca--------> R2
         R1                      R1 cb R3 R2
           +--cb---> R3
-        
+
          r1.detach(ca) -> rdetside
          ca.p[0] = cb.p[1]
          ca.j[0] = cb.j[1]
@@ -231,7 +238,7 @@ class GenerateIntersections:
            +--ca--------> R2
          R1                      R1 cb R3 R2
            <--cb---+ R3
-        
+
           r1.detach(ca) -> rdetside
           ca.p[0] = cb.p[0]
           ca.j[0] = cb.j[0]
@@ -241,7 +248,7 @@ class GenerateIntersections:
            <--ca--------+ R2
          R1                      R1 cb R3 R2
            +--cb---> R3
-        
+
           r1.detach(ca) -> rdetside
           ca.p[0] = cb.p[1]
           ca.j[0] = cb.j[1]
@@ -251,13 +258,13 @@ class GenerateIntersections:
            <--ca--------+ R2
          R1                      R1 cb  R3 ca  R2
            <--cb---+ R3
-        
+
           r1.detach(ca) -> rdetside
           ca.p[1] = cb.p[1]
           ca.j[1] = cb.j[1]
           r3.attach(ca, opp(rdetside))
         Merge(cai=1, cbi=1, ...)
- 
+
         """
 
         ca = self.corridors[ica]
@@ -266,7 +273,9 @@ class GenerateIntersections:
         if len(ca.points) != 2 or len(cb.points) != 2:
             raise ValueError("_classify_straight_merge needs two straight corridors")
 
-        if g.pt_dist2(ca.points[0], ca.points[1]) < g.pt_dist2(cb.points[0], cb.points[1]):
+        if g.pt_dist2(ca.points[0], ca.points[1]) < g.pt_dist2(
+            cb.points[0], cb.points[1]
+        ):
             ca, cb = cb, ca
             ica, icb = icb, ica
 
@@ -315,7 +324,7 @@ class GenerateIntersections:
         ca = self.corridors[m.ica]
         cb = self.corridors[m.icb]
 
-        # --- new room create 
+        # --- new room create
         # new room at the intersection point
         rn = Room()  # intersection
         rn.is_intersection = True
@@ -329,7 +338,7 @@ class GenerateIntersections:
             points=[None, None],
             joins=[None, None],
             join_sides=[None, None],
-            is_inserted=True
+            is_inserted=True,
         )
 
         # the new corridor starts at r1
@@ -366,19 +375,18 @@ class GenerateIntersections:
         # b is the crossing corridor, bleg is the crossing leg. We remove the *other* leg
         r1.detach_corridor(m.icb)
         cb.joins[m.cbi] = irn
-        cb.join_sides[m.cbi] = RoomSide.opposite(cb.join_sides[1-m.cbi])
+        cb.join_sides[m.cbi] = RoomSide.opposite(cb.join_sides[1 - m.cbi])
         # move the mid point to the new intersection
         cb.points[1] = cx.pi.clone()
         # drop the point at the r1 end of the corridor. bleg is the leg that
         # intersects and which we have just adjusted so we want to keep it.
-        cb.points = cb.points[(m.bleg):2+(m.bleg)]
+        cb.points = cb.points[(m.bleg) : 2 + (m.bleg)]
         cb.clipped += 1
         # attach the corridor to the appropriate side of the new intersection
         rn.corridors[cb.join_sides[m.cbi]].append(m.icb)
         # --- cb is complete
 
         return True
-
 
     def _merge_crossing_ll(self, cx: Crossing):
         """
@@ -402,7 +410,6 @@ class GenerateIntersections:
         # todo chose from the major cases
         return self._merge_crossing_hvl(cx)
 
-
     def _merge_straights(self, ica, icb):
 
         m = self._classify_straight_merge(ica, icb)
@@ -415,7 +422,7 @@ class GenerateIntersections:
         rdetside = rd.detach_corridor(m.ica)
         ca.points[m.cai] = cb.points[1 - m.cbi].clone()
         ca.joins[m.cai] = ir3
-        #r3.corridors[RoomSide.opposite(rdetside)].append(icor)
+        # r3.corridors[RoomSide.opposite(rdetside)].append(icor)
         r3.corridors[rdetside].append(m.icb)
 
     def _merge_ll(self, ica, icb):
@@ -427,7 +434,7 @@ class GenerateIntersections:
         ir1 = cb.joins[m.cbi]
         r1 = self.rooms[ir1]
 
-        # --- new room create 
+        # --- new room create
         # new room at the elbow of cb
         rn = Room()  # intersection
         rn.is_intersection = True
@@ -441,14 +448,14 @@ class GenerateIntersections:
             points=[None, None],
             joins=[None, None],
             join_sides=[None, None],
-            is_inserted=True
+            is_inserted=True,
         )
 
         # cn is a straight so we don't need to double cbi to get the right index into points
-        cn.points[m.cbi] = cb.points[m.cbi * 2].clone() 
+        cn.points[m.cbi] = cb.points[m.cbi * 2].clone()
         cn.points[1 - m.cbi] = cb.points[1].clone()
 
-        cn.joins[m.cbi] = cb.joins[m.cbi] 
+        cn.joins[m.cbi] = cb.joins[m.cbi]
         cn.join_sides[m.cbi] = cb.join_sides[m.cbi]
         cn.joins[1 - m.cbi] = irn
         cn.join_sides[1 - m.cbi] = RoomSide.opposite(cb.join_sides[m.cbi])
@@ -480,8 +487,8 @@ class GenerateIntersections:
             r1.detach_corridor(m.ica)
 
             ca.joins[m.cai] = irn
-            ca.join_sides[m.cai] = RoomSide.opposite(ca.join_sides[1-m.cai])
-            ca.points = ca.points[(1-m.cai):2+(1-m.cai)]
+            ca.join_sides[m.cai] = RoomSide.opposite(ca.join_sides[1 - m.cai])
+            ca.points = ca.points[(1 - m.cai) : 2 + (1 - m.cai)]
             ca.clipped += 1
             rn.corridors[ca.join_sides[m.cai]].append(m.ica)
         # --- ca update complete
@@ -493,8 +500,8 @@ class GenerateIntersections:
         r1.detach_corridor(m.icb)
 
         cb.joins[m.cbi] = irn
-        cb.join_sides[m.cbi] = RoomSide.opposite(cb.join_sides[1-m.cbi])
-        cb.points = cb.points[(1-m.cbi):2+(1-m.cbi)]
+        cb.join_sides[m.cbi] = RoomSide.opposite(cb.join_sides[1 - m.cbi])
+        cb.points = cb.points[(1 - m.cbi) : 2 + (1 - m.cbi)]
         cb.clipped += 1
 
         rn.corridors[cb.join_sides[m.cbi]].append(m.icb)
@@ -504,20 +511,20 @@ class GenerateIntersections:
     def _merge_lhv(self, ica, icb):
 
         """
-                R3
-                + i2   jc is the shorter.
-            ca  |      For this case, c1 remains an L and its i0 foot
-        i0+-----+ i1   goes on a new intersection inserted at j1
-     R1 j0+--+ j1
-            cb R3
-                
-            ca
-        j0+-------------+ j1 R2
-      R1
-        i0+-----+ i1   the mid point at i1 ends up attached to the new intersection
-            cb  |      For this case c1 is converted to a straight and
-                + i2   jc is the longer 
-               R3
+                   R3
+                   + i2   jc is the shorter.
+               ca  |      For this case, c1 remains an L and its i0 foot
+           i0+-----+ i1   goes on a new intersection inserted at j1
+        R1 j0+--+ j1
+               cb R3
+
+               ca
+           j0+-------------+ j1 R2
+         R1
+           i0+-----+ i1   the mid point at i1 ends up attached to the new intersection
+               cb  |      For this case c1 is converted to a straight and
+                   + i2   jc is the longer
+                  R3
         """
 
         m = self._classify_lhv_merge(ica, icb)
@@ -547,7 +554,7 @@ class GenerateIntersections:
             r3.corridors[r1side].append(m.ica)
             return
 
-        # --- new room create 
+        # --- new room create
         # new room at the end of cb
         rn = Room()  # intersection
         rn.is_intersection = True
@@ -561,16 +568,16 @@ class GenerateIntersections:
             points=[None, None],
             joins=[None, None],
             join_sides=[None, None],
-            is_inserted=True
+            is_inserted=True,
         )
 
         # ca is the longer straight, cb the short elbow
 
         # cn is a straight so we don't need to double cbi to get the right index into points
-        cn.points[m.cbi] = cb.points[m.cbi * 2].clone() 
+        cn.points[m.cbi] = cb.points[m.cbi * 2].clone()
         cn.points[1 - m.cbi] = cb.points[1].clone()
 
-        cn.joins[m.cbi] = cb.joins[m.cbi] 
+        cn.joins[m.cbi] = cb.joins[m.cbi]
         cn.join_sides[m.cbi] = cb.join_sides[m.cbi]
         cn.joins[1 - m.cbi] = irn
         cn.join_sides[1 - m.cbi] = RoomSide.opposite(cb.join_sides[m.cbi])
@@ -603,8 +610,8 @@ class GenerateIntersections:
         r1.detach_corridor(m.icb)
 
         cb.joins[m.cbi] = irn
-        cb.join_sides[m.cbi] = RoomSide.opposite(cb.join_sides[1-m.cbi])
-        cb.points = cb.points[(1-m.cbi):2+(1-m.cbi)]
+        cb.join_sides[m.cbi] = RoomSide.opposite(cb.join_sides[1 - m.cbi])
+        cb.points = cb.points[(1 - m.cbi) : 2 + (1 - m.cbi)]
         cb.clipped += 1
 
         rn.corridors[cb.join_sides[m.cbi]].append(m.icb)
@@ -640,7 +647,9 @@ class GenerateIntersections:
 
                         if self.corridors[ic].check_entangled(self.corridors[jc]):
                             continue
-                        entangled = self.corridors[ic].check_entangled(self.corridors[jc], margin_factor=margin_factor)
+                        entangled = self.corridors[ic].check_entangled(
+                            self.corridors[jc], margin_factor=margin_factor
+                        )
                         if not entangled:
                             continue
 
@@ -650,15 +659,21 @@ class GenerateIntersections:
 
                         # are the co-incident legs horizontal or vertical ?
                         ca, cb = self.corridors[ic], self.corridors[jc]
-                        if g.essentially_equal(ca.points[i].y, ca.points[i+1].y):
+                        if g.essentially_equal(ca.points[i].y, ca.points[i + 1].y):
                             # horizontal
                             y = (ca.points[i].y + cb.points[j].y) / 2.0
-                            ca.points[i].y = cb.points[j].y = ca.points[i+1].y = cb.points[j+1].y = y
+                            ca.points[i].y = cb.points[j].y = ca.points[
+                                i + 1
+                            ].y = cb.points[j + 1].y = y
                         else:
                             x = (ca.points[i].x + cb.points[j].x) / 2.0
-                            ca.points[i].x = cb.points[j].x = ca.points[i+1].x = cb.points[j+1].x = x
+                            ca.points[i].x = cb.points[j].x = ca.points[
+                                i + 1
+                            ].x = cb.points[j + 1].x = x
                         if not self.corridors[ic].check_entangled(self.corridors[jc]):
-                            print("the result of a snap should be an entangled corridor pair")
+                            print(
+                                "the result of a snap should be an entangled corridor pair"
+                            )
 
     def find_first_entangled_corridor_pair(self):
         for i, r in enumerate(self.rooms):
@@ -686,10 +701,10 @@ class GenerateIntersections:
     def find_first_crossing_from_same_room(self):
         """find the first pair of crossing corridors that exit the same room
 
-            r3
-            ^
-          --|-> r2
-       r1 __.
+             r3
+             ^
+           --|-> r2
+        r1 __.
 
         """
 
@@ -713,8 +728,15 @@ class GenerateIntersections:
                         crossing = self.corridors[ic].check_crossing(self.corridors[jc])
                         if crossing:
                             ileg, jleg, pi = crossing
-                            return Crossing(ir=i, side=side, ic=ic, jc=jc, ileg=ileg, jleg=jleg, pi=pi)
-
+                            return Crossing(
+                                ir=i,
+                                side=side,
+                                ic=ic,
+                                jc=jc,
+                                ileg=ileg,
+                                jleg=jleg,
+                                pi=pi,
+                            )
 
     def generate_corridor_intersection(self, ic, jc):
         """merge a single pair of entangled corridors"""
@@ -727,18 +749,18 @@ class GenerateIntersections:
         if len(c1.points) + len(c2.points) == 6:
             self._merge_ll(ic, jc)
             if c1.check_entangled(c2):
-                print(f'merge_ll failed to disentangle {ic}, {jc}')
+                print(f"merge_ll failed to disentangle {ic}, {jc}")
             return True
 
         if len(c1.points) + len(c2.points) == 5:
             self._merge_lhv(ic, jc)
             if c1.check_entangled(c2):
-                print(f'merge_lhv failed to disentangle {ic}, {jc}')
+                print(f"merge_lhv failed to disentangle {ic}, {jc}")
 
             return True
 
         if len(c1.points) + len(c2.points) == 4:
             self._merge_straights(ic, jc)
             if c1.check_entangled(c2):
-                print(f'merge_straights failed to disentangle {ic}, {jc}')
+                print(f"merge_straights failed to disentangle {ic}, {jc}")
             return True

@@ -9,6 +9,7 @@ WEST = RoomSide.WEST
 SOUTH = RoomSide.SOUTH
 EAST = RoomSide.EAST
 
+
 @pytest.fixture
 def emptymodel():
     g = Generator()

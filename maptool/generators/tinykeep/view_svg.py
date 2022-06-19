@@ -15,16 +15,19 @@ class SceneItem:
     class_: str = ""
     attribs: dict = None
 
+
 @dataclass
 class SceneLine(SceneItem):
     start: Vec2 = Vec2()
     end: Vec2 = Vec2()
+
 
 @dataclass
 class SceneCircle(SceneItem):
     center: Vec2 = Vec2()
     r: float = 0.0
     opacity: float = 1.0
+
 
 @dataclass
 class SceneText(SceneItem):
@@ -39,6 +42,7 @@ class SceneText(SceneItem):
 class SceneRect(SceneItem):
     insert: Vec2 = Vec2()
     size: Vec2 = 5.0
+
 
 @dataclass
 class ScenePolyline(SceneItem):
@@ -61,47 +65,53 @@ class ScenePoly(SceneItem):
 @dataclass
 class RenderOpts:
     gp: Dict = None
-    scale: float=1.0/25.0
-    corridor_end_size: float=120.0
+    scale: float = 1.0 / 25.0
+    corridor_end_size: float = 120.0
     grid: float = 3
 
-    label_colour: str="yellow"
-    label_font_size: float=15
-    label_size: float=300
+    label_colour: str = "yellow"
+    label_font_size: float = 15
+    label_size: float = 300
 
     label_rooms: bool = True
 
     label_corridors: bool = True
-    label_corridors_font_size: float=11
+    label_corridors_font_size: float = 11
     label_corridors_size: float = 200
 
     legend: bool = True
     legend_font_size: float = 20
 
+
 class Viewer:
     def __init__(self, model):
         self.model = model
-
 
     def add_markers(self, dwg):
         # markers from  https://raw.githubusercontent.com/mozman/svgwrite/master/examples/marker.py
         # 'insert' represents the insertation point in user coordinate space
         # in this example its the midpoint of the circle, see below
-        marker_start = dwg.marker(insert=(0, 0), size=(5, 5)) # target size of the marker
+        marker_start = dwg.marker(
+            insert=(0, 0), size=(5, 5)
+        )  # target size of the marker
         # setting a user coordinate space for the appanded graphic elements
         # bounding coordinates for this example:
         # minx = -5, maxx = +5, miny = -5, maxy = +5
-        marker_start.viewbox(minx=-5, miny=-5, width=10, height=10) # the marker user coordinate space
-        marker_start.add(dwg.circle((0, 0), r=5)).fill('red', opacity=0.5)
+        marker_start.viewbox(
+            minx=-5, miny=-5, width=10, height=10
+        )  # the marker user coordinate space
+        marker_start.add(dwg.circle((0, 0), r=5)).fill("red", opacity=0.5)
 
-        #--end-- A blue point as marker-end element
+        # --end-- A blue point as marker-end element
         # a shorter form of the code above:
-        marker_end = dwg.marker(size=(5, 5)) # marker defaults: insert=(0,0)
+        marker_end = dwg.marker(size=(5, 5))  # marker defaults: insert=(0,0)
         # set viewbox to the bounding coordinates of the circle
         marker_end.viewbox(-1, -1, 2, 2)
-        marker_end.add(dwg.circle(fill='blue', fill_opacity=0.5)) # circle defaults: insert=(0,0), r=1
+        marker_end.add(
+            dwg.circle(fill="blue", fill_opacity=0.5)
+        )  # circle defaults: insert=(0,0), r=1
 
-        #--mid-- A green point as marker-mid element
+        # --mid-- A green point as marker-mid element
         # if you don't setup a user coordinate space, the default ucs is
         # minx = 0, miny = 0, maxx=size[0], maxy=size[1]
         # default size = (3, 3) defined by the SVG standard
@@ -109,7 +119,7 @@ class Viewer:
         # minx = 0, maxx = 6, miny = 0, maxy = 6
         # => center of the viewbox = (3, 3)!
         marker_mid = dwg.marker(insert=(3, 3), size=(6, 6))
-        marker_mid.add(dwg.circle((3, 3), r=3)).fill('green', opacity=0.7)
+        marker_mid.add(dwg.circle((3, 3), r=3)).fill("green", opacity=0.7)
 
         # The drawing size of the 'start-marker' is greater than the drawing size of
         # the 'marker-mid' (r=5 > r=3), but the resulting size is defined by the
@@ -123,11 +133,11 @@ class Viewer:
 
     def add_grid(self, layer, bbox, opts: RenderOpts):
 
-        opacity_step = 1.0/opts.grid
+        opacity_step = 1.0 / opts.grid
 
         w, h = bbox.width_height()
 
-        grid_step=Vec2(w/opts.grid, h/opts.grid)
+        grid_step = Vec2(w / opts.grid, h / opts.grid)
 
         # vertical lines
         opacity = 0.0
@@ -138,7 +148,12 @@ class Viewer:
 
             layer.append(
                 SceneLine(
-                    start=p1.clone(), end=p2.clone(), stroke="blue", stroke_width=1 , attribs=dict(opacity=opacity if i != 0 else 1.0))
+                    start=p1.clone(),
+                    end=p2.clone(),
+                    stroke="blue",
+                    stroke_width=1,
+                    attribs=dict(opacity=opacity if i != 0 else 1.0),
+                )
             )
             opacity = opacity + opacity_step
             if opacity > 1.0:
@@ -153,7 +168,13 @@ class Viewer:
 
         for i in range(int(opts.grid) + 1):
             layer.append(
-                SceneLine(start=p1.clone(), end=p2.clone(), stroke="blue", stroke_width=1, attribs=dict(opacity=opacity if i != 0  else 1.0))
+                SceneLine(
+                    start=p1.clone(),
+                    end=p2.clone(),
+                    stroke="blue",
+                    stroke_width=1,
+                    attribs=dict(opacity=opacity if i != 0 else 1.0),
+                )
             )
             opacity = opacity + opacity_step
             if opacity > 1.0:
@@ -161,7 +182,6 @@ class Viewer:
 
             p1.y += grid_step.y
             p2.y += grid_step.y
-
 
     def add_construction_elements(self, layer, opts: RenderOpts):
 
@@ -202,10 +222,25 @@ class Viewer:
                 for pt in poly_points:
                     points.append(Vec2(pt[0], pt[1]))
                 layer.append(
-                    ScenePoly(points=points, fill="none", stroke="grey", stroke_width=1, attribs=dict(opacity=0.1))
+                    ScenePoly(
+                        points=points,
+                        fill="none",
+                        stroke="grey",
+                        stroke_width=1,
+                        attribs=dict(opacity=0.1),
+                    )
                 )
 
-    def add_label(self, layer, center, text, opts: RenderOpts, font_size=None, label_size=None, colour=None):
+    def add_label(
+        self,
+        layer,
+        center,
+        text,
+        opts: RenderOpts,
+        font_size=None,
+        label_size=None,
+        colour=None,
+    ):
 
         if colour is None:
             colour = opts.label_colour
@@ -220,10 +255,10 @@ class Viewer:
             SceneCircle(center=center, r=label_size, fill=colour, stroke_width=1)
         )
 
-        dx = - (max(len(text) -1, 0) / 2.0) * opts.label_size
-        dx = - (len(text) / 3.0) * opts.label_size
+        dx = -(max(len(text) - 1, 0) / 2.0) * opts.label_size
+        dx = -(len(text) / 3.0) * opts.label_size
 
-        insert=Vec2(center.x + dx, center.y + opts.label_size / 2.5)
+        insert = Vec2(center.x + dx, center.y + opts.label_size / 2.5)
 
         layer.append(
             SceneText(insert=insert, text=text, font_size=font_size, stroke_width=0.5)
@@ -231,11 +266,24 @@ class Viewer:
 
     def add_corridor_label(self, layer, center, text, opts: RenderOpts, colour=None):
         return self.add_label(
-            layer, center, text, opts, colour=colour, font_size=opts.label_corridors_font_size, label_size=opts.label_corridors_size)
+            layer,
+            center,
+            text,
+            opts,
+            colour=colour,
+            font_size=opts.label_corridors_font_size,
+            label_size=opts.label_corridors_size,
+        )
 
     def add_legend_entry(self, layer, legend_line_start, opts, fmt, **kw):
 
-        layer.append(SceneText(insert=legend_line_start.clone(), text=fmt.format(**kw), stroke_width=0.5))
+        layer.append(
+            SceneText(
+                insert=legend_line_start.clone(),
+                text=fmt.format(**kw),
+                stroke_width=0.5,
+            )
+        )
         legend_line_start.y += opts.label_size * 1.5
 
     def build_scene(self, bbox, gp, opts: RenderOpts):
@@ -245,7 +293,14 @@ class Viewer:
         layers.append([])
         ground = layers[-1]
         ground.append(
-            SceneCircle(center=Vec2(0.0, 0.0), r=gp.arena_size, fill="none", stroke="blue", stroke_width=1, attribs=dict(stroke_opacity=0.2))
+            SceneCircle(
+                center=Vec2(0.0, 0.0),
+                r=gp.arena_size,
+                fill="none",
+                stroke="blue",
+                stroke_width=1,
+                attribs=dict(stroke_opacity=0.2),
+            )
         )
 
         if opts.grid is not None:
@@ -254,7 +309,6 @@ class Viewer:
         layers.append([])
         self.add_construction_elements(layers[-1], opts)
 
-
         structure = []
         layers.append(structure)
         labels = []
@@ -262,12 +316,15 @@ class Viewer:
         legend = []
         layers.append(legend)
 
-        legend_line_start  = [Vec2(bbox.tl.x, bbox.br.y + opts.label_size), Vec2(bbox.br.x, bbox.br.y + opts.label_size)]
+        legend_line_start = [
+            Vec2(bbox.tl.x, bbox.br.y + opts.label_size),
+            Vec2(bbox.br.x, bbox.br.y + opts.label_size),
+        ]
 
         def add_legend_entry(fmt, **kw):
             if not opts.legend:
                 return
-            line_start = legend_line_start[kw.pop('col', 0)]
+            line_start = legend_line_start[kw.pop("col", 0)]
             self.add_legend_entry(legend, line_start, opts, fmt, **kw)
 
         add_legend_entry("Rooms")
@@ -285,7 +342,10 @@ class Viewer:
             west = f"{','.join(map(str, r.corridors[RoomSide.WEST]))}"
             south = f"{','.join(map(str, r.corridors[RoomSide.SOUTH]))}"
             east = f"{','.join(map(str, r.corridors[RoomSide.EAST]))}"
-            add_legend_entry(f"{kind} ({i}): corridors N={north}, W={west}, S={south}, E={east}", col=0)
+            add_legend_entry(
+                f"{kind} ({i}): corridors N={north}, W={west}, S={south}, E={east}",
+                col=0,
+            )
 
         def add_corridor_legend(i):
 
@@ -294,7 +354,9 @@ class Viewer:
             axis = "degenerate"
             joins = "-"
             if c.join_sides:
-                axis = f"{RoomSide.name(c.join_sides[0])}-{RoomSide.name(c.join_sides[1])}"
+                axis = (
+                    f"{RoomSide.name(c.join_sides[0])}-{RoomSide.name(c.join_sides[1])}"
+                )
                 joins = f"{c.joins[0]}.{c.joins[1]}"
 
             kind = "linear"
@@ -304,7 +366,7 @@ class Viewer:
             entangled = f"{','.join(map(str, list(c.entangled)))}"
             add_legend_entry(
                 f"cor ({i}): kind={kind}, {axis}, joins={joins},{' inserted,' if c.is_inserted else ' '}clipped={c.clipped}, entangled={entangled}",
-                col=1
+                col=1,
             )
 
         for i, r in enumerate(self.model.rooms):
@@ -313,7 +375,9 @@ class Viewer:
 
             if not r.is_intersection:
                 structure.append(
-                    SceneRect(insert=r.topleft(), size=Vec2(r.width, r.length), fill=fill)
+                    SceneRect(
+                        insert=r.topleft(), size=Vec2(r.width, r.length), fill=fill
+                    )
                 )
             if opts.label_rooms:
                 self.add_label(labels, r.center, str(i), opts)
@@ -325,8 +389,12 @@ class Viewer:
             line_kw = dict(stroke_width=3)
 
             def append_end_circles(ps, pe):
-                structure.append(SceneCircle(center=ps, r=opts.corridor_end_size, fill="green"))
-                structure.append(SceneCircle(center=pe, r=opts.corridor_end_size, fill="yellow"))
+                structure.append(
+                    SceneCircle(center=ps, r=opts.corridor_end_size, fill="green")
+                )
+                structure.append(
+                    SceneCircle(center=pe, r=opts.corridor_end_size, fill="yellow")
+                )
 
             for icor, cor in enumerate(self.model.corridors):
 
@@ -346,11 +414,15 @@ class Viewer:
                 if len(cor.points) == 2:
                     p1, p2 = cor.points
 
-                    structure.append(SceneLine(start=p1, end=p2, stroke=colour, **line_kw))
+                    structure.append(
+                        SceneLine(start=p1, end=p2, stroke=colour, **line_kw)
+                    )
                     append_end_circles(p1, p2)
                     if opts.label_corridors:
-                        mid = Vec2((p1.x + p2.x) / 2.0, (p1.y + p2.y)/2.0)
-                        self.add_corridor_label(labels, mid, str(icor), opts, colour="green")
+                        mid = Vec2((p1.x + p2.x) / 2.0, (p1.y + p2.y) / 2.0)
+                        self.add_corridor_label(
+                            labels, mid, str(icor), opts, colour="green"
+                        )
 
                     continue
 
@@ -379,10 +451,9 @@ class Viewer:
                 structure.append(SceneLine(start=p2, end=p3, stroke=colour, **line_kw))
                 append_end_circles(p1, p3)
 
-
         return layers
 
-    def render(self, gp, dwg, arena, opts: RenderOpts=None, base_tx=0.0, base_ty=0):
+    def render(self, gp, dwg, arena, opts: RenderOpts = None, base_tx=0.0, base_ty=0):
 
         if opts is None:
             opts = RenderOpts(gp=gp)
@@ -468,8 +539,16 @@ class Viewer:
                 elif isinstance(si, SceneText):
                     x, y = transform(si.insert.x, si.insert.y)
 
-                    ri = dwg.text("", insert=(x,y))
-                    ri.add(dwg.tspan(si.text, font_size=si.font_size, font_family=si.font_family, font_weight=si.font_weight, **kw))
+                    ri = dwg.text("", insert=(x, y))
+                    ri.add(
+                        dwg.tspan(
+                            si.text,
+                            font_size=si.font_size,
+                            font_family=si.font_family,
+                            font_weight=si.font_weight,
+                            **kw,
+                        )
+                    )
 
                 else:
                     print("unknown item", si)

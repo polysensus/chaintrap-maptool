@@ -2,6 +2,7 @@
 import math
 from dataclasses import dataclass
 
+
 class Error(Exception):
     """general error"""
 

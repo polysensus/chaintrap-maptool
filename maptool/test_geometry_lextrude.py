@@ -23,6 +23,7 @@ box_lextrude test cases
 import pytest
 from maptool.geometry import *
 
+
 @pytest.fixture
 def box_tl_br():
     """
@@ -59,6 +60,7 @@ def _box_bl_tr():
 
     return [(b1, b2), (b2, b1)]
 
+
 def _box_bl_tr_vshadow():
     """
 
@@ -90,7 +92,7 @@ def box_bl_tr():
     [
         ("vertically distinct", _box_bl_tr),
         ("vertically shadowed", _box_bl_tr_vshadow),
-    ]
+    ],
 )
 def test_bl_tr(note, bl_tr_cases):
     print(note)
@@ -138,6 +140,3 @@ def test_bl_tr(note, bl_tr_cases):
             assert join1[1] == TOP
             assert join2[0] == BOTTOM
             assert join2[1] == RIGHT
-
-
-

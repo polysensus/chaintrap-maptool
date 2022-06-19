@@ -1,5 +1,4 @@
 class TestCorridor:
-
     def test_entangle_horizontal(self, spur_horizontal):
 
         g = spur_horizontal
@@ -30,7 +29,6 @@ class TestCorridor:
         assert ca.check_entangled(cb)
         assert cb.check_entangled(ca)
 
-
     def test_entangle_horizontal_11(self, spur_horizontal_11):
 
         g = spur_horizontal_11
@@ -40,4 +38,3 @@ class TestCorridor:
 
         assert ca.check_entangled(cb)
         assert cb.check_entangled(ca)
-

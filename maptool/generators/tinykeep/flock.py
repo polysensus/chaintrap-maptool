@@ -5,6 +5,8 @@ import random
 from dataclasses import dataclass
 
 from maptool.geometry import essentially_zero
+
+
 @dataclass
 class Boid:
     """

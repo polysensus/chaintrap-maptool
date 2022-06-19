@@ -8,6 +8,7 @@ from maptool import geometry as g
 class GenRoom(GenSpace):
     pass
 
+
 class RoomSide:
     NORTH: int = g.TOP
     WEST: int = g.LEFT
@@ -20,19 +21,23 @@ class RoomSide:
 
     @classmethod
     def name(cls, side: int) -> str:
-        return { 
+        return {
             RoomSide.NORTH: "north",
             RoomSide.WEST: "west",
             RoomSide.SOUTH: "south",
-            RoomSide.EAST: "east"
+            RoomSide.EAST: "east",
         }[side]
 
+
 SIDES = [RoomSide.NORTH, RoomSide.WEST, RoomSide.SOUTH, RoomSide.EAST]
+
+
 class SRoomSide:
-    NORTH: str = 'NORTH'
-    WEST: str = 'WEST'
-    SOUTH: str = 'SOUTH'
-    EAST: str = 'SOUTH'
+    NORTH: str = "NORTH"
+    WEST: str = "WEST"
+    SOUTH: str = "SOUTH"
+    EAST: str = "SOUTH"
+
 
 @dataclass
 class Room:
@@ -45,7 +50,15 @@ class Room:
     # corridors[NORTH, WEST, SOUTH, EAST]]
     corridors: List[List[int]] = ()
 
-    def __init__(self, center=Vec2(), width=0.0, length=0.0, is_main=False, is_intersection=False, corridors=None):
+    def __init__(
+        self,
+        center=Vec2(),
+        width=0.0,
+        length=0.0,
+        is_main=False,
+        is_intersection=False,
+        corridors=None,
+    ):
         self.center = center
         self.width = width
         self.length = length
@@ -62,21 +75,21 @@ class Room:
         ln = br.y - tl.y if br.y > tl.y else tl.y - br.y
         return cls(center, w, ln, **kw)
 
-
     @classmethod
     def from_encoding(cls, d):
 
         return cls(
-            center = Vec2(d["x"], d["y"]),
-            width = d["w"],
-            length = d["l"],
-            is_intersection = d["inter"],
-            is_main = d["main"],
-            corridors = [
+            center=Vec2(d["x"], d["y"]),
+            width=d["w"],
+            length=d["l"],
+            is_intersection=d["inter"],
+            is_main=d["main"],
+            corridors=[
                 d["corridors"][0][:],
                 d["corridors"][1][:],
                 d["corridors"][2][:],
-                d["corridors"][3][:]]
+                d["corridors"][3][:],
+            ],
         )
 
     def encode(self):
@@ -87,31 +100,32 @@ class Room:
             l=self.length,
             inter=self.is_intersection,
             main=self.is_main,
-            corridors=[self.corridors[0][:],self.corridors[1][:],self.corridors[2][:],self.corridors[3][:]]
+            corridors=[
+                self.corridors[0][:],
+                self.corridors[1][:],
+                self.corridors[2][:],
+                self.corridors[3][:],
+            ],
         )
-
 
     def topleft(self) -> Vec2:
         x = self.center.x - (self.width / 2)
         y = self.center.y - (self.length / 2)
         return Vec2(x, y)
 
-
     def bottomright(self) -> Vec2:
         x = self.center.x + (self.width / 2)
         y = self.center.y + (self.length / 2)
         return Vec2(x, y)
 
-
     def pt_left(self, factor=0.5):
 
         tlx = self.center.x - (self.width / 2)
         tly = self.center.y - (self.length / 2)
-        bry = self.center.y + (self.length / 2) 
+        bry = self.center.y + (self.length / 2)
 
         y = tly + (bry - tly) * factor
         return Vec2(tlx, y)
-
 
     def pt_right(self, factor=0.5):
 
@@ -120,9 +134,8 @@ class Room:
         bry = self.center.y + (self.length / 2)
 
         # larger y is down
-        y = tly + (bry - tly) * factor 
+        y = tly + (bry - tly) * factor
         return Vec2(brx, y)
-
 
     def pt_top(self, factor=0.5):
 
@@ -132,7 +145,6 @@ class Room:
         x = tlx + (brx - tlx) * factor
         return Vec2(x, tly)
 
-    
     def pt_bottom(self, factor=0.5):
 
         tlx = self.center.x - (self.width / 2)
@@ -142,14 +154,11 @@ class Room:
         x = tlx + (brx - tlx) * factor
         return Vec2(x, bry)
 
-
     def euclidean_dist(self, other) -> float:
         return g.pt_dist(self.center, other.center)
 
-
     def attached_side(self, icor) -> int:
-        """Determine which side, if any, icor is present on
-        """
+        """Determine which side, if any, icor is present on"""
         for side, axis in enumerate(self.corridors):
             try:
                 i = axis.index(icor)
@@ -163,7 +172,7 @@ class Room:
 
         this method detaches the corridor identified by icor or raises KeyError
         if it is not found entering any side of the room
-        
+
         when we do that we need to detach the corridor from the old room and
         attach to the intersection.  Note that its not geometrically possible
         for a corridor to be attached to multiple sides of the same room"""
@@ -187,7 +196,6 @@ class Room:
         raise KeyError(f"corridor {icor} not found in room {self.id}")
 
 
-
 def rooms_check_line(rooms, line, *ignore) -> int:
 
     for i, r in enumerate(rooms):
@@ -198,10 +206,11 @@ def rooms_check_line(rooms, line, *ignore) -> int:
         room_box = Box(r.topleft(), r.bottomright())
         # coridors are 3 points
         for j in range(len(line) - 1):
-            p1, p2 = line[j], line[j+1]
-            if g.check_box_line(room_box, p1, p2) >=0:
+            p1, p2 = line[j], line[j + 1]
+            if g.check_box_line(room_box, p1, p2) >= 0:
                 return i
     return False
+
 
 def rooms_crossing_line(rooms, line, *ignore):
 
@@ -213,10 +222,11 @@ def rooms_crossing_line(rooms, line, *ignore):
         room_box = Box(r.topleft(), r.bottomright())
         # coridors are 3 points
         for j in range(len(line) - 1):
-            p1, p2 = line[j], line[j+1]
+            p1, p2 = line[j], line[j + 1]
             wall = g.check_box_line(room_box, p1, p2)
             if wall != -1:
                 yield (i, wall, j)
+
 
 def rooms_bbox(rooms) -> Box:
 

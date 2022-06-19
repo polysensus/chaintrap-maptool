@@ -1,6 +1,7 @@
 from .datatypes import Box, Vec2
 from .geometry import *
 
+
 def test_hextrude_ideal():
     """
 
@@ -22,6 +23,7 @@ def test_hextrude_ideal():
     assert sides[1] == LEFT
     assert essentially_equal(a.x, 5)
     assert essentially_equal(b.x, 7)
+
 
 def test_hextrude_ideal_inverted():
     """
