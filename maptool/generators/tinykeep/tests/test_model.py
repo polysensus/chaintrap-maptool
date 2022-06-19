@@ -10,7 +10,127 @@ WEST = RoomSide.WEST
 SOUTH = RoomSide.SOUTH
 EAST = RoomSide.EAST
 
-class TestModel:
+class TestMergeCrossing:
+
+    def test_sameroom_cross_up(self, emptymodel, room3_horizontal_cross):
+        """
+                r2
+                ^ cb
+                |
+        r1 .--------> r3 ca
+                |
+           .----.
+
+                r2
+                ^ cb
+                |
+        r1 .----+---> r3
+             cn   ca
+
+        Should:
+        - eliminate the first leg of cb
+        - move the start of cb leg 2 to the new intersection
+        - create an intersection on ca
+        - move the start of ca to the new intersection
+        - create a new corridor from r1 to the intersection
+
+        """
+        # --- setup
+        g = emptymodel
+        r1, r2, r3 = room3_horizontal_cross
+
+        ca = Corridor(
+            points=[r1.pt_right(0.25), r3.pt_left(0.25)],
+            joins=[0,2],
+            join_sides=[EAST, WEST]
+            )
+
+        cb = Corridor(
+            points=[r1.pt_right(0.75), None, r2.pt_bottom()],
+            joins=[0,1],
+            join_sides=[EAST, SOUTH]
+            )
+        cb.points[1] = Vec2(cb.points[2].x, cb.points[0].y)
+
+        r1.corridors[EAST] = [0, 1]
+        r3.corridors[WEST] = [0]
+        r2.corridors[SOUTH] = [1]
+
+        g.rooms.extend([r1, r2, r3])
+        g.corridors.extend([ca, cb])
+
+        # --- test
+        g._generate_intersections()
+
+        # Should:
+        # - eliminate the first leg of cb
+        # - move the start of cb leg 2 to the new intersection
+        # - create an intersection on ca
+        # - create a new corridor from r1 to the intersection
+
+        assert len(g.corridors) == 3, "expected a single new corridor"
+        assert len(g.rooms) == 4, "expected a single new interesection"
+        assert len(cb.points) == 2, "expected first leg of cb to be removed"
+
+        cn = g.corridors[-1]
+        rn = g.rooms[-1]
+        irn = len(g.rooms) - 1
+
+        assert cb.joins == [irn, 1], "expected cb to start on north side of new intersection and end on r2"
+        assert cb.join_sides[0] == NORTH, "expected cb to start on north side of new intersection"
+        assert cb.join_sides[1] == SOUTH, "expected cb to end at south side of r2"
+
+        assert cn.join_sides == [EAST, WEST], "expected cn to join east side of r1 to west side of new intersection"
+        assert cn.joins == [0, irn], "expected cn to join r1 to new intersection"
+        assert pt_essentially_same(cn.points[1], rn.center)
+
+        assert ca.join_sides == [EAST, WEST], "expected ca to join east side of new intersection to west side of r3"
+        assert ca.joins == [irn, 2], "expected ca to join new intersection to r3"
+        assert pt_essentially_same(ca.points[0], rn.center)
+
+        assert pt_essentially_same(cb.points[0], rn.center)
+
+    def test_room_pair_cross_up(self, emptymodel, room4_horizontal_cross):
+        """
+                r2
+                ^ cb
+                |
+        r1 .--------> r3 ca
+                |
+        r4 .----.
+        """
+        # --- setup
+        g = emptymodel
+        r1, r2, r3, r4 = room4_horizontal_cross
+
+        ca = Corridor(
+            points=[r1.pt_right(), r3.pt_left()],
+            joins=[0,1],
+            join_sides=[EAST, WEST]
+            )
+
+        cb = Corridor(
+            points=[r4.pt_right(), None, r2.pt_bottom()],
+            joins=[0,2],
+            join_sides=[EAST, SOUTH]
+            )
+        cb.points[1] = Vec2(cb.points[2].x, cb.points[0].y)
+
+        r1.corridors[EAST] = [0]
+        r4.corridors[EAST] = [1]
+        r3.corridors[WEST] = [0]
+        r2.corridors[SOUTH] = [1]
+
+        g.rooms.extend([r1, r2, r3, r4])
+        g.corridors.extend([ca, cb])
+
+        # --- test
+        g._generate_intersections()
+ 
+        pass
+
+
+class TestMerge:
 
     def test_merge_tee_horizontal(self, emptymodel, rooms3_horizontal_tee):
         """

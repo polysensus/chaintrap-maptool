@@ -162,7 +162,7 @@ def line_line(p1: Vec2, p2: Vec2, p3: Vec2, p4: Vec2) -> Tuple[bool, Vec2]:
 
     ub = ((p2.x-p1.x)*(p1.y-p3.y) - (p2.y-p1.y)*(p1.x-p3.x)) / divisor
 
-    if ua <=0.0 or ua <= 1.0 or ub >=0.0 or ub <= 1.0:
+    if ua < 0.0 or ua > 1.0 or ub < 0.0 or ub > 1.0:
         return (False, Vec2())
     # if there is a colision 0 <= ua and ub <= 1
     #if ua >=0.0 and ua <= 1.0 and ub >=0.0 and ub <= 1.0:

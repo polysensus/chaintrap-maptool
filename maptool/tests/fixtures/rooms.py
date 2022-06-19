@@ -10,6 +10,78 @@ SOUTH = RoomSide.SOUTH
 EAST = RoomSide.EAST
 
 @pytest.fixture
+def room3_horizontal_cross():
+    """
+            (6,0)+--+
+                 |r2|
+                 +--+ (10,4)
+                      
+ (0,6)+--+             (12,6)+--+         
+      |r1|                   |r3| 
+      +--+ (4,10)            +--+ (16,10)
+    """
+    ox, oy = 0.0, 0.0
+    def frombox(tl, br, **kw):
+        return Room.frombox(Vec2(ox + tl.x, oy+tl.y), Vec2(ox+br.x, oy+br.y), corridors=[[], [], [], []], **kw)
+
+    r2 = frombox(Vec2(6.0, 0.0), Vec2(10.0, 4.0))
+    #             (6,0)
+    #               +--+
+    #               |r2|
+    #               +--+ (10,4)
+    r3 = frombox(Vec2(12.0, 6.0), Vec2(16.0, 10.0))
+    #       
+    #  (0,6)+--+          (12,8)+--+
+    #       |r1|               |r3|
+    #       +--+               +--+
+    #        (4,10)       (16,12)
+    r1 = frombox(Vec2(0.0, 6.0), Vec2(4.0, 10.0))
+    return r1, r2, r3
+
+
+@pytest.fixture
+def room4_horizontal_cross():
+    """
+            (6,0)+--+
+                 |r2|
+                 +--+ (10,4)
+                      
+ (0,6)+--+             (12,6)+--+         
+      |r1|                   |r3| 
+      +--+ (4,10)            +--+ (16,10)
+
+ (0,12)+--+
+      |r4|
+      +--+ (4,16)
+
+    """
+    ox, oy = 0.0, 0.0
+    def frombox(tl, br, **kw):
+        return Room.frombox(Vec2(ox + tl.x, oy+tl.y), Vec2(ox+br.x, oy+br.y), corridors=[[], [], [], []], **kw)
+
+    r2 = frombox(Vec2(6.0, 0.0), Vec2(10.0, 4.0))
+    #             (6,0)
+    #               +--+
+    #               |r2|
+    #               +--+ (10,4)
+    r3 = frombox(Vec2(12.0, 6.0), Vec2(16.0, 10.0))
+    #       
+    #  (0,6)+--+          (12,8)+--+
+    #       |r1|               |r3|
+    #       +--+               +--+
+    #        (4,10)       (16,12)
+    #
+    # (0,12)+--+
+    #      |r4|
+    #      +--+ (4,16)
+ 
+    r1 = frombox(Vec2(0.0, 6.0), Vec2(4.0, 10.0))
+    r4 = frombox(Vec2(0.0, 12.0), Vec2(4.0, 16.0))
+    return r1, r2, r3, r4
+
+
+
+@pytest.fixture
 def room3_horizontal_converge():
     """
                             (14,0)+--+

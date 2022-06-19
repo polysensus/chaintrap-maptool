@@ -9,7 +9,15 @@ from maptool.corridor import Corridor
 
 # cai and cbi are the index into join & join_sides representing R1.
 # ica and icb are the corridor indices for ca and cb
-Merge = namedtuple("Merge", "cai cbi ica icb cbshort tee".split(), defaults=(None, None, None, None, None, None))
+_fields = "cai cbi ica icb cbshort tee".split()
+Merge = namedtuple("Merge", _fields, defaults=(None,) * len(_fields))
+
+# cai and cbi are the actual corridor indices. irca and ircb are the indices of the respective corridors in the room side
+_fields = "irca ircb cai cbi ica icb aleg bleg".split()
+CrossMerge = namedtuple("CrossMerge", _fields, defaults=(None,) * len(_fields))
+
+_fields = "ir side ic jc ileg jleg pi".split()
+Crossing = namedtuple("Crossing", _fields, defaults=(None,)*len(_fields))
 
 class GenerateIntersections:
 
@@ -18,6 +26,45 @@ class GenerateIntersections:
         self.corridors = corridors
 
     # ---
+
+    def _classify_crossing(self, cx: Crossing):
+        """
+
+        """
+        r1 = self.rooms[cx.ir]
+
+        ic = cx.ic
+        ij = cx.jc
+        ica = cx.ic
+        icb = cx.jc
+
+        ca = self.corridors[ica]
+        cb = self.corridors[icb]
+        cai = cbi = None
+        if ca.joins[0] == cx.ir and cb.joins[0] == cx.ir:
+            cai, cbi = 0, 0
+        elif ca.joins[0] == cx.ir and cb.joins[1] == cx.ir:
+            cai, cbi = 0, 1
+        elif ca.joins[1] == cx.ir and cb.joins[0] == cx.ir:
+            cai, cbi = 1, 0
+        elif ca.joins[1] == cx.ir and cb.joins[1] == cx.ir:
+            cai, cbi = 1, 1
+        else:
+            raise ValueError("no co-incident points, corridors are not entanbled")
+
+        irca, ircb = ic, ij
+        aleg, bleg = cx.ileg, cx.jleg
+
+        if len(self.corridors[ica].points) == 3:
+            # Then we need to swap to ensure cb is the L crossing
+            ica, icb = icb, ica
+            irca, ircb = ij, ic
+            cai, cbi = cbi, cai
+            aleg = cx.jleg
+            bleg = cx.ileg
+
+        return CrossMerge(irca=irca, ircb=ircb, ica=ica, icb=icb, cai=cai, cbi=cbi, aleg=aleg, bleg=bleg)
+
 
     def _classify_lhv_merge(self, ica, icb) -> Merge:
 
@@ -244,6 +291,117 @@ class GenerateIntersections:
             cbi = 0
 
         return Merge(cai, cbi, ica, icb)
+
+    def _merge_crossing_hvl(self, cx: Crossing):
+        """
+                r2
+                ^ cb
+                |
+        r1 .--------> r3 ca
+                |
+           .----.
+
+                r2
+                ^ cb
+                |
+        r1 .----+---> r3
+             cn   ca
+
+        """
+
+        m = self._classify_crossing(cx)
+
+        r1 = self.rooms[cx.ir]
+        ca = self.corridors[m.ica]
+        cb = self.corridors[m.icb]
+
+        # --- new room create 
+        # new room at the intersection point
+        rn = Room()  # intersection
+        rn.is_intersection = True
+        rn.center = cx.pi.clone()
+        irn = len(self.rooms)
+        self.rooms.append(rn)
+
+        # --- new corridor
+        # new corridor from rn to r3 (replacing the portion of ca after the new intersection)
+        cn = Corridor(
+            points=[None, None],
+            joins=[None, None],
+            join_sides=[None, None],
+            is_inserted=True
+        )
+
+        # the new corridor starts at r1
+        cn.joins[m.cai] = ca.joins[m.cai]
+        cn.points[m.cai] = ca.points[m.cai].clone()
+        # end point of new corridor is the new intersection
+        cn.points[1 - m.cai] = cx.pi.clone()
+        cn.joins[1 - m.cai] = irn
+        # because we are filling the gap left by truncating a straight, the sides for the
+        # new corridor are the same
+        cn.join_sides[m.cai] = ca.join_sides[m.cai]
+        cn.join_sides[1 - m.cai] = ca.join_sides[1 - m.cai]
+
+        icn = len(self.corridors)
+        self.corridors.append(cn)
+        # attach to r1 (same side as we were attached to on ca)
+        r1.corridors[ca.join_sides[m.cai]].append(icn)
+        # attach to the new intersection
+        rn.corridors[ca.join_sides[1 - m.cai]].append(icn)
+        # --- end: new corridor
+
+        # --- update ca to start at the new intersection
+        # detach from r1
+        r1side = r1.detach_corridor(m.ica)
+        # attach to same side of rn
+        rn.corridors[r1side].append(m.ica)
+        # set the start point to the center of the intersection
+        ca.points[m.cai] = rn.center.clone()
+        ca.joins[m.cai] = irn
+        # join_sides unchanged
+        # --- end: update ca to start at the new intersection
+
+        # --- cb - drop the first leg of the crossing corridor
+        # b is the crossing corridor, bleg is the crossing leg. We remove the *other* leg
+        r1.detach_corridor(m.icb)
+        cb.joins[m.cbi] = irn
+        cb.join_sides[m.cbi] = RoomSide.opposite(cb.join_sides[1-m.cbi])
+        # move the mid point to the new intersection
+        cb.points[1] = cx.pi.clone()
+        # drop the point at the r1 end of the corridor. bleg is the leg that
+        # intersects and which we have just adjusted so we want to keep it.
+        cb.points = cb.points[(m.bleg):2+(m.bleg)]
+        cb.clipped += 1
+        # attach the corridor to the appropriate side of the new intersection
+        rn.corridors[cb.join_sides[m.cbi]].append(m.icb)
+        # --- cb is complete
+
+        return True
+
+
+    def _merge_crossing_ll(self, cx: Crossing):
+        """
+                r2    r3 ca
+                ^ cb  ^
+                |     |
+        r1 .----------.
+                |
+           .----.
+
+                r2     r3
+                ^ cb  ^
+                |     |
+        r1 .----+-----.
+             cn   ca
+
+        """
+
+    def merge_crossing(self, cx: Crossing):
+        """Merge a crossing corridor pair which leave the same room"""
+        # todo chose from the major cases
+        return self._merge_crossing_hvl(cx)
+
 
     def _merge_straights(self, ica, icb):
 
@@ -500,8 +658,7 @@ class GenerateIntersections:
                             x = (ca.points[i].x + cb.points[j].x) / 2.0
                             ca.points[i].x = cb.points[j].x = ca.points[i+1].x = cb.points[j+1].x = x
                         if not self.corridors[ic].check_entangled(self.corridors[jc]):
-                            raise ValueError('bug')
-
+                            print("the result of a snap should be an entangled corridor pair")
 
     def find_first_entangled_corridor_pair(self):
         for i, r in enumerate(self.rooms):
@@ -525,6 +682,39 @@ class GenerateIntersections:
                             continue
 
                         return ic, jc
+
+    def find_first_crossing_from_same_room(self):
+        """find the first pair of crossing corridors that exit the same room
+
+            r3
+            ^
+          --|-> r2
+       r1 __.
+
+        """
+
+        for i, r in enumerate(self.rooms):
+
+            for side in range(4):
+                side_corridors = set(r.corridors[side])
+                if len(side_corridors) <= 1:
+                    continue
+
+                # for each pair m, n of corridors see if they are actually
+                # co-incident.  corridors joining intersections will touch as
+                # intersections have zero widith & length so we need on point of
+                # co-incidence plust another on the same x or same y as the co-incident
+
+                for ic in side_corridors:
+                    for jc in side_corridors:
+                        if ic == jc:
+                            continue
+
+                        crossing = self.corridors[ic].check_crossing(self.corridors[jc])
+                        if crossing:
+                            ileg, jleg, pi = crossing
+                            return Crossing(ir=i, side=side, ic=ic, jc=jc, ileg=ileg, jleg=jleg, pi=pi)
+
 
     def generate_corridor_intersection(self, ic, jc):
         """merge a single pair of entangled corridors"""

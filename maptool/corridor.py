@@ -42,6 +42,7 @@ class Corridor:
         )
 
     def check_entangled(self, co, margin=0.1, margin_factor=None):
+        """check for pairs of co-linear corridor segments"""
 
         for i in range(2):
 
@@ -66,6 +67,36 @@ class Corridor:
                 if ok and p1 and p2:
                     return (p1, p2, i, j, opposed) 
         return False
+
+    
+    def check_crossing(self, co):
+        """check for pairs of intersecting corridor segments"""
+
+        for i in range(2):
+
+            if i+1 >= len(self.points):
+                continue
+            lap1, lap2 = self.points[i], self.points[i+1]
+
+            for j in range(2):
+                if j+1 >= len(co.points):
+                    continue
+                lbp1, lbp2 = co.points[j], co.points[j+1]
+
+                ok, pi = g.line_line(lap1, lap2, lbp1, lbp2)
+                if ok:
+                    endpoint = False
+                    for lp in [lap1, lap2, lbp1, lbp2]:
+                        if g.pt_essentially_same(pi, lp):
+                            endpoint = True
+                            break
+                    if not endpoint:
+                        return (i, j, pi)
+
+        return None
+
+
+
 
     def entangle(self, i):
         if not self.entangled:

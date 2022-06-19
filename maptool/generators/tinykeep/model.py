@@ -404,6 +404,12 @@ class Generator:
             assert ok
             entangled = gi.find_first_entangled_corridor_pair()
 
+        # now look for crossing corridors that leave the same room
+        cx = gi.find_first_crossing_from_same_room()
+        while cx:
+            ok = gi.merge_crossing(cx)
+            assert ok
+            cx = gi.find_first_crossing_from_same_room()
 
     def _generate_corridors(self, map):
 
