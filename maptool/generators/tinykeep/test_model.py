@@ -51,6 +51,44 @@ def room3_horizontal_converge():
     return r1, r2, r3
 
 @pytest.fixture
+def rooms3_horizontal_tee():
+    """
+               (10,0)+--+
+                     |r2|
+                     +--+ (14,4)
+                      
+    (0,6)+--+         
+         |r1|
+         +--+ (4,10)
+                   
+            (10,12)  +--+
+                     |r3|
+                     +--+ (14,16)
+
+    """
+
+    ox, oy = 2.0, 2.0
+    def frombox(tl, br, **kw):
+        return Room.frombox(Vec2(ox + tl.x, oy+tl.y), Vec2(ox+br.x, oy+br.y), corridors=[[], [], [], []], **kw)
+
+    #             (10,0)+--+
+    #                   |  |
+    #                   +--+ (14,4)
+    r2 = frombox(Vec2(10.0, 0.0), Vec2(14.0, 4.0))
+    #                    ^
+    #  (0,6)+--+         |
+    #       |  |---------+
+    #       +--+ (4,10)
+    r1 = frombox(Vec2(0.0, 6.0), Vec2(4.0, 10.0))
+    #                    |
+    #             (10,12)+--+
+    #                   |  |
+    #                   +--+ (14,16)
+    r3 = frombox(Vec2(10.0, 12.0), Vec2(14.0, 16.0))
+
+    return r1, r2, r3
+
+@pytest.fixture
 def rooms3_horizontal_spur():
     """
                (10,0)+--+
@@ -597,6 +635,71 @@ class TestCorridor:
 
 class TestModel:
 
+    def test_merge_tee_horizontal(self, emptymodel, rooms3_horizontal_tee):
+        """
+        This is a rare case
+                     r2
+                      + i2
+                      |     Corridor A
+        r1  i0+-------+ i1
+        r1  j0+-------+ j1     Corridor B
+                      |        <- spur is j1 - j2
+                      + j2
+                      r3
+
+                      |
+            +---------+  results in 3 straights
+                      |
+        """
+
+        # --- setup
+        g = emptymodel
+        r1, r2, r3 = rooms3_horizontal_tee
+
+        ca = Corridor(
+            points=[r1.pt_right(), None, r2.pt_bottom()],
+            joins=[0,1],
+            join_sides=[EAST, SOUTH]
+            )
+        ca.points[1] = Vec2(ca.points[2].x, ca.points[0].y)
+
+        cb = Corridor(
+            points=[r1.pt_right(), None, r3.pt_top()],
+            joins=[0,2],
+            join_sides=[EAST, NORTH]
+            )
+        cb.points[1] = Vec2(cb.points[2].x, cb.points[0].y)
+
+        r2.corridors[SOUTH] = [0]
+        r1.corridors[EAST] = [0, 1]
+        r3.corridors[NORTH] = [1]
+
+        g.rooms.extend([r1, r2, r3])
+        g.corridors.extend([ca, cb])
+
+        # --- test
+        g._generate_intersections()
+        assert len(g.corridors) == 3
+        assert len(g.rooms) == 4
+
+        cn = g.corridors[-1]
+        rn = g.rooms[-1]
+        irn = len(g.rooms) - 1
+
+        assert cn.join_sides == [EAST, WEST]
+        assert cn.joins == [0, irn]
+        assert essentially_equal(cn.points[1].x, rn.center.x)
+        assert essentially_equal(cn.points[1].y, rn.center.y)
+
+        assert ca.join_sides == [NORTH, SOUTH]
+        assert ca.joins == [irn, 1]
+        assert pt_essentially_same(ca.points[0], rn.center)
+
+        assert cb.join_sides == [SOUTH, NORTH]
+        assert cb.joins == [irn, 2]
+        assert pt_essentially_same(cb.points[0], rn.center)
+
+
     def test_merge_ll_converge_right(self, emptymodel, room3_horizontal_converge):
         """
         .----------+ r2  ca
@@ -701,8 +804,10 @@ class TestModel:
 
         assert cb.joins[0] == 2
         assert cb.joins[1] == 3
-        assert cn.joins[1] == 0
-        assert cn.joins[0] == 3
+        assert cn.joins[1] == 3
+        assert cn.join_sides[0] == RIGHT
+        assert cn.join_sides[1] == LEFT
+        assert cn.joins[0] == 0
 
 
     def test_merge_l_hshort(self, l_hshort):

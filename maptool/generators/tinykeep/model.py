@@ -394,6 +394,9 @@ class Generator:
     def _generate_intersections(self):
 
         gi = GenerateIntersections(self.rooms, self.corridors)
+
+        gi.snap_close_corridor_pairs()
+
         entangled = gi.find_first_entangled_corridor_pair()
         while entangled:
             ic, jc = entangled

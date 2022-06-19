@@ -54,9 +54,25 @@ def check_pt_dist(p1: Vec2, p2: Vec2, dist: float) -> bool:
     x = math.sqrt(pt_dist2(p1, p2))
     return x < dist
 
-def check_pt_on_line(p, l1, l2, margin=0.1) -> bool:
+def check_pt_on_line(p, l1, l2, margin=0.1, margin_factor=None) -> bool:
+    """
+    Note: if providing values for margin or margin_factor be aware this will
+    give you line pairs where pt_essentially_same will be false, even though the
+    line and the point are classified as co-incident.
+
+    margin: absoloute fudge factor to allow for float precision
+    margin_factor: if not none, margin is calculated as len(line) * margin_factor
+    """
 
     line_len = pt_dist(l1, l2)
+
+    # Note that using margin_factor will cause issues with places where we
+    # assume pt_essentially_same is true after this function returns true. The
+    # caller needs to be aware of this when using margin_factor
+
+    if margin_factor is not None:
+        margin = line_len * margin_factor
+
     d1 = pt_dist(p, l1)
     d2 = pt_dist(p, l2)
 
@@ -81,11 +97,13 @@ def check_line_in_line(l1a, l1b, l2a, l2b, margin=0.1) -> bool:
     
     return True
 
-def xline_in_line(p1, p2, p3, p4) -> Tuple[bool, Vec2, Vec2]:
-    """for cases where the lines are co-linear, return the pt(s) of overlap"""
+def xline_in_line(p1, p2, p3, p4, margin=0.1, margin_factor=None) -> Tuple[bool, Vec2, Vec2]:
+    """for cases where the lines are co-linear, return the pt(s) of overlap
+    
+    Note: margin_factor and margine can cause unexpected results from pt_essentially_same"""
 
-    p1_on = check_pt_on_line(p1, p3, p4)
-    p2_on = check_pt_on_line(p2, p3, p4)
+    p1_on = check_pt_on_line(p1, p3, p4, margin=margin, margin_factor=margin_factor)
+    p2_on = check_pt_on_line(p2, p3, p4, margin=margin, margin_factor=margin_factor)
 
     if not (p1_on or p2_on):
         return (False, None, None)
@@ -285,7 +303,7 @@ def box_hextrude(b1, b2, factor=0.5, min=0.0):
     if b1.tl.y >= b2.tl.y:
         y0, y1 = b1.tl.y, b2.br.y
     else:
-        y0, y1 = b2.tl.y, b2.br.y
+        y0, y1 = b2.tl.y, b1.br.y
 
     iy = y0 + (y1 - y0) * factor
 

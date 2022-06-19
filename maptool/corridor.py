@@ -41,7 +41,7 @@ class Corridor:
             join_sides = e['join_sides'][:]
         )
 
-    def check_entangled(self, co):
+    def check_entangled(self, co, margin=0.1, margin_factor=None):
 
         for i in range(2):
 
@@ -55,14 +55,16 @@ class Corridor:
                 lbp1, lbp2 = co.points[j], co.points[j+1]
 
                 # p1 and p2 will be the points of la or None if they are not on lb
-                ok, p1, p2 = g.xline_in_line(lap1, lap2, lbp1, lbp2)
+                opposed = False
+                ok, p1, p2 = g.xline_in_line(lap1, lap2, lbp1, lbp2, margin=margin, margin_factor=margin_factor)
                 if ok and not (p1 and p2):
+                    opposed = True
                     # try the otherway round - if lap1 -> lap2 is longer lap2 will be off the line
-                    ok, p1, p2 = g.xline_in_line(lbp1, lbp2, lap1, lap2)
+                    ok, p1, p2 = g.xline_in_line(lbp1, lbp2, lap1, lap2, margin=margin, margin_factor=margin_factor)
 
                 # For an entanglement we need two points of intersection
                 if ok and p1 and p2:
-                    return True
+                    return (p1, p2, i, j, opposed) 
         return False
 
     def entangle(self, i):

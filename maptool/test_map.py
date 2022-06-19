@@ -43,6 +43,7 @@ def test_generator_vrf_inputs():
     ("regression-demo-map", "9c9d1793f1e2c6db", "b6eb87339ec3b87f70308f471e02b544325e88f30bd56e8bf9ff530cb1223325"),
     ("regression-clip-indirectly-disentangles", b'K\x92\xa1o\xa6\xff\xc4\x0c'.hex(), b'\x11\x19)~\xcc]\\5\x94\xfe\x92\xea\x0e\xca \x85\xbbd^\x9b\xf7GN\xcc\\\xa7u3\xc3q)k'.hex()),
     ("regression-2", "e7357c72ae6861ae", "a23cccec37055701674748316860eac927212048f0666ea02ef0bf1737e2195e"),
+    ("regression-3", "49febb61d5f15e9e", "a80a2426333f59f9b585d8e6698d01163f959dbd196d44d43d35b4ce699646d0"),
 
     ("random", None, None)
     ])

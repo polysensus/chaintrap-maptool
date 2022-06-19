@@ -15,8 +15,18 @@
             },
             "args": [
                 "gen",
-                "--seed", "8619379876264bad",
-                "--secret", "c8a747f6631a8056c1f3f340782f4bc05b9de9fcbb9b7c8b16260a43591b1112",
+
+                // test case: hextrude case that was broken. and also a corridor
+                // pair that are very close but not quite entangled
+                "--seed", "e7098b383bd3a558",
+                "--secret", "07eb9d018bf3fee7ca33db4761c753f88d1474f832ec4e65b0d8e24f64c304e2",
+
+                // tee case (quite nasty)
+                // "--seed", "49febb61d5f15e9e",
+                // "--secret", "a80a2426333f59f9b585d8e6698d01163f959dbd196d44d43d35b4ce699646d0",
+
+                // "--seed", "8619379876264bad",
+                // "--secret", "c8a747f6631a8056c1f3f340782f4bc05b9de9fcbb9b7c8b16260a43591b1112",
                 // "--seed", "289ca2e6e99564b7",
                 // "--secret", "362914aa4acfdffd7d31be9ae315a8aa888b70007e87ad2ac6637fab84ec3f86",
                 // "--seed", "ce538b0a1a3da1c2",
