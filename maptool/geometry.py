@@ -425,6 +425,8 @@ def box_lextrude(b0, b1, factor=0.5, min=0.0):
     """assume the boxes are neither horizonatly nor verticaly aligned and create
     a pair of elbows. The caller can pick the one they like
 
+    b0.tl.x < bl.tl.x on entry is required
+
                            We deal with the opposite cases by flipping the points around
     +-----+b1_i            +-----+b2_i
     |b1   |-----+          |b2   |-----+
@@ -442,22 +444,17 @@ def box_lextrude(b0, b1, factor=0.5, min=0.0):
     +-----+ b1_i           +-----+ b2_i
     """
 
-    # TODO: thought we needed to explicitly allow for inverse cases. But it
-    # seems best to check for the caller to check those and pass in b0 and b1 in
-    # a consistent layout. So can simplify accordingly and use b0, b1 directly
-    b = [b0, b1]
+    # It # seems best to require that the caller to check for the inverse case and flip b0, b1 if necessary
+    assert b0.tl.x < b1.tl.x
 
-    ib0, ib1 = 0, 1
-    assert b[0].tl.x < b[1].tl.x
+    b0_right_i = Vec2(b0.br.x, b0.tl.y + (b0.br.y - b0.tl.y) * factor)
+    b1_left_i = Vec2(b1.tl.x, b1.tl.y + (b1.br.y - b1.tl.y) * factor)
 
-    b0_right_i = Vec2(b[ib0].br.x, b[ib0].tl.y + (b[ib0].br.y - b[ib0].tl.y) * factor)
-    b1_left_i = Vec2(b[ib1].tl.x, b[ib1].tl.y + (b[ib1].br.y - b[ib1].tl.y) * factor)
+    b0_top_i = Vec2(b0.tl.x + (b0.br.x - b0.tl.x) * factor, b0.tl.y)
+    b0_bot_i = Vec2(b0.tl.x + (b0.br.x - b0.tl.x) * factor, b0.br.y)
 
-    b0_top_i = Vec2(b[ib0].tl.x + (b[ib0].br.x - b[ib0].tl.x) * factor, b[ib0].tl.y)
-    b0_bot_i = Vec2(b[ib0].tl.x + (b[ib0].br.x - b[ib0].tl.x) * factor, b[ib0].br.y)
-
-    b1_top_i = Vec2(b[ib1].tl.x + (b[ib1].br.x - b[ib1].tl.x) * factor, b[ib1].tl.y)
-    b1_bot_i = Vec2(b[ib1].tl.x + (b[ib1].br.x - b[ib1].tl.x) * factor, b[ib1].br.y)
+    b1_top_i = Vec2(b1.tl.x + (b1.br.x - b1.tl.x) * factor, b1.tl.y)
+    b1_bot_i = Vec2(b1.tl.x + (b1.br.x - b1.tl.x) * factor, b1.br.y)
 
     # b1 right to b2 top
     # +-----+b1_i            +-----+b2_i
@@ -470,7 +467,7 @@ def box_lextrude(b0, b1, factor=0.5, min=0.0):
     #
     # also the cases where b1 and b2 have a slight over lap - because we reject
     # horizontal and vertical corridors where the overlap shadow is to narrow
-    if essentially_lt(b[ib0].tl.y, b[ib1].tl.y):
+    if essentially_lt(b0.tl.y, b1.tl.y):
 
         el_right_top = (b0_right_i, Vec2(b1_top_i.x, b0_right_i.y), b1_top_i)
         el_bot_left = (b0_bot_i, Vec2(b0_bot_i.x, b1_left_i.y), b1_left_i)
@@ -483,18 +480,14 @@ def box_lextrude(b0, b1, factor=0.5, min=0.0):
 
         if d2_right_top < d2_bot_left:
 
-            join1, join2 = [None, None], [None, None]
-
-            join1[ib0], join1[ib1] = (RIGHT, TOP)
-            join2[ib0], join2[ib1] = (BOTTOM, LEFT)
+            join1 = [RIGHT, TOP]
+            join2 = [BOTTOM, LEFT]
 
             return (el_right_top, join1), (el_bot_left, join2)
 
         else:
-            join1, join2 = [None, None], [None, None]
-
-            join1[ib0], join1[ib1] = (BOTTOM, LEFT)
-            join2[ib0], join2[ib1] = (RIGHT, TOP)
+            join1 = [BOTTOM, LEFT]
+            join2 = [RIGHT, TOP]
 
             return (el_bot_left, join1), (el_right_top, join2)
 
@@ -515,17 +508,14 @@ def box_lextrude(b0, b1, factor=0.5, min=0.0):
     d2_right_bot += dist2(el_right_bot[1], el_right_bot[1])
 
     if d2_top_left < d2_right_bot:
-        join1, join2 = [None, None], [None, None]
 
-        join1[ib0], join1[ib1] = (TOP, LEFT)
-        join2[ib0], join2[ib1] = (RIGHT, BOTTOM)
+        join1 = [TOP, LEFT]
+        join2 = [RIGHT, BOTTOM]
 
         return (el_top_left, join1), (el_right_bot, join2)
 
     else:
-        join1, join2 = [None, None], [None, None]
-
-        join1[ib0], join1[ib1] = (RIGHT, BOTTOM)
-        join2[ib0], join2[ib1] = (TOP, LEFT)
+        join1 = [RIGHT, BOTTOM]
+        join2 = [TOP, LEFT]
 
         return (el_right_bot, join1), (el_top_left, join2)
