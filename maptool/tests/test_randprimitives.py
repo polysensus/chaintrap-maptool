@@ -1,4 +1,4 @@
-from .randprimitives import rand_box, rand_split_box
+from ..randprimitives import rand_box, rand_split_box
 
 
 def test_rand_split_box():

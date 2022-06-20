@@ -1,5 +1,5 @@
-from .datatypes import Box, Vec2
-from .geometry import *
+from ..datatypes import Box, Vec2
+from ..geometry import *
 
 
 def test_pt_on_line_horizontal():
