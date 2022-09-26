@@ -6,5 +6,5 @@ setup(
             "toc-maptool = maptool.map:main",
         ]
     },
-    packages=["maptool", "vrf"]
+    packages=["maptool", "vrf", "service"]
 )

@@ -9,6 +9,8 @@ numpy = "*"
 svgwrite = "*"
 scipy = "*"
 bs4 = "*"
+fastapi = {extras = ["all"], version = "*"}
+starlette = "*"
 
 [dev-packages]
 pytest = "*"

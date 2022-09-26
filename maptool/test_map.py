@@ -31,7 +31,7 @@ def test_generator_vrf_inputs():
     args = Map.defaults()
     args.secret = secrets.token_bytes(nbytes=32).hex()
     args.seed = secrets.token_bytes(nbytes=8).hex()
-    g = Map(args)
+    g = Map.from_args(args)
     doc = g.vrf_inputs()
     assert isinstance(doc, str)
     r = json.loads(doc)
@@ -78,7 +78,7 @@ def test_generator_deterministic(note, seed, secret):
     args.seed = seed
     args.secret = secret
 
-    g = Map(args)
+    g = Map.from_args(args)
     g.generate()
     rooms1 = g.model.rooms
     g.generate()
@@ -147,13 +147,14 @@ def test_rooms_persist():
 
     args = Map.defaults()
     args.gp_model = "tinykeep"
-    g = Map(args)
+    g = Map.from_args(args)
     g.generate()
     rooms1 = g.model.rooms[:]
     corridors1 = g.model.corridors[:]
     source = g.tojson(dumps=True)
 
     g = Map(args)
+
     map = g.load_common(source)
     g.model = g.import_model(map["model_type"])
     g.model._reset_generator(g.gp)
@@ -175,13 +176,12 @@ def test_generator_persist():
 
     args = Map.defaults()
     args.gp_model = "tinykeep"
-    g = Map(args)
+    g = Map.from_args(args)
     g.generate()
     rooms1 = g.model.rooms
 
     source = g.tojson(dumps=True)
-    g = Map(args)
-    g.load(source)
+    g = Map.from_source(args, source)
 
     for (i, r) in enumerate(rooms1):
         if rooms_eq(r, g.model.rooms[i]):

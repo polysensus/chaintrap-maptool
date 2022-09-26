@@ -21,7 +21,6 @@ RIGHT = 3
 class GeometryError(Error):
     """An error with the math, geometry or spatial logic"""
 
-
 def essentially_zero(x):
     e = sys.float_info.epsilon * 2
     return x >= -e and x <= e

@@ -16,6 +16,10 @@
             "args": [
                 "gen",
 
+                // test case: regresion broken merge
+                //"--seed", "54c9a1d056c015cd",
+                //"--secret", "1ccdd2dbbb34eb1715086d9b6e617799a7ca683da35bbd150476ac80b3bcf743",
+
                 // test case: single crossing corridor L + straight
                 // "--secret", "938935293bde47868386d9f32b141f51e101323cd276fcb57447602b8c4abc9f",
                 // "--seed", "af3cffbda46b58b4",
@@ -31,11 +35,15 @@
 
                 // "--seed", "8619379876264bad",
                 // "--secret", "c8a747f6631a8056c1f3f340782f4bc05b9de9fcbb9b7c8b16260a43591b1112",
+
                 // "--seed", "289ca2e6e99564b7",
                 // "--secret", "362914aa4acfdffd7d31be9ae315a8aa888b70007e87ad2ac6637fab84ec3f86",
+
                 // "--seed", "ce538b0a1a3da1c2",
                 // "--secret", "098ed2701e8ea7b945b2a2a4ad367938849f11f7e3037ed1b913b7dffe985013",
+
                 // "--seed", "9c9d1793f1e2c6db",
+                // "--secret", "d6859de99e6986b1d4dfdd59a50adb6e59a308d990468531d32d2112240d092b",
                 // "--secret", "b6eb87339ec3b87f70308f471e02b544325e88f30bd56e8bf9ff530cb1223325",
                 "--svgfile",
                 "${workspaceFolder}/x.svg",
