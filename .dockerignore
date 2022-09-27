@@ -1,0 +1,9 @@
+# Ignore everything
+**
+
+# Except exactly what we need
+!Pipfile
+!Pipfile.lock
+!vrf
+!maptool
+!service
