@@ -139,13 +139,15 @@ async def generate(req: GenerateRequest, svg: bool = False):
         return map.tojson(dumps=False)
     return XmlResponse(map.render(None))
 
-@app.get("/hello")
-async def hello():
-    return {"message": "Hello World"}
-
 @app.get("/defaults")
 async def defaults():
     return Map.defaults_dict()
+
+
+@app.get("/healthz")
+async def healthz():
+    return {"status": "ready"}
+
 
 if __name__ == '__main__':
     uvicorn.run(app, host="0.0.0.0", port=8000)
