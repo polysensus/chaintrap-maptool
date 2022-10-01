@@ -8,22 +8,28 @@ from .geometry import *
 
 
 def test_generator_init_noargs():
-    args = Map.defaults()
-    g = Map(args)
-    assert g._generated_seed is True
-    assert g._generated_secret is True
+    g = Map(None)
+    g.new_proof()
+    v = g.vrf_inputs(format=None)
+    assert v['alpha']
+    assert v['proof']
+    assert v['seed']
+    assert v['secret']
 
 
 def test_generator_init_bothargs():
 
     args = Map.defaults()
-    args.secret = secrets.token_bytes(nbytes=32).hex()
-    args.seed = secrets.token_bytes(nbytes=8).hex()
+    args = type('args', (), dict(
+        secret = secrets.token_bytes(nbytes=32).hex(),
+        seed = secrets.token_bytes(nbytes=8).hex()))()
     g = Map(args)
-    assert g._generated_seed is False
-    assert g._generated_secret is False
-    assert args.seed in g._alpha.decode()
-    assert args.secret not in g._alpha.decode()
+    g.new_proof()
+    v = g.vrf_inputs(format=None)
+    assert v['alpha']
+    assert v['proof']
+    assert 'seed' not in v
+    assert 'secret' not in v
 
 
 def test_generator_vrf_inputs():
@@ -36,8 +42,7 @@ def test_generator_vrf_inputs():
     assert isinstance(doc, str)
     r = json.loads(doc)
     assert "secret" not in r
-    assert args.seed == r["seed"]
-    assert args.seed in r["alpha"]
+    assert "seed" not in r
 
 
 @pytest.mark.parametrize(

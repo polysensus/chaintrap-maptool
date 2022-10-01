@@ -98,8 +98,9 @@ tasks:
           --file-output {{.BUILD_ARTIFACTS}}
 
   cd-build:
-    desc: "currently just an alias for build"
+    desc: "cd entry point for build (runs generate)"
     cmds:
+      - task: generate
       - task: build
 
   deploy:

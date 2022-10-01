@@ -105,8 +105,16 @@ class Map:
     def __init__(self, args):
 
         self.args = args
+
         if self.args is None:
             self.args = self.defaults()
+            return
+
+        for k, v in self.defaults_dict().items():
+            if k in ['seed', 'secret']:
+                continue
+            if not hasattr(self.args, k):
+                setattr(self.args, k, v)
 
     def canonical_gpstr(self, gp) -> str:
         """
@@ -268,9 +276,7 @@ class Map:
         else:
             map = json.load(source)
 
-        self._vrf_inputs = map["vrf_inputs"]
-        self._gp = self._gp_from_alphastr(self._vrf_inputs["alpha"])
-        self._beta = bytes.fromhex(self._vrf_inputs["proof"]["beta"])
+        self.set_vrf_inputs(map["vrf_inputs"])
 
         # guarantee on load that the rng state is the same as it was at the
         # begining of generation.
