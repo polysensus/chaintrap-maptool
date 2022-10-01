@@ -2,7 +2,7 @@ name: ci
 on: push
 permissions:
   id-token: write
-  contente: read
+  contents: read
 jobs:
   cd:
     name: Build, test and push to iona's container registry
