@@ -1,0 +1,44 @@
+interpreter: bash -c
+name: apikeystore
+usage: conveniences and ergonomics for apikeystore
+options:
+  url:
+    # default: "http://127.0.0.1:8000"
+    default: "https://iona.thaumagen.io/stage/chaintrap/maptool"
+  alpha:
+    default: '"1:1:a5fd36c714a59f66:arena_size=2048.0,corridor_redundancy=15.0,flock_factor=600.0,main_room_thresh=0.8,min_separation_factor=1.7,model=tinykeep,room_szmax=1024.0,room_szmin=512.0,room_szratio=1.8,rooms=16,tan_fudge=0.0001,tile_snap_size=4.0","hash_alpha": "sha512:0x82d31a0fe00709fea4589d6d4f9e55a2e45e189936abe8c930ed1ff2d08f8b9a01403846c98254b4d31120feb7808e7047364dc21e534fe9e127ac8fed141698"'
+
+tasks:
+  generate:
+    options:
+      svg:
+        type: bool
+    run:
+      - command:
+          exec: |
+            set -e
+            COMMITTED=$(curl -s -X POST -H 'Content-Type: application/json' -d '{"gp":{}}' ${url}/commit/)
+
+            PUB=$(echo $COMMITTED | jq -r .public_key)
+            ALPHA=$(echo $COMMITTED | jq -r .alpha)
+            BETA=$(echo $COMMITTED | jq -r .beta)
+            PI=$(echo $COMMITTED | jq -r .pi)
+            GEN=$(cat <<EOF
+            { "public_key" : "$PUB", "alpha" : "$ALPHA", "beta" : "$BETA", "pi" : "$PI" }
+            EOF
+            )
+            echo $GEN
+            SVG=""
+            ${svg} && SVG="?svg=true"
+            curl -s -X POST -H 'Content-Type: application/json' -d "$GEN" ${url}/generate/$SVG
+
+  defaults:
+    usage: "get the default content for commit"
+    run:
+      - command:
+          exec: |
+            set -e
+            curl -X GET ${url}/defaults
+
+
+
