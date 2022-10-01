@@ -6,21 +6,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: maptool
+  name: chaintrap-maptool
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: maptool
+      app: chaintrap-maptool
   template:
     metadata:
       labels:
-        app: maptool
+        app: chaintrap-maptool
     spec:
 
       containers:
         - name: service
-          image: maptool
+          image: chaintrap-maptool
           ports:
             - name: app-port
               containerPort: 8000
@@ -29,13 +29,13 @@ spec:
             - name: MAPTOOL_ADDRESS
               valueFrom:
                 configMapKeyRef:
-                  name: maptool
+                  name: chaintrap-maptool
                   key: MAPTOOL_ADDRESS
 
             - name: MAPTOOL_PREFIX
               valueFrom:
                 configMapKeyRef:
-                  name: maptool
+                  name: chaintrap-maptool
                   key: MAPTOOL_PREFIX
 
           startupProbe:

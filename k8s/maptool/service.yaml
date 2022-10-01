@@ -6,12 +6,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: maptool
+  name: chaintrap-maptool
 
 spec:
   clusterIP: None
   selector:
-    app: maptool
+    app: chaintrap-maptool
   ports:
     - name: http
       port: 80

@@ -57,7 +57,7 @@ tasks:
       NAMESPACE: "{{.NAMESPACE}}"
       TAG: "{{.TAG}}"
       SKAFFOLD_DEFAULT_REPO: "{{.SKAFFOLD_DEFAULT_REPO}}"
-      APPNAME: '{{.APPNAME | default "maptool"}}'
+      APPNAME: '{{.APPNAME | default "chaintrap-maptool"}}'
       PYENV: '{{.PYENV | default "env"}}'
       PROFILE: '{{.PROFILE | default "local"}}'
       PORT: '{{.PORT | default "8000"}}'
