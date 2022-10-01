@@ -1,0 +1,32 @@
+apiVersion: traefik.containo.us/v1alpha1
+# requires a traefik instance with the kubernetes provider enabled
+
+kind: IngressRoute
+metadata:
+  name: chaintrap-maptool
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: PathPrefix(`/chaintrap-maptool/`) && Method(`GET`)
+      kind: Rule
+      services:
+        - kind: Service
+          name: chaintrap-maptool
+          scheme: http
+          port: http
+      middlewares:
+        - name: chaintrap-maptool-strip-ingressroute-prefix
+    - match: PathPrefix(`/chaintrap-maptool/`) && Method(`POST`, `PUT`, `PATCH`, `DELETE`)
+      kind: Rule
+      services:
+        - kind: Service
+          name: chaintrap-maptool
+          scheme: http
+          port: http
+          # port: http2
+      middlewares:
+        - name: chaintrap-maptool-strip-ingressroute-prefix
+
+  tls:
+    secretName: iona-app-dev

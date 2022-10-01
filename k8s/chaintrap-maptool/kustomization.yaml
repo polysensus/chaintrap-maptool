@@ -3,6 +3,8 @@ commonLabels:
 resources:
   - deployment.yaml
   - service.yaml
+  - ingressroute.yaml
+  - middleware-stripprefix-ingressroute.yaml
   # - middleware-removepath.yaml
 configMapGenerator:
   - name: chaintrap-maptool
