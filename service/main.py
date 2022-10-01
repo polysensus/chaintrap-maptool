@@ -141,7 +141,13 @@ async def generate(req: GenerateRequest, svg: bool = False):
 
 @app.get("/defaults")
 async def defaults():
-    return Map.defaults_dict()
+    return dict(gp = dict(
+        [
+            (k[k.startswith('gp_') and len('gp_'):], v)
+            for k, v in Map.defaults_dict().items()
+            if v is not None
+        ]
+    ))
 
 
 @app.get("/healthz")

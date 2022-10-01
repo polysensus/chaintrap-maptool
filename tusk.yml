@@ -13,11 +13,18 @@ tasks:
     options:
       svg:
         type: bool
+      nosave:
+        type: bool
+        short: "S"
+      quiet:
+        type: bool
+
     run:
       - command:
           exec: |
             set -e
             COMMITTED=$(curl -s -X POST -H 'Content-Type: application/json' -d '{"gp":{}}' ${url}/commit/)
+            ! ${nosave} && echo $COMMITTED | jq -r > committed.json && ! ${quiet} && echo "Wrote: commited.json"
 
             PUB=$(echo $COMMITTED | jq -r .public_key)
             ALPHA=$(echo $COMMITTED | jq -r .alpha)
@@ -27,7 +34,7 @@ tasks:
             { "public_key" : "$PUB", "alpha" : "$ALPHA", "beta" : "$BETA", "pi" : "$PI" }
             EOF
             )
-            echo $GEN
+            ! ${nosave} && echo $GEN | jq -r > params.json && ! ${quiet} && echo "Wrote: params.json"
             SVG=""
             ${svg} && SVG="?svg=true"
             curl -s -X POST -H 'Content-Type: application/json' -d "$GEN" ${url}/generate/$SVG
