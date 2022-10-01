@@ -97,6 +97,11 @@ tasks:
           ${TAG:+-t $TAG} \
           --file-output {{.BUILD_ARTIFACTS}}
 
+  cd-build:
+    desc: "currently just an alias for build"
+    cmds:
+      - task: build
+
   deploy:
     desc: 'deploy the app using skaffold'
     precondition:
