@@ -1,0 +1,12 @@
+commonLabels:
+  repository: github.com-polysensus-chaintrap-maptool
+resources:
+  - deployment.yaml
+  - service.yaml
+  # - middleware-removepath.yaml
+configMapGenerator:
+  - name: chaintrap-maptool
+    literals:
+      - MAPTOOL_ADDRESS=0.0.0.0:8000
+      - MAPTOOL_PREFIX=/
+      #- MAPTOOL_PREFIX=chaintrap/api/maptool/v1

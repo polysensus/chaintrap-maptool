@@ -1,1 +1,5 @@
 toc.egg-info
+**/*.pyc
+.local
+k8s/tmp
+.envrc

@@ -1,10 +1,10 @@
 from setuptools import setup
 setup(
-    name="toc",
+    name="chaintrap-maptool",
     entry_points={
         "console_scripts": [
-            "toc-maptool = maptool.map:main",
+            "maptool = maptool.map:main",
         ]
     },
-    packages=["maptool", "vrf"]
+    packages=["maptool", "vrf", "service"]
 )

@@ -5,6 +5,7 @@ import argparse
 import secrets
 import json
 import random
+import hashlib
 import pickle
 import importlib
 from pathlib import Path
@@ -12,6 +13,27 @@ import svgwrite
 import vrf.ec
 from vrf.ec import ecvrf_prove, ecvrf_proof_to_hash
 from .clicommon import run_status
+
+def hash(message):
+    """Return 64-byte SHA512 hash of arbitrary-length byte message"""
+    return hashlib.sha512(message).digest()
+
+
+def gp_from_alphastr(alphastr: str) -> dict:
+    items = alphastr.split(":")[3].split(',')
+    gp = {}
+    for it in items:
+        it = it.split('=')
+        for ty in [int, float]:
+            try:
+                gp[it[0]] = ty(it[1])
+                break
+            except ValueError:
+                continue
+        else:
+            gp[it[0]] = it[1]
+
+    return gp
 
 
 class Error(Exception):
@@ -46,76 +68,99 @@ class Map:
     default_tile_snap_size = 4.0
 
     @classmethod
+    def defaults_dict(cls):
+        return dict(
+            # gp_ indicates generation parameter. all gp_ prefixed attributes
+            # are automatically included in the vrf alpha
+            gp_model=cls.default_model,
+            gp_arena_size=cls.default_arena_size,
+            gp_corridor_redundancy=cls.default_corridor_redundancy,
+            gp_flock_factor=cls.default_flock_factor,
+            gp_main_room_thresh=cls.default_main_room_thresh,
+            gp_min_separation_factor=cls.default_min_separation_factor,
+            gp_room_szmax=cls.default_room_szmax,
+            gp_room_szmin=cls.default_room_szmin,
+            gp_room_szratio=cls.default_room_szratio,
+            gp_rooms=cls.default_rooms,
+            gp_tan_fudge=cls.default_tan_fudge,
+            gp_tile_snap_size=cls.default_tile_snap_size,
+            secret=None,
+            seed=None,
+            debug=False,
+            svgfile=None,
+            render_generations=-1,
+            no_label_rooms=False,
+            no_label_corridors=False,
+            no_legend=False,
+        )
+
+    @classmethod
     def defaults(cls):
         return type(
             "MapArgs",
             (),
-            dict(
-                # gp_ indicates generation parameter. all gp_ prefixed attributes
-                # are automatically included in the vrf alpha
-                gp_model=cls.default_model,
-                gp_arena_size=cls.default_arena_size,
-                gp_corridor_redundancy=cls.default_corridor_redundancy,
-                gp_flock_factor=cls.default_flock_factor,
-                gp_main_room_thresh=cls.default_main_room_thresh,
-                gp_min_separation_factor=cls.default_min_separation_factor,
-                gp_room_szmax=cls.default_room_szmax,
-                gp_room_szmin=cls.default_room_szmin,
-                gp_room_szratio=cls.default_room_szratio,
-                gp_rooms=cls.default_rooms,
-                gp_tan_fudge=cls.default_tan_fudge,
-                gp_tile_snap_size=cls.default_tile_snap_size,
-                secret=None,
-                seed=None,
-                debug=False,
-                svgfile=None,
-                render_generations=-1,
-                no_label_rooms=False,
-                no_label_corridors=False,
-                no_legend=False,
-            ),
+            cls.defaults_dict()
         )
 
     def __init__(self, args):
 
         self.args = args
 
-        # If the user provided a private key, use it. Otherwise generate one
-        self._generated_secret = False
-        secret = args.secret
-        if secret is not None:
-            secret = bytes.fromhex(secret)
-        if secret is None:
-            secret = secrets.token_bytes(nbytes=32)
-            self._generated_secret = True
-        self._secret = secret
+        if self.args is None:
+            self.args = self.defaults()
+            return
 
-        # If the user provided a seed, use it. Otherwise generate one
-        self._generated_seed = False
-        seed = args.seed
-        if seed is not None:
-            seed = bytes.fromhex(seed)
-        if seed is None:
-            seed = secrets.token_bytes(nbytes=8)
-            self._generated_seed = True
-        self._seed = seed
+        for k, v in self.defaults_dict().items():
+            if k in ['seed', 'secret']:
+                continue
+            if not hasattr(self.args, k):
+                setattr(self.args, k, v)
 
-        self._gp = dict()
-        for k, v in args.__dict__.items():
-            if k.startswith("gp_"):
-                self._gp[k[3:]] = v
+    def canonical_gpstr(self, gp) -> str:
+        """
+        Convert the provided generation paramaters to a string in a cannonical
+        way.
+        """
+        gp = [f"{k}={v}" for k, v in gp.items()]
+        gp.sort()
+        return ",".join(gp)
 
-        gp = ",".join([f"{k}={v}" for k, v in self._gp.items()])
+    def _gp_from_alphastr(self, alphastr: str) -> dict:
+        return gp_from_alphastr(alphastr)
 
-        # Only the holder of the secret can prove
-        # a) they generated the map
-        # b) what the map generation inputs were
-        self._alpha = (
-            f"{self._version}:{self._variant}:{self._seed.hex()}:{gp}".encode()
-        )
 
-        self._public_key = vrf.ec.get_public_key(self._secret)
-        p_status, pi = ecvrf_prove(self._secret, self._alpha)
+    def cannonical_alpha(self, gpstr: str, seed: bytes) -> str:
+        """Make the vrf alpha input from the seed and the generation parameter string"""
+
+        if not isinstance(gpstr, str):
+            raise ValueError(f"gpstr must be string here, call cannonical_gp2str to get one")
+
+        return f"{self._version}:{self._variant}:{seed.hex()}:{gpstr}"
+
+    def _seed_from_alphastr(self, alphastr: str) -> bytes:
+        return bytes.fromhex(alphastr.split(":", 3)[2])
+
+    def make_commitment(self, gp: dict, seed: bytes, secret: bytes):
+        """Commit to the map, requires the caller to reveal the secret key
+
+        Note: We factor this class so that the commitment can be made off line
+        and independently. We can store this generator in a docker image.
+        Possibly in ipfs. 
+
+        Alternately, we can host it as a service and generate the secret key for
+        the caller. It would then be returned with the map - but we don't store
+        it ourselves. Its then like an api key - they need to save it to later
+        prove the map.
+
+        Only the holder of the secret can prove
+        a) they generated the map
+        b) what the map generation inputs were
+        """
+
+        gpstr = self.canonical_gpstr(gp)
+        alpha = self.cannonical_alpha(gpstr, seed)
+        public_key = vrf.ec.get_public_key(secret)
+        p_status, pi = ecvrf_prove(secret, alpha.encode())
         if p_status != "VALID":
             raise SeedError("failed to generate seed and paramaters proof")
 
@@ -123,18 +168,90 @@ class Map:
         if b_status != "VALID":
             raise SeedError("failed to derive hash from seed proof")
 
-        self._pi = pi
-        self._beta = beta
-        self.reseed_rng()
+        return (alpha, dict(
+            public_key=public_key.hex(),
+            pi=pi.hex(),
+            beta=beta.hex()
+        ))
+
+    @classmethod
+    def from_file(cls, args):
+        map = Map(args)
+        f = open(args.loadfile, "r")
+        map.load(f)
+        return map
+    
+    @classmethod
+    def from_source(cls, args, source):
+        map = Map(args)
+        map.load(source)
+        return map
+
+
+    @classmethod
+    def from_args(cls, args):
+        """
+        """
+        map = cls(args)
+        map.new_proof()
+
+        return map
+
+    def new_proof(self):
+
+        # If the user provided a private key, use it. Otherwise generate one
+        secret = self.args.secret
+        if secret is not None:
+            secret = bytes.fromhex(secret)
+        if secret is None:
+            secret = secrets.token_bytes(nbytes=32)
+
+        # If the user provided a seed, use it. Otherwise generate one
+        seed = self.args.seed
+        if seed is not None:
+            seed = bytes.fromhex(seed)
+        if seed is None:
+            seed = secrets.token_bytes(nbytes=8)
+
+        gp = dict()
+        for k, v in self.args.__dict__.items():
+            if k.startswith("gp_"):
+                gp[k[3:]] = v
+
+        alpha, proof = self.make_commitment(gp, seed, secret)
+        vrf_inputs = dict(alpha=alpha, proof=proof)
+        if self.args.secret is None:
+            vrf_inputs['secret'] = secret.hex()
+
+        if self.args.seed is None:
+            vrf_inputs['seed'] = seed.hex()
+
+        self.set_vrf_inputs(vrf_inputs)
+
+
+    def set_vrf_inputs(self, vrf_inputs):
+        """Set the map rng based on the vrv provable state"""
+
+        self._vrf_inputs = vrf_inputs.copy()
+        self._proof = vrf_inputs['proof'].copy()
+        self._pi = bytes.fromhex(self._proof['pi'])
+        self._beta = bytes.fromhex(self._proof['beta'])
+        self.reseed_rng(hash(self._vrf_inputs["alpha"].encode()))
+
+        self._gp = self._gp_from_alphastr(self._vrf_inputs["alpha"])
+
 
     @property
     def gp(self):
         return type("GenerationParams", (), self._gp)
 
-    def reseed_rng(self):
+    def reseed_rng(self, hash_alpha = None):
         """Re seed the rng so the geneartor can run again with the current parameters"""
+        if hash_alpha is not None:
+            self._hash_alpha = hash_alpha
         # Note: version=2 means the integer seed uses all the bytes in _beta
-        random.seed(a=self._beta, version=2)
+        # XXXX: XXXX: this needs to seed on ALPHA! we put beta on the chain
+        random.seed(a=self._hash_alpha, version=2)
 
     def generate(self, model="tinykeep"):
 
@@ -152,20 +269,6 @@ class Map:
                 f"failed to import model using: {module} relative to {__package__}"
             )
 
-    def tojson(self, dumps=True):
-
-        map = dict(
-            gp=self._gp,
-            vrf_inputs=self.vrf_inputs(format=None),
-            model_type=self.model.NAME,
-            model=self.model.tojson(),
-        )
-
-        if not dumps:
-            return map
-
-        return json.dumps(map)
-
     def load_common(self, source):
 
         if isinstance(source, str):
@@ -173,12 +276,7 @@ class Map:
         else:
             map = json.load(source)
 
-        self._gp = map["gp"]
-        self._seed = bytes.fromhex(map["vrf_inputs"]["seed"])
-        self._pi = bytes.fromhex(map["vrf_inputs"]["pi"])
-        self._beta = bytes.fromhex(map["vrf_inputs"]["beta"])
-        self._public_key = bytes.fromhex(map["vrf_inputs"]["public_key"])
-        self._alpha = map["vrf_inputs"]["alpha"].encode()
+        self.set_vrf_inputs(map["vrf_inputs"])
 
         # guarantee on load that the rng state is the same as it was at the
         # begining of generation.
@@ -203,33 +301,41 @@ class Map:
         dwg = svgwrite.Drawing(filename=svgfile)
         arena = dwg.add(dwg.g(id="arena", fill="blue"))
         self.model.render(dwg, arena, opts=opts)
-        dwg.save(pretty=True)
+        if svgfile is not None:
+            dwg.save(pretty=True)
+        else:
+            return dwg.tostring()
 
     def vrf_inputs(self, format="json"):
 
-        vrf = dict(
-            seed=self._seed.hex(),
-            alpha=self._alpha.decode(),
-            pi=self._pi.hex(),
-            beta=self._beta.hex(),
-            public_key=self._public_key.hex(),
-        )
-        if self._generated_secret:
-            vrf["secret"] = self._secret.hex()
+        if not self._vrf_inputs:
+            return {}
+
         if format == "json":
-            return json.dumps(vrf, sort_keys=True, indent=2)
-        return vrf
+            return json.dumps(self._vrf_inputs, sort_keys=True, indent=2)
+        return self._vrf_inputs.copy()
+
+    def tojson(self, dumps=True):
+
+        map = dict(
+            vrf_inputs=self.vrf_inputs(format=None),
+            model_type=self.model.NAME,
+            model=self.model.tojson(),
+        )
+
+        if not dumps:
+            return map
+
+        return json.dumps(map)
 
 
 def run_generate(args):
     """Generate a map"""
 
-    g = Map(args)
-
     if args.loadfile:
-        f = open(args.loadfile, "r")
-        g.load(f)
+        g = Map.from_file(args)
     else:
+        g = Map.from_args(args)
         g.generate()
 
     if args.savefile:

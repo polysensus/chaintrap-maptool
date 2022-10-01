@@ -265,9 +265,19 @@ class TestMerge:
         assert ca.joins == [0, irn]
         assert pt_essentially_same(ca.points[-1], rn.center)
 
+        # check the first point remains attatched to r1
+        assert essentially_equal(ca.points[0].y, r1.pt_top().y)
+        # check for a degenerate leg
+        assert not essentially_equal(ca.points[1].y, r1.pt_top().y)
+
         assert cb.join_sides == [NORTH, SOUTH]
         assert cb.joins == [2, irn]
         assert pt_essentially_same(cb.points[-1], rn.center)
+
+        # check the first point remains attatched to r3
+        assert essentially_equal(cb.points[0].y, r3.pt_top().y)
+        # check for a degenerate leg
+        assert not essentially_equal(cb.points[1].y, r3.pt_top().y)
 
     def test_merge_l_hlong(self, emptymodel, rooms3_horizontal_spur):
         """
