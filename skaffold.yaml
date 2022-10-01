@@ -14,7 +14,7 @@ build:
 
   artifacts:
     - context: .
-      image: maptool
+      image: chaintrap-maptool
 
 deploy:
   kustomize:
