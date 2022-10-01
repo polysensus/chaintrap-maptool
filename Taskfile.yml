@@ -96,6 +96,9 @@ tasks:
           ${PROFILE:+-p $PROFILE} \
           ${TAG:+-t $TAG} \
           --file-output {{.BUILD_ARTIFACTS}}
+    vars:
+      TAG: '{{.TAG | default (env "TAG") }}'
+      PROFILE: '{{.PROFILE | default ""}}'
 
   cd-build:
     desc: "cd entry point for build (runs generate)"
