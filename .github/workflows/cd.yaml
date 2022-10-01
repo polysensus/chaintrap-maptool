@@ -32,10 +32,10 @@ jobs:
         if: steps.cache-pipenv.outputs.cache-hit != 'true'
         run: |
           pipenv install --deploy --dev
+
       - name: Run test suite
         run: |
-          # pipenv run test -v
-          echo UNIT TEST SUITE TEMPORARILY DISABLED
+          pipenv run test -v
 
       - uses: 'arduino/setup-task@v1'
         with:
