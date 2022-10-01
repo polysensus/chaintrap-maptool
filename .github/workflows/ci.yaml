@@ -46,9 +46,7 @@ jobs:
         with:
           token_format: 'access_token'
           workload_identity_provider: 'projects/871349271977/locations/global/workloadIdentityPools/github-oidc-1/providers/github-provider'
-          # XXX: TODO create this
-          #service_account: 'gha-cd-chaintrap-maptool@iona-1.iam.gserviceaccount.com'
-          service_account: 'gha-cd-apikeystore@iona-1.iam.gserviceaccount.com'
+          service_account: 'gha-cd-chaintrap-maptool@iona-1.iam.gserviceaccount.com'
 
       - uses: 'docker/login-action@v1'
         with:
