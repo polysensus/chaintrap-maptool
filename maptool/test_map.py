@@ -96,6 +96,21 @@ def test_generator_deterministic(note, seed, secret):
     assert rooms1 != rooms2
     assert rooms1 == rooms3
 
+def test_commit_and_generate():
+
+    gp = Map.defaults_dict()
+    args = type('args', (), dict([('gp_' + k, v) for k, v in gp.items()]))
+    args.seed = None
+    args.secret = None
+    map = Map.from_args(args)
+    vrf_inputs = map.vrf_inputs(format=None)
+
+    map = Map(None)
+    map.set_vrf_inputs(vrf_inputs)
+    map.generate()
+    j = map.tojson(dumps=False)
+
+
 
 def rooms_eq(ra, rb, ignore_isolated=False, ignore_main=False):
 

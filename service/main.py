@@ -1,14 +1,14 @@
-import secrets
 from enum import Enum
 
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 from starlette.responses import Response
-from fastapi.encoders import jsonable_encoder
 
 from pydantic import BaseModel, Field
 
-from maptool.map import Map, hash, gp_from_alphastr
+from maptool.map import Map, hash
 
 class ModelName(str, Enum):
     tinykeep = "tinykeep"
@@ -48,7 +48,7 @@ class GeneratorInputs(BaseModel):
         default = 1.8,
         description = """controls the maximum difference between width and
         height (how skinny the rooms can be)""")
-    rooms: float = Field(
+    rooms: int = Field(
         default = 16, description = """number of rooms to create"""
     )
     tan_fudge: float = Field(
@@ -88,6 +88,21 @@ class XmlResponse(Response):
         return content.encode('utf-8')
 
 app = FastAPI()
+origins = [
+    "http://localhost",
+    "https://localhost",
+    "http://localhost:3000",
+    "https://localhost:3000",
+    "https://chaintrap-frontend.vercel.app"
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_origin_regex="https://chaintrap-frontend-.*-polysensus-chaintrap\.vercel\.app",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 @app.get("/")
 async def root():
