@@ -8,7 +8,7 @@ from starlette.responses import Response
 
 from pydantic import BaseModel, Field
 
-from maptool.map import Map, hash
+from maptool.map import Map, hash256
 
 class ModelName(str, Enum):
     tinykeep = "tinykeep"
@@ -126,7 +126,7 @@ async def commit(req: ProofRequest):
         gp = req.gp,
         seed = vrf_inputs['seed'],
         alpha = vrf_inputs['alpha'],
-        hash_alpha = f"sha512:0x{hash(vrf_inputs['alpha'].encode()).hex()}",
+        hash_alpha = f"sha256:0x{hash256(vrf_inputs['alpha'].encode()).hex()}",
         pi = vrf_inputs['proof']['pi'],
         beta = vrf_inputs['proof']['beta'],
         secret = vrf_inputs['secret'],

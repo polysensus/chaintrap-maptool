@@ -14,9 +14,13 @@ import vrf.ec
 from vrf.ec import ecvrf_prove, ecvrf_proof_to_hash
 from .clicommon import run_status
 
-def hash(message):
+def hash512(message):
     """Return 64-byte SHA512 hash of arbitrary-length byte message"""
     return hashlib.sha512(message).digest()
+
+def hash256(message):
+    """Return 32-byte SHA256 hash of arbitrary-length byte message"""
+    return hashlib.sha256(message).digest()
 
 
 def gp_from_alphastr(alphastr: str) -> dict:
@@ -236,7 +240,7 @@ class Map:
         self._proof = vrf_inputs['proof'].copy()
         self._pi = bytes.fromhex(self._proof['pi'])
         self._beta = bytes.fromhex(self._proof['beta'])
-        self.reseed_rng(hash(self._vrf_inputs["alpha"].encode()))
+        self.reseed_rng(hash512(self._vrf_inputs["alpha"].encode()))
 
         self._gp = self._gp_from_alphastr(self._vrf_inputs["alpha"])
 

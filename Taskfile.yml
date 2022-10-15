@@ -107,6 +107,7 @@ tasks:
       - task: build
 
   dev:run:
+    desc: "run the service in local development mode (localhost:8000)"
     cmds:
       - |
         pipenv run uvicorn service.main:app --reload --log-level debug
