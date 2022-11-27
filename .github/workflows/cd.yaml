@@ -54,12 +54,12 @@ jobs:
 
       - uses: 'docker/login-action@v1'
         with:
-          registry: 'eu.gcr.io/hoy-1' # or REGION-docker.pkg.dev
+          registry: 'eu.gcr.io/hoy-dev-1' # or REGION-docker.pkg.dev
           username: 'oauth2accesstoken'
           password: '${{ steps.auth.outputs.access_token }}'
 
       - run: |-
-          echo '${{ steps.auth.outputs.access_token }}' | docker login -u oauth2accesstoken --password-stdin https://eu.gcr.io/hoy-1
+          echo '${{ steps.auth.outputs.access_token }}' | docker login -u oauth2accesstoken --password-stdin https://eu.gcr.io/hoy-dev-1
 
       - id: build_id
         name: Generate build ID
@@ -75,7 +75,7 @@ jobs:
 
       - name: Build and publish container image with tag
         run: |
-            export SKAFFOLD_DEFAULT_REPO=eu.gcr.io/hoy-1
+            export SKAFFOLD_DEFAULT_REPO=eu.gcr.io/hoy-dev-1
             TAG=${{ steps.build_id.outputs.BUILD_ID }} \
               task cd-build
 

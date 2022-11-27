@@ -3,3 +3,4 @@ toc.egg-info
 .local
 k8s/tmp
 .envrc
+maps
