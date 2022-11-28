@@ -12,6 +12,7 @@ bs4 = "*"
 fastapi = {extras = ["all"], version = "*"}
 starlette = "*"
 typing-extensions = "*"
+toc = {editable = true, path = "."}
 
 [dev-packages]
 pytest = "*"

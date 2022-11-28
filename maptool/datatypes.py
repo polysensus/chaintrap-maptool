@@ -1,6 +1,6 @@
 """common data classes"""
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 class Error(Exception):
@@ -20,8 +20,8 @@ class Vec2:
 class Box:
     """Box (Axis Aligned"""
 
-    tl: Vec2 = Vec2()
-    br: Vec2 = Vec2()
+    tl: Vec2 = field(default_factory=Vec2)
+    br: Vec2 = field(default_factory=Vec2)
 
     def width_height(self):
         return self.br.x - self.tl.x, self.br.y - self.tl.y
