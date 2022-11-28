@@ -1,5 +1,5 @@
 from typing import Dict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from numpy import append
 from svgwrite import mm
 
@@ -18,20 +18,20 @@ class SceneItem:
 
 @dataclass
 class SceneLine(SceneItem):
-    start: Vec2 = Vec2()
-    end: Vec2 = Vec2()
+    start: Vec2 = field(default_factory=Vec2)
+    end: Vec2 = field(default_factory=Vec2)
 
 
 @dataclass
 class SceneCircle(SceneItem):
-    center: Vec2 = Vec2()
+    center: Vec2 = field(default_factory=Vec2)
     r: float = 0.0
     opacity: float = 1.0
 
 
 @dataclass
 class SceneText(SceneItem):
-    insert: Vec2 = Vec2()
+    insert: Vec2 = field(default_factory=Vec2)
     text: str = ""
     font_size: int = 14
     font_family: str = "monospace"
@@ -40,7 +40,7 @@ class SceneText(SceneItem):
 
 @dataclass
 class SceneRect(SceneItem):
-    insert: Vec2 = Vec2()
+    insert: Vec2 = field(default_factory=Vec2)
     size: Vec2 = 5.0
 
 

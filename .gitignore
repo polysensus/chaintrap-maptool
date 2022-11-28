@@ -1,6 +1,7 @@
-toc.egg-info
+chaintrap_maptool.egg-info
 **/*.pyc
 .local
 k8s/tmp
 .envrc
 maps
+build

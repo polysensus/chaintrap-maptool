@@ -1,5 +1,5 @@
 from typing import List
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from .datatypes import Vec2, Box, GenSpace
 from maptool import geometry as g
 
@@ -41,7 +41,7 @@ class SRoomSide:
 
 @dataclass
 class Room:
-    center: Vec2 = Vec2()
+    center: Vec2 = field(default_factory=Vec2)
     width: float = 0.0
     length: float = 0.0
     is_main: bool = False
