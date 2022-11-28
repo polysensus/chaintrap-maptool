@@ -12,7 +12,9 @@ bs4 = "*"
 fastapi = {extras = ["all"], version = "*"}
 starlette = "*"
 typing-extensions = "*"
-toc = {editable = true, path = "."}
+# This causes a very obscure error due to
+# https://github.com/pypa/pipenv/issues/4900
+# chaintrap-maptool = {editable = true, path = "."}
 
 [dev-packages]
 pytest = "*"

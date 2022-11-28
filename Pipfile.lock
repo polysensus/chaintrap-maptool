@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "c47febbd8b80798db7e74e6bdcaadeb858b1ba969f16595319d39330a3b9596d"
+            "sha256": "b85a57c0cf9e35ffa1690e41fecb363a60a4fe50535d26d741228954c0cdd2e5"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -46,10 +46,6 @@
             ],
             "markers": "python_version >= '3.6'",
             "version": "==2022.9.24"
-        },
-        "chaintrap-maptool": {
-            "editable": true,
-            "path": "."
         },
         "click": {
             "hashes": [
@@ -461,7 +457,7 @@
                 "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926",
                 "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"
             ],
-            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2'",
+            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
             "version": "==1.16.0"
         },
         "sniffio": {
