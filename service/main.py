@@ -136,7 +136,7 @@ async def commit(req: ProofRequest):
     return res
 
 @app.post("/generate/")
-async def generate(req: GenerateRequest, svg: bool = False):
+async def generate(req: GenerateRequest, svg: bool = False, svg_legend: bool = False):
 
     vrf_inputs = dict(
         public_key = req.public_key,
@@ -147,7 +147,10 @@ async def generate(req: GenerateRequest, svg: bool = False):
         )
     )
 
-    map = Map(None)
+    args = Map.defaults()
+    args.no_legend = not svg_legend
+
+    map = Map(args)
     map.set_vrf_inputs(vrf_inputs)
     map.generate()
     if not svg:
