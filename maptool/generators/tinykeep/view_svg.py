@@ -484,7 +484,8 @@ class Viewer:
             y *= opts.scale
             return x, y
         
-        dwg.viewBox = ViewBox(minx=bbox.tl.x * opts.scale, miny = bbox.tl.y * opts.scale, width=w*opts.scale, height=h*opts.scale)
+        # dwg.viewBox = ViewBox(minx=bbox.tl.x * opts.scale, miny = bbox.tl.y * opts.scale, width=w*opts.scale, height=h*opts.scale)
+        dwg.viewbox(minx=bbox.tl.x * opts.scale, miny = bbox.tl.y * opts.scale, width=w*opts.scale, height=h*opts.scale)
 
         # render the scene
 
