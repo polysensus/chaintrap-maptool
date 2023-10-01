@@ -474,8 +474,11 @@ class Viewer:
         w, h = bbox.width_height()
         # tx = w / 2.0 + avg.x
         # ty = h / 2.0 + avg.y
-        tx = base_tx + w
-        ty = base_ty + h
+        # tx = base_tx + w 
+        # ty = base_ty + h
+
+        tx = base_tx - bbox.tl.x
+        ty = base_ty - bbox.tl.y
 
         def transform(x, y):
             x += tx
@@ -485,7 +488,8 @@ class Viewer:
             return x, y
         
         # dwg.viewBox = ViewBox(minx=bbox.tl.x * opts.scale, miny = bbox.tl.y * opts.scale, width=w*opts.scale, height=h*opts.scale)
-        dwg.viewbox(minx=bbox.tl.x * opts.scale, miny = bbox.tl.y * opts.scale, width=w*opts.scale, height=h*opts.scale)
+        # dwg.viewbox(minx=bbox.tl.x * opts.scale, miny = bbox.tl.y * opts.scale, width=w*opts.scale, height=h*opts.scale)
+        dwg.viewbox(minx=0, miny = 0, width=w*opts.scale, height=h*opts.scale)
 
         # render the scene
 
