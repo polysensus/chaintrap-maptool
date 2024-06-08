@@ -1,0 +1,2 @@
+{{- include "lib-hoy.certificate" (merge (dict "name" "maptool") .) -}}
+{{- define "chaintrap.maptool-certificate.merge" -}} {{- end -}}

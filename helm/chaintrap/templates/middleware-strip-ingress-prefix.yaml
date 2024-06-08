@@ -1,0 +1,2 @@
+{{- include "lib-hoy.middleware-strip-ingressroute-prefix" (merge (dict "name" "maptool") .) -}}
+{{- define "chaintrap.maptool-middleware-strip-ingressroute-prefix.merge" -}} {{- end -}}

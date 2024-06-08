@@ -1,0 +1,5 @@
+---
+{{- include "lib-hoy.service"
+  (merge (dict "name" "maptool") .) -}}
+{{- define "chaintrap.maptool-service.merge" -}}{{- end -}}
+{{- define "chaintrap.maptool-service.apply" -}}{{- end -}}

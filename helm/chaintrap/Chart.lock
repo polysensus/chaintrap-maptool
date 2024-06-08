@@ -1,0 +1,6 @@
+dependencies:
+- name: lib-hoy
+  repository: file://../../../ops/hoy-charts/charts/lib-hoy
+  version: 0.1.0
+digest: sha256:7f20f6cbfddd05e22102111044798293a9b36df51266ea3d0329208e5aa2c349
+generated: "2024-05-29T08:38:53.668502+01:00"

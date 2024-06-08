@@ -1,0 +1,17 @@
+---
+{{/* An maptool of the bare minimum. */}}
+{{- include "lib-hoy.deployment" (merge (dict "name" "maptool") .) -}}
+{{- define "chaintrap.maptool-deployment.merge" -}} {{- end -}}
+{{- define "chaintrap.maptool-deployment.apply" -}}
+yamlenv:
+  MAPTOOL_ADDRESS:
+    valueFrom:
+      configMapKeyRef:
+        name: maptool
+        key: MAPTOOL_ADDRESS
+  MAPTOOL_PREFIX:
+    valueFrom:
+      configMapKeyRef:
+        name: maptool
+        key: MAPTOOL_PREFIX
+{{- end -}}

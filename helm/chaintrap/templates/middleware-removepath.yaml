@@ -1,0 +1,2 @@
+{{- include "lib-hoy.middleware-removepath" (merge (dict "name" "maptool") .) -}}
+{{- define "chaintrap.maptool-middleware-removepath.merge" -}} {{- end -}}

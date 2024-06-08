@@ -1,0 +1,3 @@
+global: {}
+maptool:
+  image: eu.gcr.io/hoy-dev-1/chaintrap-maptool:latest

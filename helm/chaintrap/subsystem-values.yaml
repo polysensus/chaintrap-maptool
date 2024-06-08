@@ -1,0 +1,6 @@
+subsystem:
+  name: chaintrap
+  instance: dev
+subsystem_dev:
+  name: dev-chaintrap
+

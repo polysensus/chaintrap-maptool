@@ -1,0 +1,18 @@
+---
+{{/* ingress route via cluster traefik instance. */}}
+{{- include "lib-hoy.ingressroute" (merge (dict "name" "maptool") .) -}}
+{{- define "chaintrap.maptool-ingressroute.merge" -}} {{- end -}}
+{{- define "chaintrap.maptool-ingressroute.apply" -}}
+routes:
+  http:
+    - pathSuffix: ""
+      methods:
+        - "`GET`"
+    - pathSuffix: ""
+      methods:
+        - "`POST`"
+        - "`PUT`"
+        - "`PATCH`"
+        - "`DELETE`"
+
+{{- end -}}

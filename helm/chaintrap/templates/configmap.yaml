@@ -1,0 +1,6 @@
+{{- include "lib-hoy.configmap" (merge (dict "name" "maptool") .) -}}
+{{- define "chaintrap.maptool-configmap.merge" -}}
+data:
+  MAPTOOL_ADDRESS: "0.0.0.0:8000"
+  MAPTOOL_PREFIX: "/"
+{{- end -}}

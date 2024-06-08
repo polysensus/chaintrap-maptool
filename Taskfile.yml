@@ -12,7 +12,7 @@ env:
 vars:
   BUILD_ARTIFACTS: k8s/tmp/skaffold/build-artifacts.json
 
-dotenv: [".env", '{{.ENV}}/.env', '{{.HOME}}/.env']
+dotenv: [".env.app", ".env", '{{.ENV}}/.env', '{{.HOME}}/.env']
 
 tasks:
 
@@ -106,11 +106,35 @@ tasks:
       - task: generate
       - task: build
 
-  dev:run:
+  helm:test:
+    desc: "update dependencies and do a test render of the helm charts"
+    cmds:
+      - |
+        helm dependency update helm/chaintrap
+        helm template chaintrap-$USER helm/chaintrap \
+          -f helm/chaintrap/project-values.yaml \
+          -f helm/chaintrap/subsystem-values.yaml \
+          -f ../ops/hoy-charts/values/platforms/hoy/values.yaml --debug
+
+      
+  local:run:
     desc: "run the service in local development mode (localhost:8000)"
     cmds:
       - |
         pipenv run uvicorn service.main:app --reload --log-level debug
+
+  run:
+    desc: 'run deploy the app using skaffold'
+    cmds:
+      - |
+        helm dependency update helm/${APPNAME}
+        skaffold run --namespace ${APPNAME}-$USER
+
+  down:
+    desc: 'delete the resources created by skaffold run'
+    cmds:
+      - |
+        skaffold delete --namespace ${APPNAME}-$USER
 
   deploy:
     desc: 'deploy the app using skaffold'
